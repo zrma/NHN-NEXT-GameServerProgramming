@@ -194,6 +194,10 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 		//}
 
 		// 참고 : http://stackoverflow.com/questions/5830699/getqueuedcompletionstatus-delayed
+		// 참고 : http://msdn.microsoft.com/en-us/library/windows/desktop/aa364986(v=vs.85).aspx
+		// If *lpOverlapped is NULL, the function did not dequeue a completion packet from the completion port.
+		// In this case, the function does not store information in the variables pointed to by the 
+		// lpNumberOfBytes and lpCompletionKey parameters, and their values are indeterminate.
 		if ( !context )
 		{
 			// 한 바퀴 더 돌아라
@@ -230,11 +234,16 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 
 bool IocpManager::ReceiveCompletion(const ClientSession* client, OverlappedIOContext* context, DWORD dwTransferred)
 {
-
-	/// echo back 처리 client->PostSend()사용.
+	/// echo back 처리 client->PostSend()사용. -> 구현
+	if ( !client )
+	{
+		delete context;
+		return false;
+	}
 	
-	delete context;
+	client->PostSend( context->mBuffer, dwTransferred );
 
+	delete context;
 	return client->PostRecv();
 }
 
