@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Exception.h"
 #include "EduServer_IOCP.h"
 #include "ClientSession.h"
@@ -7,7 +7,7 @@
 
 bool ClientSession::OnConnect(SOCKADDR_IN* addr)
 {
-	//TODO: ÀÌ ¿µ¿ª lockÀ¸·Î º¸È£ ÇÒ °Í
+	//TODO: ì´ ì˜ì—­ lockìœ¼ë¡œ ë³´í˜¸ í•  ê²ƒ
 
 	CRASH_ASSERT(LThreadType == THREAD_MAIN_ACCEPT);
 
@@ -26,7 +26,7 @@ bool ClientSession::OnConnect(SOCKADDR_IN* addr)
 		return false;
 	}
 	
-	HANDLE handle = 0; //TODO: ¿©±â¿¡¼­ CreateIoCompletionPort((HANDLE)mSocket, ...);»ç¿ëÇÏ¿© ¿¬°áÇÒ °Í
+	HANDLE handle = 0; //TODO: ì—¬ê¸°ì—ì„œ CreateIoCompletionPort((HANDLE)mSocket, ...);ì‚¬ìš©í•˜ì—¬ ì—°ê²°í•  ê²ƒ
 	if (handle != GIocpManager->GetComletionPort())
 	{
 		printf_s("[DEBUG] CreateIoCompletionPort error: %d\n", GetLastError());
@@ -45,7 +45,7 @@ bool ClientSession::OnConnect(SOCKADDR_IN* addr)
 
 void ClientSession::Disconnect(DisconnectReason dr)
 {
-	//TODO: ÀÌ ¿µ¿ª lockÀ¸·Î º¸È£ÇÒ °Í
+	//TODO: ì´ ì˜ì—­ lockìœ¼ë¡œ ë³´í˜¸í•  ê²ƒ
 
 	if ( !IsConnected() )
 		return ;
@@ -76,7 +76,7 @@ bool ClientSession::PostRecv() const
 
 	OverlappedIOContext* recvContext = new OverlappedIOContext(this, IO_RECV);
 
-	//TODO: WSARecv »ç¿ëÇÏ¿© ±¸ÇöÇÒ °Í
+	//TODO: WSARecv ì‚¬ìš©í•˜ì—¬ êµ¬í˜„í•  ê²ƒ
 
 
 	return true;
@@ -92,7 +92,7 @@ bool ClientSession::PostSend(const char* buf, int len) const
 	/// copy for echoing back..
 	memcpy_s(sendContext->mBuffer, BUFSIZE, buf, len);
 
-	//TODO: WSASend »ç¿ëÇÏ¿© ±¸ÇöÇÒ °Í
+	//TODO: WSASend ì‚¬ìš©í•˜ì—¬ êµ¬í˜„í•  ê²ƒ
 
 
 	return true;

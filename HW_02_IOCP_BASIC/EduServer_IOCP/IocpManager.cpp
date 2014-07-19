@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "IocpManager.h"
 #include "EduServer_IOCP.h"
 #include "ClientSession.h"
@@ -20,7 +20,7 @@ IocpManager::~IocpManager()
 
 bool IocpManager::Initialize()
 {
-	//TODO: mIoThreadCount = ...;GetSystemInfo»ç¿ëÇØ¼­ set num of I/O threads
+	//TODO: mIoThreadCount = ...;GetSystemInfoì‚¬ìš©í•´ì„œ set num of I/O threads
 
 	/// winsock initializing
 	WSADATA wsa;
@@ -78,10 +78,10 @@ bool IocpManager::StartAcceptLoop()
 		int addrlen = sizeof(clientaddr);
 		getpeername(acceptedSock, (SOCKADDR*)&clientaddr, &addrlen);
 
-		/// ¼ÒÄÏ Á¤º¸ ±¸Á¶Ã¼ ÇÒ´ç°ú ÃÊ±âÈ­
+		/// ì†Œì¼“ ì •ë³´ êµ¬ì¡°ì²´ í• ë‹¹ê³¼ ì´ˆê¸°í™”
 		ClientSession* client = GSessionManager->CreateClientSession(acceptedSock);
 
-		/// Å¬¶ó Á¢¼Ó Ã³¸®
+		/// í´ë¼ ì ‘ì† ì²˜ë¦¬
 		if (false == client->OnConnect(&clientaddr))
 		{
 			client->Disconnect(DR_ONCONNECT_ERROR);
@@ -115,7 +115,7 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 		OverlappedIOContext* context = nullptr;
 		ClientSession* asCompletionKey = nullptr;
 
-		int ret = 0; ///<¿©±â¿¡´Â GetQueuedCompletionStatus(hComletionPort, ..., GQCS_TIMEOUT)¸¦ ¼öÇàÇÑ °á°ú°ªÀ» ´ëÀÔ
+		int ret = 0; ///<ì—¬ê¸°ì—ëŠ” GetQueuedCompletionStatus(hComletionPort, ..., GQCS_TIMEOUT)ë¥¼ ìˆ˜í–‰í•œ ê²°ê³¼ê°’ì„ ëŒ€ìž…
 
 		/// check time out first 
 		if (ret == 0 && GetLastError()==WAIT_TIMEOUT)
@@ -129,7 +129,8 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 			continue;
 		}
 
-		// if (nullptr == context) ÀÎ °æ¿ì Ã³¸®
+		//TODO
+		// if (nullptr == context) ì¸ ê²½ìš° ì²˜ë¦¬
 		//{
 		//}
 
@@ -164,7 +165,7 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 bool IocpManager::ReceiveCompletion(const ClientSession* client, OverlappedIOContext* context, DWORD dwTransferred)
 {
 
-	/// echo back Ã³¸® client->PostSend()»ç¿ë.
+	/// echo back ì²˜ë¦¬ client->PostSend()ì‚¬ìš©.
 	
 	delete context;
 
@@ -173,7 +174,7 @@ bool IocpManager::ReceiveCompletion(const ClientSession* client, OverlappedIOCon
 
 bool IocpManager::SendCompletion(const ClientSession* client, OverlappedIOContext* context, DWORD dwTransferred)
 {
-	/// Àü¼Û ´Ù µÇ¾ú´ÂÁö È®ÀÎÇÏ´Â °Í Ã³¸®..
+	/// ì „ì†¡ ë‹¤ ë˜ì—ˆëŠ”ì§€ í™•ì¸í•˜ëŠ” ê²ƒ ì²˜ë¦¬..
 	//if (context->mWsaBuf.len != dwTransferred) {...}
 	
 	delete context;

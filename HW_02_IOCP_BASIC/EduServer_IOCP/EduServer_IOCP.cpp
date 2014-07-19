@@ -1,4 +1,4 @@
-// EduServer_IOCP.cpp : Defines the entry point for the console application.
+﻿// EduServer_IOCP.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -21,18 +21,23 @@ int _tmain(int argc, _TCHAR* argv[])
 	/// Global Managers
 	GSessionManager = new SessionManager;
 	GIocpManager = new IocpManager;
-
-
-	if (false == GIocpManager->Initialize())
+	
+	if ( false == GIocpManager->Initialize() )
+	{
 		return -1;
+	}
 
-	if (false == GIocpManager->StartIoThreads())
+	if ( false == GIocpManager->StartIoThreads() )
+	{
 		return -1;
+	}
 
 	printf_s("Start Server\n");
-	if (false == GIocpManager->StartAcceptLoop())
-		return -1;
 
+	if ( false == GIocpManager->StartAcceptLoop() )
+	{
+		return -1;
+	}
 
 	GIocpManager->Finalize();
 
