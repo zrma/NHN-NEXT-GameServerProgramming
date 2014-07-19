@@ -9,42 +9,42 @@
 #include "IocpManager.h"
 
 
-__declspec(thread) int LThreadType = -1;
+__declspec(thread) int g_ThreadType = -1;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	LThreadType = THREAD_MAIN_ACCEPT;
+	g_ThreadType = THREAD_MAIN_ACCEPT;
 
 	/// for dump on crash
 	SetUnhandledExceptionFilter(ExceptionFilter);
 
 	/// Global Managers
-	GSessionManager = new SessionManager;
-	GIocpManager = new IocpManager;
+	g_SessionManager = new SessionManager;
+	g_IocpManager = new IocpManager;
 	
-	if ( false == GIocpManager->Initialize() )
+	if ( false == g_IocpManager->Initialize() )
 	{
 		return -1;
 	}
 
-	if ( false == GIocpManager->StartIoThreads() )
+	if ( false == g_IocpManager->StartIoThreads() )
 	{
 		return -1;
 	}
 
 	printf_s("Start Server\n");
 
-	if ( false == GIocpManager->StartAcceptLoop() )
+	if ( false == g_IocpManager->StartAcceptLoop() )
 	{
 		return -1;
 	}
 
-	GIocpManager->Finalize();
+	g_IocpManager->Finalize();
 
 	printf_s("End Server\n");
 
-	delete GIocpManager;
-	delete GSessionManager;
+	delete g_IocpManager;
+	delete g_SessionManager;
 
 	return 0;
 }

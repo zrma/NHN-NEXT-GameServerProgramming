@@ -6,13 +6,12 @@
 
 #define GQCS_TIMEOUT	20
 
-__declspec(thread) int LIoThreadId = 0;
-IocpManager* GIocpManager = nullptr;
+__declspec(thread) int g_IoThreadId = 0;
+IocpManager* g_IocpManager = nullptr;
 
-IocpManager::IocpManager() : mCompletionPort(NULL), mIoThreadCount(2), mListenSocket(NULL)
+IocpManager::IocpManager(): m_CompletionPort( NULL ), m_IoThreadCount( 2 ), m_ListenSocket( NULL )
 {
 }
-
 
 IocpManager::~IocpManager()
 {
@@ -20,25 +19,73 @@ IocpManager::~IocpManager()
 
 bool IocpManager::Initialize()
 {
-	//TODO: mIoThreadCount = ...;GetSystemInfo사용해서 set num of I/O threads
+	// TODO: mIoThreadCount = ...;GetSystemInfo사용해서 set num of I/O threads -> 구현
+	// 참고 : http://msdn.microsoft.com/en-us/library/ms724953(v=vs.85).aspx
+	// 참고 : http://msdn.microsoft.com/en-us/library/ms724381(v=vs.85).aspx
+	// 참고 : http://msdn.microsoft.com/en-us/library/ms724958(v=vs.85).aspx
+
+	SYSTEM_INFO sysInfo;
+	ZeroMemory( &sysInfo, sizeof( SYSTEM_INFO ) );
+	GetSystemInfo( &sysInfo );
+
+	m_IoThreadCount = sysInfo.dwNumberOfProcessors;
 
 	/// winsock initializing
 	WSADATA wsa;
-	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+	if ( WSAStartup( MAKEWORD( 2, 2 ), &wsa ) != 0 )
+	{
 		return false;
+	}
 
 	/// Create I/O Completion Port
-	//TODO: mCompletionPort = CreateIoCompletionPort(...)
+	// TODO: mCompletionPort = CreateIoCompletionPort(...) -> 구현
 	
+	// 일단 IOCP 객체부터 생성
+	m_CompletionPort = CreateIoCompletionPort( INVALID_HANDLE_VALUE, NULL, 0, m_IoThreadCount );
+	if ( !m_CompletionPort )
+	{
+		return false;
+	}
+		
+	// 참고 : http://k1rha.tistory.com/entry/IOCP-Server-Client-C-%EC%98%88%EC%A0%9C%EC%BD%94%EB%93%9C-winsock2-IOCP-Server-Client-using-winsock2-via-C
+	// 참고 : http://copynull.tistory.com/30
+
 	/// create TCP socket
-	//TODO: mListenSocket = ...
+	// TODO: mListenSocket = ... -> 구현
+	if ( INVALID_SOCKET == ( m_ListenSocket = WSASocket( AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED ) ) )
+	{
+		printf_s( "Socket() Failed with Error Code %d \n", WSAGetLastError() );
+		return false;
+	}
+
+	// 소켓을 IOCP 디바이스 리스트에 추가
+	HANDLE handle = CreateIoCompletionPort( reinterpret_cast<HANDLE>( m_ListenSocket ), m_CompletionPort, 0, 0 );
+	if ( handle != m_CompletionPort )
+	{
+		printf_s( "Socket add to IOCP Device List Failed with Error Code %d \n", GetLastError() );
+		return false;
+	}
 	
 	int opt = 1;
-	setsockopt(mListenSocket, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof(int));
+	setsockopt(m_ListenSocket, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof(int));
 
 	//TODO:  bind
-	//if (SOCKET_ERROR == bind(mListenSocket, (SOCKADDR*)&serveraddr, sizeof(serveraddr)))
+	//if (SOCKET_ERROR == bind(mListenSocket, (SOCKADDR*)&serveraddr, sizeof(serveraddr))) -> 구현
 	//	return false;
+	SOCKADDR_IN	addr;
+	ZeroMemory( &addr, sizeof( SOCKADDR_IN ) );
+
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons( 9001 );
+	addr.sin_addr.s_addr = htons( INADDR_ANY );
+
+	int result = 0;
+
+	if ( SOCKET_ERROR == ( result = bind( m_ListenSocket, (SOCKADDR*)&addr, sizeof( addr ) ) ) )
+	{
+		printf_s( "Bind() Failed with Error Code %d \n", WSAGetLastError() );
+		return false;
+	}
 
 	return true;
 }
@@ -47,7 +94,7 @@ bool IocpManager::Initialize()
 bool IocpManager::StartIoThreads()
 {
 	/// I/O Thread
-	for (int i = 0; i < mIoThreadCount; ++i)
+	for (int i = 0; i < m_IoThreadCount; ++i)
 	{
 		DWORD dwThreadId;
 		//TODO: HANDLE hThread = (HANDLE)_beginthreadex...);
@@ -60,14 +107,14 @@ bool IocpManager::StartIoThreads()
 bool IocpManager::StartAcceptLoop()
 {
 	/// listen
-	if (SOCKET_ERROR == listen(mListenSocket, SOMAXCONN))
+	if (SOCKET_ERROR == listen(m_ListenSocket, SOMAXCONN))
 		return false;
 
 
 	/// accept loop
 	while (true)
 	{
-		SOCKET acceptedSock = accept(mListenSocket, NULL, NULL);
+		SOCKET acceptedSock = accept(m_ListenSocket, NULL, NULL);
 		if (acceptedSock == INVALID_SOCKET)
 		{
 			printf_s("accept: invalid socket\n");
@@ -79,13 +126,13 @@ bool IocpManager::StartAcceptLoop()
 		getpeername(acceptedSock, (SOCKADDR*)&clientaddr, &addrlen);
 
 		/// 소켓 정보 구조체 할당과 초기화
-		ClientSession* client = GSessionManager->CreateClientSession(acceptedSock);
+		ClientSession* client = g_SessionManager->CreateClientSession(acceptedSock);
 
 		/// 클라 접속 처리
 		if (false == client->OnConnect(&clientaddr))
 		{
 			client->Disconnect(DR_ONCONNECT_ERROR);
-			GSessionManager->DeleteClientSession(client);
+			g_SessionManager->DeleteClientSession(client);
 		}
 	}
 
@@ -94,7 +141,7 @@ bool IocpManager::StartAcceptLoop()
 
 void IocpManager::Finalize()
 {
-	CloseHandle(mCompletionPort);
+	CloseHandle(m_CompletionPort);
 
 	/// winsock finalizing
 	WSACleanup();
@@ -104,10 +151,10 @@ void IocpManager::Finalize()
 
 unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 {
-	LThreadType = THREAD_IO_WORKER;
+	g_ThreadType = THREAD_IO_WORKER;
 
-	LIoThreadId = reinterpret_cast<int>(lpParam);
-	HANDLE hComletionPort = GIocpManager->GetComletionPort();
+	g_IoThreadId = reinterpret_cast<int>(lpParam);
+	HANDLE hComletionPort = g_IocpManager->GetComletionPort();
 
 	while (true)
 	{
@@ -125,7 +172,7 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 		{
 			/// connection closing
 			asCompletionKey->Disconnect(DR_RECV_ZERO);
-			GSessionManager->DeleteClientSession(asCompletionKey);
+			g_SessionManager->DeleteClientSession(asCompletionKey);
 			continue;
 		}
 
@@ -154,7 +201,7 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 		{
 			/// connection closing
 			asCompletionKey->Disconnect(DR_COMPLETION_ERROR);
-			GSessionManager->DeleteClientSession(asCompletionKey);
+			g_SessionManager->DeleteClientSession(asCompletionKey);
 		}
 
 	}

@@ -9,7 +9,7 @@ bool ClientSession::OnConnect(SOCKADDR_IN* addr)
 {
 	//TODO: 이 영역 lock으로 보호 할 것
 
-	CRASH_ASSERT(LThreadType == THREAD_MAIN_ACCEPT);
+	CRASH_ASSERT(g_ThreadType == THREAD_MAIN_ACCEPT);
 
 	/// make socket non-blocking
 	u_long arg = 1 ;
@@ -27,7 +27,7 @@ bool ClientSession::OnConnect(SOCKADDR_IN* addr)
 	}
 	
 	HANDLE handle = 0; //TODO: 여기에서 CreateIoCompletionPort((HANDLE)mSocket, ...);사용하여 연결할 것
-	if (handle != GIocpManager->GetComletionPort())
+	if (handle != g_IocpManager->GetComletionPort())
 	{
 		printf_s("[DEBUG] CreateIoCompletionPort error: %d\n", GetLastError());
 		return false;
@@ -38,7 +38,7 @@ bool ClientSession::OnConnect(SOCKADDR_IN* addr)
 
 	printf_s("[DEBUG] Client Connected: IP=%s, PORT=%d\n", inet_ntoa(mClientAddr.sin_addr), ntohs(mClientAddr.sin_port));
 
-	GSessionManager->IncreaseConnectionCount();
+	g_SessionManager->IncreaseConnectionCount();
 
 	return PostRecv() ;
 }
@@ -62,7 +62,7 @@ void ClientSession::Disconnect(DisconnectReason dr)
 
 	printf_s("[DEBUG] Client Disconnected: Reason=%d IP=%s, PORT=%d \n", dr, inet_ntoa(mClientAddr.sin_addr), ntohs(mClientAddr.sin_port));
 	
-	GSessionManager->DecreaseConnectionCount();
+	g_SessionManager->DecreaseConnectionCount();
 
 	closesocket(mSocket) ;
 

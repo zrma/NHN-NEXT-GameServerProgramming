@@ -2,15 +2,16 @@
 #include "ClientSession.h"
 #include "SessionManager.h"
 
-SessionManager* GSessionManager = nullptr;
+SessionManager* g_SessionManager = nullptr;
 
 ClientSession* SessionManager::CreateClientSession(SOCKET sock)
 {
 	ClientSession* client = new ClientSession(sock);
 
-	//TODO: lock으로 보호할 것
+	//TODO: lock으로 보호할 것 -> 구현
+	FastSpinlockGuard	dummyLocker( m_Lock );
 	{
-		mClientList.insert(ClientList::value_type(sock, client));
+		m_ClientList.insert(ClientList::value_type(sock, client));
 	}
 
 	return client;
@@ -19,9 +20,10 @@ ClientSession* SessionManager::CreateClientSession(SOCKET sock)
 
 void SessionManager::DeleteClientSession(ClientSession* client)
 {
-	//TODO: lock으로 보호할 것
+	//TODO: lock으로 보호할 것 -> 구현
+	FastSpinlockGuard	dummyLocker( m_Lock );
 	{
-		mClientList.erase(client->mSocket);
+		m_ClientList.erase(client->mSocket);
 	}
 	
 	delete client;

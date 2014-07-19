@@ -15,27 +15,21 @@ public:
 	bool StartIoThreads();
 	bool StartAcceptLoop();
 
-	HANDLE GetComletionPort()	{ return mCompletionPort; }
-	int	GetIoThreadCount()		{ return mIoThreadCount;  }
-
-
-private:
-
-	static unsigned int WINAPI IoWorkerThread(LPVOID lpParam);
-
-	static bool ReceiveCompletion(const ClientSession* client, OverlappedIOContext* context, DWORD dwTransferred);
-	static bool SendCompletion(const ClientSession* client, OverlappedIOContext* context, DWORD dwTransferred);
+	HANDLE GetComletionPort() { return m_CompletionPort; }
+	int	GetIoThreadCount() { return m_IoThreadCount; }
 
 private:
+	static unsigned int WINAPI IoWorkerThread( LPVOID lpParam );
 
-	HANDLE	mCompletionPort;
-	int		mIoThreadCount;
+	static bool ReceiveCompletion( const ClientSession* client, OverlappedIOContext* context, DWORD dwTransferred );
+	static bool SendCompletion( const ClientSession* client, OverlappedIOContext* context, DWORD dwTransferred );
 
-	SOCKET	mListenSocket;
+private:
+	HANDLE	m_CompletionPort;
+	int		m_IoThreadCount;
 
-
-
+	SOCKET	m_ListenSocket;
 };
 
-extern __declspec(thread) int LIoThreadId;
-extern IocpManager* GIocpManager;
+extern __declspec(thread) int g_IoThreadId;
+extern IocpManager* g_IocpManager;

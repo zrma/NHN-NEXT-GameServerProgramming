@@ -16,21 +16,25 @@ private:
 	volatile long mLockFlag;
 };
 
+// Dummy Lock Class
+//
+// 스택을 사용해서 생성자-소멸자 에 들어있는 EnterLock-LeaveLock 를 호출
+// 일종의 더미 렌더러 같은 역할
 class FastSpinlockGuard
 {
 public:
-	FastSpinlockGuard(FastSpinlock& lock) : mLock(lock)
+	FastSpinlockGuard(FastSpinlock& lock) : m_Lock(lock)
 	{
-		mLock.EnterLock();
+		m_Lock.EnterLock();
 	}
 
 	~FastSpinlockGuard()
 	{
-		mLock.LeaveLock();
+		m_Lock.LeaveLock();
 	}
 
 private:
-	FastSpinlock& mLock;
+	FastSpinlock& m_Lock;
 };
 
 template <class TargetClass>
@@ -41,21 +45,21 @@ public:
 	{
 		LockGuard()
 		{
-			TargetClass::mLock.EnterLock();
+			TargetClass::m_Lock.EnterLock();
 		}
 
 		~LockGuard()
 		{
-			TargetClass::mLock.LeaveLock();
+			TargetClass::m_Lock.LeaveLock();
 		}
 
 	};
 
 private:
-	static FastSpinlock mLock;
+	static FastSpinlock m_Lock;
 	
 	//friend struct LockGuard;
 };
 
 template <class TargetClass>
-FastSpinlock ClassTypeLock<TargetClass>::mLock;
+FastSpinlock ClassTypeLock<TargetClass>::m_Lock;
