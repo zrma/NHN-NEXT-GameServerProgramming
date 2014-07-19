@@ -97,7 +97,13 @@ bool IocpManager::StartIoThreads()
 	for (int i = 0; i < m_IoThreadCount; ++i)
 	{
 		DWORD dwThreadId;
-		//TODO: HANDLE hThread = (HANDLE)_beginthreadex...);
+		//TODO: HANDLE hThread = (HANDLE)_beginthreadex...); -> 구현
+		HANDLE hThread = (HANDLE)_beginthreadex( NULL, 0, IoWorkerThread, (LPVOID)i, 0, (unsigned int*)&dwThreadId );
+
+		if ( !hThread )
+		{
+			return false;
+		}
 	}
 
 	return true;
@@ -107,14 +113,16 @@ bool IocpManager::StartIoThreads()
 bool IocpManager::StartAcceptLoop()
 {
 	/// listen
-	if (SOCKET_ERROR == listen(m_ListenSocket, SOMAXCONN))
+	if ( SOCKET_ERROR == listen( m_ListenSocket, SOMAXCONN ) )
+	{
 		return false;
-
+	}
 
 	/// accept loop
 	while (true)
 	{
 		SOCKET acceptedSock = accept(m_ListenSocket, NULL, NULL);
+
 		if (acceptedSock == INVALID_SOCKET)
 		{
 			printf_s("accept: invalid socket\n");
@@ -145,7 +153,6 @@ void IocpManager::Finalize()
 
 	/// winsock finalizing
 	WSACleanup();
-
 }
 
 
@@ -162,12 +169,17 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 		OverlappedIOContext* context = nullptr;
 		ClientSession* asCompletionKey = nullptr;
 
-		int ret = 0; ///<여기에는 GetQueuedCompletionStatus(hComletionPort, ..., GQCS_TIMEOUT)를 수행한 결과값을 대입
+		// int ret = 0; ///<여기에는 GetQueuedCompletionStatus(hComletionPort, ..., GQCS_TIMEOUT)를 수행한 결과값을 대입 -> 구현
+		int ret = GetQueuedCompletionStatus( hComletionPort, &dwTransferred, (PULONG_PTR)&asCompletionKey, (LPOVERLAPPED*)&context, GQCS_TIMEOUT );
 
 		/// check time out first 
-		if (ret == 0 && GetLastError()==WAIT_TIMEOUT)
+		if ( ret == 0 && GetLastError() == WAIT_TIMEOUT )
+		{
+			// 시간 초과요
 			continue;
+		}
 
+		// 에러가 났거나, 타임오버가 아닌데 받았다고 해놓고, 받은 데이터가 없음
 		if (ret == 0 || dwTransferred == 0)
 		{
 			/// connection closing
@@ -177,9 +189,16 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 		}
 
 		//TODO
-		// if (nullptr == context) 인 경우 처리
+		// if (nullptr == context) 인 경우 처리 -> 구현
 		//{
 		//}
+
+		// 참고 : http://stackoverflow.com/questions/5830699/getqueuedcompletionstatus-delayed
+		if ( !context )
+		{
+			// 한 바퀴 더 돌아라
+			continue;
+		}
 
 		bool completionOk = true;
 		switch (context->mIoType)
