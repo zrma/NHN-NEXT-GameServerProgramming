@@ -2,11 +2,13 @@
 
 LONG WINAPI ExceptionFilter(EXCEPTION_POINTERS* exceptionInfo) ;
 
-inline void CRASH_ASSERT(bool isOk)
+inline void CRASH_ASSERT( bool isOk )
 {
 	if ( isOk )
-		return ;
+	{
+		return;
+	}
 
-	int* crashVal = 0 ;
-	*crashVal = 0xDEADBEEF ;
+	int* crashVal = 0;
+	*crashVal = 0xDEADBEEF;
 }

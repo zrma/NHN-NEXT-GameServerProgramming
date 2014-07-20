@@ -6,8 +6,9 @@
 LONG WINAPI ExceptionFilter(EXCEPTION_POINTERS* exceptionInfo)
 {
 	if ( IsDebuggerPresent() )
-		return EXCEPTION_CONTINUE_SEARCH ;
-
+	{
+		return EXCEPTION_CONTINUE_SEARCH;
+	}
 
 	/// dump file 남기자.
 
@@ -39,5 +40,4 @@ LONG WINAPI ExceptionFilter(EXCEPTION_POINTERS* exceptionInfo)
 	}
 
 	return EXCEPTION_EXECUTE_HANDLER  ;
-	
 }

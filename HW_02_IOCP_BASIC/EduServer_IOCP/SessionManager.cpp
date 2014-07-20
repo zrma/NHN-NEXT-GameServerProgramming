@@ -23,7 +23,7 @@ void SessionManager::DeleteClientSession(ClientSession* client)
 	//TODO: lock으로 보호할 것 -> 구현
 	FastSpinlockGuard	dummyLocker( m_Lock );
 	{
-		m_ClientList.erase(client->mSocket);
+		m_ClientList.erase(client->m_Socket);
 	}
 	
 	delete client;

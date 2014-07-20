@@ -59,7 +59,7 @@ bool IocpManager::Initialize()
 	}
 
 	// 소켓을 IOCP 디바이스 리스트에 추가
-	HANDLE handle = CreateIoCompletionPort( reinterpret_cast<HANDLE>( m_ListenSocket ), m_CompletionPort, 0, 0 );
+	HANDLE handle = CreateIoCompletionPort( (HANDLE)m_ListenSocket, m_CompletionPort, 0, 0 );
 	if ( handle != m_CompletionPort )
 	{
 		printf_s( "Socket add to IOCP Device List Failed with Error Code %d \n", GetLastError() );
@@ -205,7 +205,7 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 		}
 
 		bool completionOk = true;
-		switch (context->mIoType)
+		switch (context->m_IoType)
 		{
 		case IO_SEND:
 			completionOk = SendCompletion(asCompletionKey, context, dwTransferred);
@@ -216,7 +216,7 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 			break;
 
 		default:
-			printf_s("Unknown I/O Type: %d\n", context->mIoType);
+			printf_s("Unknown I/O Type: %d\n", context->m_IoType);
 			break;
 		}
 
@@ -241,7 +241,7 @@ bool IocpManager::ReceiveCompletion(const ClientSession* client, OverlappedIOCon
 		return false;
 	}
 	
-	client->PostSend( context->mBuffer, dwTransferred );
+	client->PostSend( context->m_Buffer, dwTransferred );
 
 	delete context;
 	return client->PostRecv();
@@ -251,6 +251,13 @@ bool IocpManager::SendCompletion(const ClientSession* client, OverlappedIOContex
 {
 	/// 전송 다 되었는지 확인하는 것 처리..
 	//if (context->mWsaBuf.len != dwTransferred) {...}
+	if ( context->m_WsaBuf.len != dwTransferred )
+	{
+		printf_s( "Buffer != Sent Error - Buf : %d, Send %d \n", context->m_WsaBuf.len, dwTransferred );
+
+		delete context;
+		return false;
+	}
 	
 	delete context;
 	return true;

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "FastSpinlock.h"
 
 #define BUFSIZE	4096
 
@@ -12,7 +13,7 @@ enum IOType
 	IO_RECV,
 	IO_RECV_ZERO,
 	IO_ACCEPT
-} ;
+};
 
 enum DisconnectReason
 {
@@ -25,50 +26,51 @@ enum DisconnectReason
 
 struct OverlappedIOContext
 {
-	OverlappedIOContext(const ClientSession* owner, IOType ioType) : mSessionObject(owner), mIoType(ioType)
+	OverlappedIOContext( const ClientSession* owner, IOType ioType ): m_SessionObject( owner ), m_IoType( ioType )
 	{
-		memset(&mOverlapped, 0, sizeof(OVERLAPPED));
-		memset(&mWsaBuf, 0, sizeof(WSABUF));
-		memset(mBuffer, 0, BUFSIZE);
+		memset( &m_Overlapped, 0, sizeof( OVERLAPPED ) );
+		memset( &m_WsaBuf, 0, sizeof( WSABUF ) );
+		memset( m_Buffer, 0, BUFSIZE );
 	}
 
-	OVERLAPPED				mOverlapped ;
-	const ClientSession*	mSessionObject ;
-	IOType			mIoType ;
-	WSABUF			mWsaBuf;
-	char			mBuffer[BUFSIZE];
-} ;
+	OVERLAPPED				m_Overlapped;
+	const ClientSession*	m_SessionObject;
+	IOType			m_IoType;
+	WSABUF			m_WsaBuf;
+	char			m_Buffer[BUFSIZE];
+};
 
 
 class ClientSession
 {
 public:
-	ClientSession(SOCKET sock) 
-		: mSocket(sock), mConnected(false)
+	ClientSession( SOCKET sock )
+		: m_Socket( sock ), m_Connected( false )
 	{
-		memset(&mClientAddr, 0, sizeof(SOCKADDR_IN)) ;
+		memset( &m_ClientAddr, 0, sizeof( SOCKADDR_IN ) );
 	}
 
 	~ClientSession() {}
 
-	bool	OnConnect(SOCKADDR_IN* addr);
-	bool	IsConnected() const { return mConnected; }
+	bool	OnConnect( SOCKADDR_IN* addr );
+	bool	IsConnected() const { return m_Connected; }
 
-	bool	PostRecv() const ;
-	bool	PostSend(const char* buf, int len) const ;
-	void	Disconnect(DisconnectReason dr);
-	
+	bool	PostRecv() const;
+	bool	PostSend( const char* buf, int len ) const;
+	void	Disconnect( DisconnectReason dr );
+
 
 private:
-	bool			mConnected ;
-	SOCKET			mSocket ;
+	bool			m_Connected;
+	SOCKET			m_Socket;
 
-	SOCKADDR_IN		mClientAddr ;
-		
-	//TODO: mLock; 선언할 것
+	SOCKADDR_IN		m_ClientAddr;
+
+	//TODO: mLock; 선언할 것 -> 구현
+	FastSpinlock	m_Lock;
 
 	friend class SessionManager;
-} ;
+};
 
 
 
