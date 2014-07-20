@@ -40,10 +40,10 @@ bool IocpManager::Initialize()
 	/// Create I/O Completion Port
 	// TODO: mCompletionPort = CreateIoCompletionPort(...) -> 구현
 	
-	// 일단 IOCP 객체부터 생성
 	m_CompletionPort = CreateIoCompletionPort( INVALID_HANDLE_VALUE, NULL, 0, m_IoThreadCount );
 	if ( !m_CompletionPort )
 	{
+		printf_s( "Create IOCP Failed with Error Code %d \n", GetLastError() );
 		return false;
 	}
 		
@@ -58,14 +58,6 @@ bool IocpManager::Initialize()
 		return false;
 	}
 
-	// 소켓을 IOCP 디바이스 리스트에 추가
-	HANDLE handle = CreateIoCompletionPort( (HANDLE)m_ListenSocket, m_CompletionPort, 0, 0 );
-	if ( handle != m_CompletionPort )
-	{
-		printf_s( "Socket add to IOCP Device List Failed with Error Code %d \n", GetLastError() );
-		return false;
-	}
-	
 	int opt = 1;
 	setsockopt(m_ListenSocket, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof(int));
 
@@ -102,8 +94,11 @@ bool IocpManager::StartIoThreads()
 
 		if ( !hThread )
 		{
+			printf_s( "Thread Creation Failed with Error Code %d \n", GetLastError() );
 			return false;
 		}
+
+		CloseHandle( hThread );
 	}
 
 	return true;
