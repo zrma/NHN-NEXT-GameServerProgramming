@@ -28,7 +28,7 @@ bool IocpManager::Initialize()
 	ZeroMemory( &sysInfo, sizeof( SYSTEM_INFO ) );
 	GetSystemInfo( &sysInfo );
 
-	m_IoThreadCount = sysInfo.dwNumberOfProcessors;
+	m_IoThreadCount = (int)(sysInfo.dwNumberOfProcessors) * 2;
 
 	/// winsock initializing
 	WSADATA wsa;
@@ -40,7 +40,7 @@ bool IocpManager::Initialize()
 	/// Create I/O Completion Port
 	// TODO: mCompletionPort = CreateIoCompletionPort(...) -> 구현
 	
-	m_CompletionPort = CreateIoCompletionPort( INVALID_HANDLE_VALUE, NULL, 0, m_IoThreadCount );
+	m_CompletionPort = CreateIoCompletionPort( INVALID_HANDLE_VALUE, NULL, 0, 0 );
 	if ( !m_CompletionPort )
 	{
 		printf_s( "Create IOCP Failed with Error Code %d \n", GetLastError() );
