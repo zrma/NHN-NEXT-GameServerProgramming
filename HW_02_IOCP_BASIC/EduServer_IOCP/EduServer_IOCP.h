@@ -9,4 +9,4 @@ enum THREAD_TYPE
 	THREAD_IO_WORKER
 };
 
-extern __declspec(thread) int g_ThreadType;
+extern __declspec(thread) int l_ThreadType;

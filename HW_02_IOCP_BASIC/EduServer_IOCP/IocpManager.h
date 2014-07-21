@@ -31,5 +31,5 @@ private:
 	SOCKET	m_ListenSocket;
 };
 
-extern __declspec(thread) int g_IoThreadId;
+extern __declspec(thread) int l_IoThreadId;
 extern IocpManager* g_IocpManager;

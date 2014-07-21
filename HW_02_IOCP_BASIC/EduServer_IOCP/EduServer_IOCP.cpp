@@ -9,11 +9,11 @@
 #include "IocpManager.h"
 
 
-__declspec(thread) int g_ThreadType = -1;
+__declspec(thread) int l_ThreadType = -1;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	g_ThreadType = THREAD_MAIN_ACCEPT;
+	l_ThreadType = THREAD_MAIN_ACCEPT;
 
 	/// for dump on crash
 	SetUnhandledExceptionFilter(ExceptionFilter);

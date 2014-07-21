@@ -10,7 +10,7 @@ bool ClientSession::OnConnect( SOCKADDR_IN* addr )
 	//TODO: 이 영역 lock으로 보호 할 것 -> 구현
 	FastSpinlockGuard	dummyLocker( m_Lock );
 
-	CRASH_ASSERT( g_ThreadType == THREAD_MAIN_ACCEPT );
+	CRASH_ASSERT( l_ThreadType == THREAD_MAIN_ACCEPT );
 
 	/// make socket non-blocking
 	u_long arg = 1;

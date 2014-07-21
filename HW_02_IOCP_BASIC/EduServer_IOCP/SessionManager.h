@@ -27,7 +27,7 @@ private:
 	//TODO: mLock; 선언 -> 구현
 	FastSpinlock	m_Lock;
 
-	// 2013년 OS 윈도우 실습 때 공부했던 volatile 다시 한 번 되새김질! ///< 그냥 interlocked.... 쓰려면 대상이 volatbile이어야 한다는것만 기억해도 됨.
+	// 2013년 OS 윈도우 실습 때 공부했던 volatile 다시 한 번 되새김질! ///< 그냥 interlocked.... 쓰려면 대상이 volatbile이어야 한다는것만 기억해도 됨. -> 확인
 	// 참고 : http://zapiro.tistory.com/25
 	// 참고 : http://en.wikipedia.org/wiki/Volatile_variable
 	volatile long	m_CurrentConnectionCount;

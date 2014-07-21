@@ -6,7 +6,7 @@
 
 #define GQCS_TIMEOUT	20
 
-__declspec(thread) int g_IoThreadId = 0;
+__declspec(thread) int l_IoThreadId = 0;
 IocpManager* g_IocpManager = nullptr;
 
 IocpManager::IocpManager(): m_CompletionPort( NULL ), m_IoThreadCount( 2 ), m_ListenSocket( NULL )
@@ -153,9 +153,9 @@ void IocpManager::Finalize()
 
 unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 {
-	g_ThreadType = THREAD_IO_WORKER; ///< 이건 스레드 로컬 변수다. 전역이 아니라.
+	l_ThreadType = THREAD_IO_WORKER; ///< 이건 스레드 로컬 변수다. 전역이 아니라.  -> 확인
+	l_IoThreadId = reinterpret_cast<int>(lpParam); ///< 스레드 로컬 변수인데 g_ 태그 붙이는거는 적절하지 못하다.  -> 확인
 
-	g_IoThreadId = reinterpret_cast<int>(lpParam); ///< 스레드 로컬 변수인데 g_ 태그 붙이는거는 적절하지 못하다.
 	HANDLE hComletionPort = g_IocpManager->GetComletionPort();
 
 	while (true)
@@ -196,7 +196,12 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 		if ( !context )
 		{
 			// 한 바퀴 더 돌아라
-			continue; ///< 끊거나 서버 종료 해야지... context == null 인 상황중에 정상인 경우는 앞에서 다 처리했다.
+			// continue; ///< 끊거나 서버 종료 해야지... context == null 인 상황중에 정상인 경우는 앞에서 다 처리했다.  -> 확인
+
+			// connection closing
+			asCompletionKey->Disconnect( DR_RECV_ZERO );
+			g_SessionManager->DeleteClientSession( asCompletionKey );
+			continue;
 		}
 
 		bool completionOk = true;
@@ -236,7 +241,12 @@ bool IocpManager::ReceiveCompletion(const ClientSession* client, OverlappedIOCon
 		return false;
 	}
 	
-	client->PostSend( context->m_Buffer, dwTransferred ); ///< postsend가 false를 리턴하면?
+	// client->PostSend( context->m_Buffer, dwTransferred ); ///< postsend가 false를 리턴하면?  -> 확인
+	if ( !client->PostSend( context->m_Buffer, dwTransferred ) )
+	{
+		delete context;
+		return false;
+	}
 
 	delete context;
 	return client->PostRecv();
