@@ -3,6 +3,7 @@
 #include "EduServer_IOCP.h"
 #include "ClientSession.h"
 #include "SessionManager.h"
+#include "Exception.h"
 
 #define GQCS_TIMEOUT	20
 
@@ -198,10 +199,10 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 			// 한 바퀴 더 돌아라
 			// continue; ///< 끊거나 서버 종료 해야지... context == null 인 상황중에 정상인 경우는 앞에서 다 처리했다.  -> 확인
 
-			// connection closing
-			asCompletionKey->Disconnect( DR_RECV_ZERO );
-			g_SessionManager->DeleteClientSession( asCompletionKey );
-			continue;
+			// 자료구조가 깨졌다!
+			CRASH_ASSERT( false );
+			
+			return -1;
 		}
 
 		bool completionOk = true;
