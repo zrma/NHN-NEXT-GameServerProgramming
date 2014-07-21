@@ -153,9 +153,9 @@ void IocpManager::Finalize()
 
 unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 {
-	g_ThreadType = THREAD_IO_WORKER;
+	g_ThreadType = THREAD_IO_WORKER; ///< 이건 스레드 로컬 변수다. 전역이 아니라.
 
-	g_IoThreadId = reinterpret_cast<int>(lpParam);
+	g_IoThreadId = reinterpret_cast<int>(lpParam); ///< 스레드 로컬 변수인데 g_ 태그 붙이는거는 적절하지 못하다.
 	HANDLE hComletionPort = g_IocpManager->GetComletionPort();
 
 	while (true)
@@ -178,7 +178,7 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 		if (ret == 0 || dwTransferred == 0)
 		{
 			/// connection closing
-			asCompletionKey->Disconnect(DR_RECV_ZERO);
+			asCompletionKey->Disconnect(DR_RECV_ZERO); ///< dr옵션 그냥 가져다 썼구만.. ㅋㅋㅋ
 			g_SessionManager->DeleteClientSession(asCompletionKey);
 			continue;
 		}
@@ -196,7 +196,7 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 		if ( !context )
 		{
 			// 한 바퀴 더 돌아라
-			continue;
+			continue; ///< 끊거나 서버 종료 해야지... context == null 인 상황중에 정상인 경우는 앞에서 다 처리했다.
 		}
 
 		bool completionOk = true;
@@ -236,7 +236,7 @@ bool IocpManager::ReceiveCompletion(const ClientSession* client, OverlappedIOCon
 		return false;
 	}
 	
-	client->PostSend( context->m_Buffer, dwTransferred );
+	client->PostSend( context->m_Buffer, dwTransferred ); ///< postsend가 false를 리턴하면?
 
 	delete context;
 	return client->PostRecv();
