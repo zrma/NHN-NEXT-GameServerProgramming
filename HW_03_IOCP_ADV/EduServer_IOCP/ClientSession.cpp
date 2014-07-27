@@ -61,8 +61,7 @@ bool ClientSession::PostAccept()
 			return true;
 		}
 		printf_s( "AcceptEx failed with error: %d \n", WSAGetLastError() );
-		//ÇÏ³ª¸¸ ¸ÀÀÌ °¬À» ¼öµµ ÀÖÀ¸´Ï±ñ ¸®½¼ ¼ÒÄÏÀº »ì·ÁµÐ´Ù
-		//closesocket( *GIocpManager->GetListenSocket() );
+		closesocket( *GIocpManager->GetListenSocket() );
 		closesocket( mSocket );
 		WSACleanup();
 
