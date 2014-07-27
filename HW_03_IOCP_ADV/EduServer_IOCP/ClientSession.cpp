@@ -54,8 +54,12 @@ bool ClientSession::PostAccept()
 	acceptContext->mWsaBuf.len = (ULONG) mBuffer.GetFreeSpaceSize();
 
 	DWORD dwBytes = 0;
-	if ( FALSE == AcceptEx( *GIocpManager->GetListenSocket(), mSocket, &acceptContext->mWsaBuf, 0, sizeof( sockaddr_in ) + 16, sizeof( sockaddr_in ) + 16, &dwBytes, &acceptContext->mOverlapped ) )
+	if ( FALSE == lpfnAcceptEx( *GIocpManager->GetListenSocket(), mSocket, &acceptContext->mWsaBuf, 0, sizeof( sockaddr_in ) + 16, sizeof( sockaddr_in ) + 16, &dwBytes, &acceptContext->mOverlapped ) )
 	{
+		if (WSAGetLastError() == WSA_IO_PENDING)
+		{
+			return true;
+		}
 		printf_s( "AcceptEx failed with error: %d \n", WSAGetLastError() );
 		//ÇÏ³ª¸¸ ¸ÀÀÌ °¬À» ¼öµµ ÀÖÀ¸´Ï±ñ ¸®½¼ ¼ÒÄÏÀº »ì·ÁµÐ´Ù
 		//closesocket( *GIocpManager->GetListenSocket() );
@@ -152,7 +156,7 @@ void ClientSession::DisconnectRequest(DisconnectReason dr)
 
 	//TODO: DisconnectEx¸¦ ÀÌ¿ëÇÑ ¿¬°á ²÷±â ¿äÃ»
 	DWORD dwBytes = 0;
-	if ( FALSE == DisconnectEx( mSocket, &context->mOverlapped, dwBytes, 0 ) )
+	if ( FALSE == lpfnDisconnectEx( mSocket, &context->mOverlapped, dwBytes, 0 ) )
 	{
 		printf_s( "DisconnectEx func falsed with error: %d\n", GetLastError() );
 	}

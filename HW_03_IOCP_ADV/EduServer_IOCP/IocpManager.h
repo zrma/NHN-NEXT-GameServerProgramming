@@ -45,4 +45,6 @@ private:
 extern __declspec(thread) int LIoThreadId;
 extern IocpManager* GIocpManager;
 
+extern LPFN_ACCEPTEX lpfnAcceptEx;
+extern LPFN_DISCONNECTEX lpfnDisconnectEx;
 

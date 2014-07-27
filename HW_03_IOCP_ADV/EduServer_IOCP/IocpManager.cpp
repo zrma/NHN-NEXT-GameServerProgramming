@@ -10,22 +10,24 @@
 __declspec(thread) int LIoThreadId = 0;
 IocpManager* GIocpManager = nullptr;
 
+LPFN_ACCEPTEX lpfnAcceptEx = NULL;
+LPFN_DISCONNECTEX lpfnDisconnectEx = NULL;
 
 //TODO AcceptEx DisconnectEx 함수 사용할 수 있도록 구현.
 //함수 포인터는 winsock2 함수들을 가리키고 있는 것이 아니었는가?!
 
-BOOL DisconnectEx(SOCKET hSocket, LPOVERLAPPED lpOverlapped, DWORD dwFlags, DWORD reserved)
-{
-	//return ...
-	return 0;
-}
-
-BOOL AcceptEx(SOCKET sListenSocket, SOCKET sAcceptSocket, PVOID lpOutputBuffer, DWORD dwReceiveDataLength,
-	DWORD dwLocalAddressLength, DWORD dwRemoteAddressLength, LPDWORD lpdwBytesReceived, LPOVERLAPPED lpOverlapped)
-{
-	//return ...
-	return 0;
-}
+// BOOL DisconnectEx(SOCKET hSocket, LPOVERLAPPED lpOverlapped, DWORD dwFlags, DWORD reserved)
+// {
+// 	//return ...
+// 	return 0;
+// }
+// 
+// BOOL AcceptEx(SOCKET sListenSocket, SOCKET sAcceptSocket, PVOID lpOutputBuffer, DWORD dwReceiveDataLength,
+// 	DWORD dwLocalAddressLength, DWORD dwRemoteAddressLength, LPDWORD lpdwBytesReceived, LPOVERLAPPED lpOverlapped)
+// {
+// 	//return ...
+// 	return 0;
+// }
 
 IocpManager::IocpManager() : mCompletionPort(NULL), mIoThreadCount(2), mListenSocket(NULL)
 {	
@@ -82,7 +84,7 @@ bool IocpManager::Initialize()
 
 	GUID GuidAcceptEx = WSAID_ACCEPTEX;
 	//LPFN_ACCEPTEX lpfnAcceptEx = ( LPFN_ACCEPTEX )AcceptEx;
-	LPFN_ACCEPTEX lpfnAcceptEx = NULL;
+	//LPFN_ACCEPTEX lpfnAcceptEx = NULL;
 	DWORD dwBytes = 0;
 
 	if ( SOCKET_ERROR == WSAIoctl(mListenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER, 
@@ -98,7 +100,6 @@ bool IocpManager::Initialize()
 	}
 
 	GUID GuidDisconnectEx = WSAID_DISCONNECTEX;
-	LPFN_DISCONNECTEX lpfnDisconnectEx = NULL;
 	if ( SOCKET_ERROR == WSAIoctl( mListenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
 		&GuidDisconnectEx, sizeof( GuidDisconnectEx ),
 		&lpfnDisconnectEx, sizeof( lpfnDisconnectEx ),
