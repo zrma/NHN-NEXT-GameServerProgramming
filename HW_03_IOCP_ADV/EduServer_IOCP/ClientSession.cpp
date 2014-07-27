@@ -51,11 +51,10 @@ bool ClientSession::PostAccept()
 
 	//TODO : AccpetEx를 이용한 구현.
 	//이거 이상한거 연결하지말고, 모든 것을 0으로 초기화 해서 보내야 한다
-	acceptContext->mWsaBuf.buf = nullptr;
-	acceptContext->mWsaBuf.len = 0;
 	DWORD dwBytes = 0;
+	char lpOutputBuf[1024] = { 0, };
 
-	if ( FALSE == lpfnAcceptEx( *GIocpManager->GetListenSocket(), mSocket, &acceptContext->mWsaBuf, acceptContext->mWsaBuf.len, sizeof( sockaddr_in ) + 16, sizeof( sockaddr_in ) + 16, &dwBytes, (LPOVERLAPPED)acceptContext ) )
+	if ( FALSE == lpfnAcceptEx( *GIocpManager->GetListenSocket(), mSocket, lpOutputBuf, 1024 - ( ( sizeof( sockaddr_in ) + 16 ) * 2 ), sizeof( sockaddr_in ) + 16, sizeof( sockaddr_in ) + 16, &dwBytes, (LPOVERLAPPED)acceptContext ) )
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
 		{
