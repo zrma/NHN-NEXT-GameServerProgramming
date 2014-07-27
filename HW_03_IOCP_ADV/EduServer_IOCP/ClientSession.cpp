@@ -51,10 +51,12 @@ bool ClientSession::PostAccept()
 
 	//TODO : AccpetEx를 이용한 구현.
 	//이거 이상한거 연결하지말고, 모든 것을 0으로 초기화 해서 보내야 한다
+	acceptContext->mWsaBuf.buf = mBuffer.GetBuffer();
+	acceptContext->mWsaBuf.len = mBuffer.GetFreeSpaceSize();
 	DWORD dwBytes = 0;
-	char lpOutputBuf[1024] = { 0, };
+	/*char lpOutputBuf[1024] = { 0, };*/
 
-	if ( FALSE == lpfnAcceptEx( *GIocpManager->GetListenSocket(), mSocket, lpOutputBuf, 1024 - ( ( sizeof( sockaddr_in ) + 16 ) * 2 ), sizeof( sockaddr_in ) + 16, sizeof( sockaddr_in ) + 16, &dwBytes, (LPOVERLAPPED)acceptContext ) )
+	if ( FALSE == lpfnAcceptEx( *GIocpManager->GetListenSocket(), mSocket, acceptContext->mWsaBuf.buf, 0, sizeof( sockaddr_in ) + 16, sizeof( sockaddr_in ) + 16, &dwBytes, (LPOVERLAPPED)acceptContext ) )
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
 		{
@@ -188,8 +190,8 @@ bool ClientSession::PreRecv()
 
 	DWORD recvbytes = 0;
 	DWORD flags = 0;
-	recvContext->mWsaBuf.len = (ULONG)mBuffer.GetFreeSpaceSize();
-	recvContext->mWsaBuf.buf = mBuffer.GetBuffer();
+	recvContext->mWsaBuf.len = 0;
+	recvContext->mWsaBuf.buf = nullptr;
 
 
 	/// start real recv
@@ -203,6 +205,7 @@ bool ClientSession::PreRecv()
 		}
 	}
 
+	//오히려 postRecv를 두번 넣은 효과가 나와서 수신보다 발송이 더 많아지는 상황 연출
 // 	if (false == PostRecv()) 
 // 	{
 // 
