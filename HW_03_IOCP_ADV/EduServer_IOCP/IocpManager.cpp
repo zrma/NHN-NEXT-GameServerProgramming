@@ -77,6 +77,11 @@ bool IocpManager::Initialize()
 	serveraddr.sin_port = htons(LISTEN_PORT);
 	serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
+// 	SOCKADDR_STORAGE listenAddr;
+// 	SOCKADDR_IN *pListenAddrIn = reinterpret_cast<SOCKADDR_IN*>( &listenAddr );
+// 
+// 	pListenAddrIn->sin_addr;
+
 	if (SOCKET_ERROR == bind(mListenSocket, (SOCKADDR*)&serveraddr, sizeof(serveraddr)))
 		return false;
 
@@ -89,12 +94,12 @@ bool IocpManager::Initialize()
 
 	if ( SOCKET_ERROR == WSAIoctl(mListenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER, 
 		&GuidAcceptEx, sizeof(GuidAcceptEx), 
-		&lpfnAcceptEx, sizeof(lpfnAcceptEx), 
+		&lpfnAcceptEx, sizeof(LPFN_ACCEPTEX), 
 		&dwBytes, NULL, NULL) )
 	{
 		printf_s( "[DEBUG] WSAIoctl failed error %d\n", GetLastError() );
-		closesocket( mListenSocket );
-		WSACleanup();
+// 		closesocket( mListenSocket );
+// 		WSACleanup();
 		
 		return false;
 	}
@@ -102,12 +107,12 @@ bool IocpManager::Initialize()
 	GUID GuidDisconnectEx = WSAID_DISCONNECTEX;
 	if ( SOCKET_ERROR == WSAIoctl( mListenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
 		&GuidDisconnectEx, sizeof( GuidDisconnectEx ),
-		&lpfnDisconnectEx, sizeof( lpfnDisconnectEx ),
+		&lpfnDisconnectEx, sizeof( LPFN_DISCONNECTEX ),
 		&dwBytes, NULL, NULL ) )
 	{
 		printf_s( "[DEBUG] WSAIoctl failed error %d\n", GetLastError() );
-		closesocket( mListenSocket );
-		WSACleanup();
+// 		closesocket( mListenSocket );
+// 		WSACleanup();
 
 		return false;
 	}
@@ -184,7 +189,7 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 			int gle = GetLastError();
 
 			//TODO: check time out first ... GQCS 타임 아웃의 경우는 어떻게?
-			if (gle == WAIT_TIMEOUT)
+			if (context == nullptr && gle == WAIT_TIMEOUT)
 			{
 				continue;
 			}

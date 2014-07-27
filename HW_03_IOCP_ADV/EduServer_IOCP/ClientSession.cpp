@@ -50,22 +50,22 @@ bool ClientSession::PostAccept()
 	OverlappedAcceptContext* acceptContext = new OverlappedAcceptContext(this);
 
 	//TODO : AccpetEx를 이용한 구현.
-	acceptContext->mWsaBuf.buf = mBuffer.GetBuffer();
-	acceptContext->mWsaBuf.len = (ULONG) mBuffer.GetFreeSpaceSize();
-
+	acceptContext->mWsaBuf.buf = nullptr;
+	acceptContext->mWsaBuf.len = 0;
 	DWORD dwBytes = 0;
+
 	if ( FALSE == lpfnAcceptEx( *GIocpManager->GetListenSocket(), mSocket, &acceptContext->mWsaBuf, 0, sizeof( sockaddr_in ) + 16, sizeof( sockaddr_in ) + 16, &dwBytes, &acceptContext->mOverlapped ) )
 	{
-		if (WSAGetLastError() == WSA_IO_PENDING)
+		if (WSAGetLastError() != WSA_IO_PENDING)
 		{
-			return true;
-		}
-		printf_s( "AcceptEx failed with error: %d \n", WSAGetLastError() );
-		closesocket( *GIocpManager->GetListenSocket() );
-		closesocket( mSocket );
-		WSACleanup();
+			//세션에서 WSACleanUP 소환하지 말것
+			//
+			printf_s( "AcceptEx failed with error: %d \n", WSAGetLastError() );
+			DeleteIoContext( acceptContext );
 
-		return false;
+			return false;
+		}
+		
 	}
 
 	return true;
@@ -119,11 +119,12 @@ void ClientSession::AcceptCompletion()
 		//TODO: CreateIoCompletionPort를 이용한 소켓 연결
 		//HANDLE handle = CreateIoCompletionPort(...);
 
-		if ( NULL == CreateIoCompletionPort( (HANDLE)mSocket, GIocpManager->GetComletionPort(), ( u_long )this, 0 ) )
+		HANDLE handle = CreateIoCompletionPort( (HANDLE)mSocket, GIocpManager->GetComletionPort(), ( u_long )this, 0 );
+		if ( handle != GIocpManager->GetComletionPort() )
 		{
 			printf_s( "CreateIOCP in accept area with error: %d\n", GetLastError() );
-			closesocket( mSocket );
-			WSACleanup();
+			resultOk = false;
+			break;
 		}
 		
 
@@ -157,7 +158,12 @@ void ClientSession::DisconnectRequest(DisconnectReason dr)
 	DWORD dwBytes = 0;
 	if ( FALSE == lpfnDisconnectEx( mSocket, &context->mOverlapped, dwBytes, 0 ) )
 	{
-		printf_s( "DisconnectEx func falsed with error: %d\n", GetLastError() );
+		//펜딩 상태가 아니면 문제가 있는 것
+		if (WSAGetLastError() != WSA_IO_PENDING)
+		{
+			DeleteIoContext( context );
+			printf_s( "DisconnectEx func falsed with error: %d\n", GetLastError() );
+		}
 	}
 }
 
