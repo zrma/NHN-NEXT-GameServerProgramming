@@ -26,6 +26,13 @@ public:
 
 	SOCKET* GetListenSocket()  { return &mListenSocket;  }
 
+	static BOOL DisconnectEx( SOCKET hSocket, LPOVERLAPPED lpOverlapped, DWORD dwFlags, DWORD dwReserved );
+	static BOOL AcceptEx( SOCKET sListenSocket, SOCKET sAcceptSocket, PVOID lpOutputBuffer, DWORD dwReceiveDataLength,
+						  DWORD dwLocalAddressLength, DWORD dwRemoteAddressLength, LPDWORD lpdwBytesReceived, LPOVERLAPPED lpOverlapped );
+
+	static LPFN_ACCEPTEX		mFnAcceptEx;
+	static LPFN_DISCONNECTEX	mFnDisconnectEx;
+
 private:
 
 	static unsigned int WINAPI IoWorkerThread(LPVOID lpParam);
@@ -44,7 +51,3 @@ private:
 
 extern __declspec(thread) int LIoThreadId;
 extern IocpManager* GIocpManager;
-
-extern LPFN_ACCEPTEX lpfnAcceptEx;
-extern LPFN_DISCONNECTEX lpfnDisconnectEx;
-

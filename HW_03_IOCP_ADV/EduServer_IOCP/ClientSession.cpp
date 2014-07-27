@@ -49,14 +49,14 @@ bool ClientSession::PostAccept()
 
 	OverlappedAcceptContext* acceptContext = new OverlappedAcceptContext(this);
 
-	//TODO : AccpetEx를 이용한 구현.
-	//이거 이상한거 연결하지말고, 모든 것을 0으로 초기화 해서 보내야 한다
+	//TODO : AccpetEx를 이용한 구현
 	acceptContext->mWsaBuf.buf = mBuffer.GetBuffer();
 	acceptContext->mWsaBuf.len = mBuffer.GetFreeSpaceSize();
 	DWORD dwBytes = 0;
 	/*char lpOutputBuf[1024] = { 0, };*/
 
-	if ( FALSE == lpfnAcceptEx( *GIocpManager->GetListenSocket(), mSocket, acceptContext->mWsaBuf.buf, 0, sizeof( sockaddr_in ) + 16, sizeof( sockaddr_in ) + 16, &dwBytes, (LPOVERLAPPED)acceptContext ) )
+	if ( FALSE == IocpManager::AcceptEx( *GIocpManager->GetListenSocket(), mSocket, acceptContext->mWsaBuf.buf, 0,
+		sizeof( sockaddr_in ) + 16, sizeof( sockaddr_in ) + 16, &dwBytes, (LPOVERLAPPED)acceptContext ) )
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
 		{
@@ -157,8 +157,7 @@ void ClientSession::DisconnectRequest(DisconnectReason dr)
 	OverlappedDisconnectContext* context = new OverlappedDisconnectContext(this, dr);
 
 	//TODO: DisconnectEx를 이용한 연결 끊기 요청
-	//DWORD dwBytes = 0;
-	if ( FALSE == lpfnDisconnectEx( mSocket, &context->mOverlapped, TF_REUSE_SOCKET, 0 ) )
+	if ( FALSE == IocpManager::DisconnectEx( mSocket, &context->mOverlapped, TF_REUSE_SOCKET, 0 ) )
 	{
 		//펜딩 상태가 아니면 문제가 있는 것
 		if (WSAGetLastError() != WSA_IO_PENDING)
@@ -205,12 +204,6 @@ bool ClientSession::PreRecv()
 		}
 	}
 
-	//오히려 postRecv를 두번 넣은 효과가 나와서 수신보다 발송이 더 많아지는 상황 연출
-// 	if (false == PostRecv()) 
-// 	{
-// 
-// 		return false;
-// 	}
 	return true;
 }
 
