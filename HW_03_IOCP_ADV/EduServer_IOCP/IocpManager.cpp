@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Exception.h"
 #include "IocpManager.h"
 #include "EduServer_IOCP.h"
@@ -13,8 +13,8 @@ IocpManager* GIocpManager = nullptr;
 LPFN_ACCEPTEX lpfnAcceptEx = NULL;
 LPFN_DISCONNECTEX lpfnDisconnectEx = NULL;
 
-//TODO AcceptEx DisconnectEx ÇÔ¼ö »ç¿ëÇÒ ¼ö ÀÖµµ·Ï ±¸Çö.
-//ÇÔ¼ö Æ÷ÀÎÅÍ´Â winsock2 ÇÔ¼öµéÀ» °¡¸®Å°°í ÀÖ´Â °ÍÀÌ ¾Æ´Ï¾ú´Â°¡?!
+//TODO AcceptEx DisconnectEx í•¨ìˆ˜ ì‚¬ìš©í•  ìˆ˜ ìˆë„ë¡ êµ¬í˜„.
+//í•¨ìˆ˜ í¬ì¸í„°ëŠ” winsock2 í•¨ìˆ˜ë“¤ì„ ê°€ë¦¬í‚¤ê³  ìˆëŠ” ê²ƒì´ ì•„ë‹ˆì—ˆëŠ”ê°€?!
 
 // BOOL DisconnectEx(SOCKET hSocket, LPOVERLAPPED lpOverlapped, DWORD dwFlags, DWORD reserved)
 // {
@@ -80,7 +80,7 @@ bool IocpManager::Initialize()
 	if (SOCKET_ERROR == bind(mListenSocket, (SOCKADDR*)&serveraddr, sizeof(serveraddr)))
 		return false;
 
-	//TODO : WSAIoctlÀ» ÀÌ¿ëÇÏ¿© AcceptEx, DisconnectEx ÇÔ¼ö »ç¿ë°¡´ÉÇÏµµ·Ï ÇÏ´Â ÀÛ¾÷..
+	//TODO : WSAIoctlì„ ì´ìš©í•˜ì—¬ AcceptEx, DisconnectEx í•¨ìˆ˜ ì‚¬ìš©ê°€ëŠ¥í•˜ë„ë¡ í•˜ëŠ” ì‘ì—…..
 
 	GUID GuidAcceptEx = WSAID_ACCEPTEX;
 	//LPFN_ACCEPTEX lpfnAcceptEx = ( LPFN_ACCEPTEX )AcceptEx;
@@ -183,7 +183,7 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 		{
 			int gle = GetLastError();
 
-			//TODO: check time out first ... GQCS Å¸ÀÓ ¾Æ¿ôÀÇ °æ¿ì´Â ¾î¶»°Ô?
+			//TODO: check time out first ... GQCS íƒ€ì„ ì•„ì›ƒì˜ ê²½ìš°ëŠ” ì–´ë–»ê²Œ?
 			if (gle == WAIT_TIMEOUT)
 			{
 				continue;

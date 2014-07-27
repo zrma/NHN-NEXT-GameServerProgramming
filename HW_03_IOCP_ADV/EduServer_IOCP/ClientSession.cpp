@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Exception.h"
 #include "EduServer_IOCP.h"
 #include "ClientSession.h"
@@ -49,7 +49,7 @@ bool ClientSession::PostAccept()
 
 	OverlappedAcceptContext* acceptContext = new OverlappedAcceptContext(this);
 
-	//TODO : AccpetEx¸¦ ÀÌ¿ëÇÑ ±¸Çö.
+	//TODO : AccpetExë¥¼ ì´ìš©í•œ êµ¬í˜„.
 	acceptContext->mWsaBuf.buf = mBuffer.GetBuffer();
 	acceptContext->mWsaBuf.len = (ULONG) mBuffer.GetFreeSpaceSize();
 
@@ -116,7 +116,7 @@ void ClientSession::AcceptCompletion()
 			break;
 		}
 
-		//TODO: CreateIoCompletionPort¸¦ ÀÌ¿ëÇÑ ¼ÒÄÏ ¿¬°á
+		//TODO: CreateIoCompletionPortë¥¼ ì´ìš©í•œ ì†Œì¼“ ì—°ê²°
 		//HANDLE handle = CreateIoCompletionPort(...);
 
 		if ( NULL == CreateIoCompletionPort( (HANDLE)mSocket, GIocpManager->GetComletionPort(), ( u_long )this, 0 ) )
@@ -147,13 +147,13 @@ void ClientSession::AcceptCompletion()
 
 void ClientSession::DisconnectRequest(DisconnectReason dr)
 {
-	/// ÀÌ¹Ì ²÷°å°Å³ª ²÷±â´Â ÁßÀÌ°Å³ª
+	/// ì´ë¯¸ ëŠê²¼ê±°ë‚˜ ëŠê¸°ëŠ” ì¤‘ì´ê±°ë‚˜
 	if (0 == InterlockedExchange(&mConnected, 0))
 		return ;
 	
 	OverlappedDisconnectContext* context = new OverlappedDisconnectContext(this, dr);
 
-	//TODO: DisconnectEx¸¦ ÀÌ¿ëÇÑ ¿¬°á ²÷±â ¿äÃ»
+	//TODO: DisconnectExë¥¼ ì´ìš©í•œ ì—°ê²° ëŠê¸° ìš”ì²­
 	DWORD dwBytes = 0;
 	if ( FALSE == lpfnDisconnectEx( mSocket, &context->mOverlapped, dwBytes, 0 ) )
 	{
@@ -177,8 +177,8 @@ bool ClientSession::PreRecv()
 
 	OverlappedPreRecvContext* recvContext = new OverlappedPreRecvContext(this);
 
-	//TODO: zero-byte recv ±¸Çö
-	//0¹ÙÀÌÆ® ¹Ş´Â´Ù°í ¼Ó¿©¾ß µÊ
+	//TODO: zero-byte recv êµ¬í˜„
+	//0ë°”ì´íŠ¸ ë°›ëŠ”ë‹¤ê³  ì†ì—¬ì•¼ ë¨
 
 	DWORD recvbytes = 0;
 	DWORD flags = 0;

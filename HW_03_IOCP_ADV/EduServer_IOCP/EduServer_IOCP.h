@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #define LISTEN_PORT		9990
 #define MAX_CONNECTION	10000

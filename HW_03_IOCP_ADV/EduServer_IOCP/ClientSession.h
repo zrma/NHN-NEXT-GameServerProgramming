@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Exception.h"
 #include "CircularBuffer.h"
 #include "FastSpinlock.h"
