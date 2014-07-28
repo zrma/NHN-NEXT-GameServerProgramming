@@ -50,12 +50,15 @@ bool ClientSession::PostAccept()
 	OverlappedAcceptContext* acceptContext = new OverlappedAcceptContext(this);
 
 	//TODO : AccpetEx를 이용한 구현
-	acceptContext->mWsaBuf.buf = mBuffer.GetBuffer(); ///# 0
-	acceptContext->mWsaBuf.len = mBuffer.GetFreeSpaceSize(); ///# 0으로 
+	// acceptContext->mWsaBuf.buf = mBuffer.GetBuffer(); ///# 0
+	// acceptContext->mWsaBuf.len = mBuffer.GetFreeSpaceSize(); ///# 0으로 
+	acceptContext->mWsaBuf.buf = nullptr; ///# 0
+	acceptContext->mWsaBuf.len = 0; ///# 0으로 
+
 	DWORD dwBytes = 0;
 	/*char lpOutputBuf[1024] = { 0, };*/
-
-	if ( FALSE == IocpManager::AcceptEx( *GIocpManager->GetListenSocket(), mSocket, acceptContext->mWsaBuf.buf, 0, ///# acceptex 전용 버퍼는 따로 두면 편함.
+	
+	if ( FALSE == IocpManager::AcceptEx( *GIocpManager->GetListenSocket(), mSocket, GIocpManager->mBuffer, 0, ///# acceptex 전용 버퍼는 따로 두면 편함. -> 확인
 		sizeof( sockaddr_in ) + 16, sizeof( sockaddr_in ) + 16, &dwBytes, (LPOVERLAPPED)acceptContext ) )
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
@@ -157,7 +160,7 @@ void ClientSession::DisconnectRequest(DisconnectReason dr)
 	OverlappedDisconnectContext* context = new OverlappedDisconnectContext(this, dr);
 
 	//TODO: DisconnectEx를 이용한 연결 끊기 요청
-	if ( FALSE == IocpManager::DisconnectEx( mSocket, &context->mOverlapped, TF_REUSE_SOCKET, 0 ) ) ///# context 그대로 넘겨도 된다. overlapped가 맨 앞에 있으므로.
+	if ( FALSE == IocpManager::DisconnectEx( mSocket, (LPOVERLAPPED) context, TF_REUSE_SOCKET, 0 ) ) ///# context 그대로 넘겨도 된다. overlapped가 맨 앞에 있으므로.  -> 확인
 	{
 		//펜딩 상태가 아니면 문제가 있는 것
 		if (WSAGetLastError() != WSA_IO_PENDING)

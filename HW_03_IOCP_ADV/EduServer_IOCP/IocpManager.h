@@ -29,9 +29,11 @@ public:
 	static BOOL DisconnectEx( SOCKET hSocket, LPOVERLAPPED lpOverlapped, DWORD dwFlags, DWORD dwReserved );
 	static BOOL AcceptEx( SOCKET sListenSocket, SOCKET sAcceptSocket, PVOID lpOutputBuffer, DWORD dwReceiveDataLength,
 						  DWORD dwLocalAddressLength, DWORD dwRemoteAddressLength, LPDWORD lpdwBytesReceived, LPOVERLAPPED lpOverlapped );
-
+	
 	static LPFN_ACCEPTEX		mFnAcceptEx;
 	static LPFN_DISCONNECTEX	mFnDisconnectEx;
+
+	char mBuffer[1024];
 
 private:
 

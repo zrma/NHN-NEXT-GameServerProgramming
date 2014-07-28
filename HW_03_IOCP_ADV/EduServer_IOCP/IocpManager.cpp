@@ -43,7 +43,8 @@ BOOL IocpManager::AcceptEx( SOCKET sListenSocket, SOCKET sAcceptSocket, PVOID lp
 }
 
 IocpManager::IocpManager() : mCompletionPort(NULL), mIoThreadCount(2), mListenSocket(NULL)
-{	
+{
+	ZeroMemory( mBuffer, sizeof( mBuffer ) );
 }
 
 
@@ -192,7 +193,7 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 			int gle = GetLastError();
 
 			//TODO: check time out first ... GQCS 타임 아웃의 경우는 어떻게?
-			if (ret == 0 && gle == WAIT_TIMEOUT) ///# 엄밀히 말하면, (context == null && gle == WAIT_TIMEOUT)인 경우
+			if ( context == nullptr && gle == WAIT_TIMEOUT ) ///# 엄밀히 말하면, (context == null && gle == WAIT_TIMEOUT)인 경우  -> 확인
 			{
 				continue;
 			}

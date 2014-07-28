@@ -23,13 +23,11 @@ void SessionManager::PrepareSessions()
 	for (int i = 0; i < MAX_CONNECTION; ++i)
 	{
 		ClientSession* client = new ClientSession();
+		client->SessionReset();
 
 		mFreeSessionList.push_back(client);
 	}
 }
-
-
-
 
 
 void SessionManager::ReturnClientSession(ClientSession* client)
@@ -55,7 +53,7 @@ bool SessionManager::AcceptSessions()
 		// AddRef()도 당연히 해줘야 하고...
 		ClientSession* accepttingSession = mFreeSessionList.back();
 		mFreeSessionList.pop_back();
-
+		
 		if ( !(accepttingSession->PostAccept()) )
 		{
 			return false;
