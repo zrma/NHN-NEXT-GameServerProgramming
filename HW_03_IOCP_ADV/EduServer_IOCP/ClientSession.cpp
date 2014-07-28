@@ -192,7 +192,6 @@ bool ClientSession::PreRecv()
 	recvContext->mWsaBuf.len = 0;
 	recvContext->mWsaBuf.buf = nullptr;
 
-
 	/// start real recv
 	if ( SOCKET_ERROR == WSARecv( mSocket, &recvContext->mWsaBuf, 1, &recvbytes, &flags, (LPWSAOVERLAPPED)recvContext, NULL ) )
 	{
