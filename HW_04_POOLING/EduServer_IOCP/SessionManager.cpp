@@ -23,7 +23,7 @@ void SessionManager::PrepareSessions()
 
 	for (int i = 0; i < MAX_CONNECTION; ++i)
 	{
-		ClientSession* client = xnew<ClientSession>( ClientSession );
+		ClientSession* client = xnew<ClientSession>( );
 			
 		mFreeSessionList.push_back(client);
 	}

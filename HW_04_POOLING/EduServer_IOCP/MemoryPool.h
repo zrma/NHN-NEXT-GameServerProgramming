@@ -89,7 +89,7 @@ T* xnew(Args... arg)
 	void* alloc = nullptr; 
 	
 	//TODO: ... ...
-	alloc = new ( GMemoryPool->Allocate( sizeof( T ) ) );
+	alloc =  GMemoryPool->Allocate( sizeof( T ) );
 
 	return reinterpret_cast<T*>(alloc);
 }
