@@ -46,13 +46,15 @@ public:
 	T* allocate(size_t n)
 	{
 		//TODO: 메모리풀에서 할당해서 리턴
-		return static_cast<T*>(malloc(n*sizeof(T)));
+		//return static_cast<T*>(malloc(n*sizeof(T)));
+		return static_cast<T*>( GMemoryPool->Allocate( sizeof( T ) * n ) );
 	}
 
 	void deallocate(T* ptr, size_t n)
 	{
 		//TODO: 메모리풀에 반납
-		free(ptr);
+		//free(ptr);
+		return ( GMemoryPool->Deallocate( ptr, n ) );
 	}
 };
 
