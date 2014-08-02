@@ -17,11 +17,18 @@ struct MemAllocInfo : SLIST_ENTRY
 inline void* AttachMemAllocInfo(MemAllocInfo* header, int size)
 {
 	//TODO: header에 MemAllocInfo를 펼친 다음에 실제 앱에서 사용할 메모리 주소를 void*로 리턴... 실제 사용되는 예 및 DetachMemAllocInfo 참고.
-	return 0;
+	
+	//실제 할당하는 메모리 사이즈를 헤더에 넣어주고
+	//실제 데이터를 기록할 부분 = 헤더 바로 뒷 부분으로 포인터를 뒤로 미룬다
+	header->mAllocSize = size;
+	++header;
+
+	return reinterpret_cast<void*>(header);
 }
 
 inline MemAllocInfo* DetachMemAllocInfo(void* ptr)
 {
+	//실제 위치가 들어오면 헤더만큼 당겨서 실제 해제 해야될 위치로 포인터 이동
 	MemAllocInfo* header = reinterpret_cast<MemAllocInfo*>(ptr);
 	--header;
 	return header;
@@ -82,6 +89,7 @@ T* xnew(Args... arg)
 	void* alloc = nullptr; 
 	
 	//TODO: ... ...
+	alloc = new ( GMemoryPool->allocate( sizeof( T ) ) );
 
 	return reinterpret_cast<T*>(alloc);
 }
@@ -92,5 +100,7 @@ void xdelete(T* object)
 	static_assert(true == std::is_convertible<T, PooledAllocatable>::value, "only allowed when PooledAllocatable");
 
 	//TODO: object의 소멸자 불러주고 메모리풀에 반납.
+	object->~T();
+	GMemoryPool->Deallocate( object, NULL );
 	
 }

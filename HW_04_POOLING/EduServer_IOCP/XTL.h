@@ -68,6 +68,7 @@ struct xdeque
 {
 	//TODO: STL 할당자를 사용하는 deque를 type으로 선언
 	//typedef ... type;
+	typedef std::deque<T, STLAllocator<T>> type;
 };
 
 template <class T>
@@ -82,6 +83,7 @@ struct xmap
 {
 	//TODO: STL 할당자 사용하는 map을  type으로 선언
 	//typedef ... type;
+	typedef std::map<K, T, C, STLAllocator<std::pair<K, T>>> type;
 };
 
 template <class T, class C = std::less<T> >
@@ -89,6 +91,8 @@ struct xset
 {
 	//TODO: STL 할당자 사용하는 set을  type으로 선언
 	//typedef ... type;
+
+	typedef std::set < T, C, STLAllocator<T> > type;
 };
 
 template <class K, class T, class C = std::hash_compare<K, std::less<K>> >
@@ -108,6 +112,7 @@ struct xpriority_queue
 {
 	//TODO: STL 할당자 사용하는 priority_queue을  type으로 선언
 	//typedef ... type;
+	typedef std::priority_queue < T, std::vector<T>, C > type;
 };
 
 typedef std::basic_string<wchar_t, std::char_traits<wchar_t>, STLAllocator<wchar_t>> xstring;

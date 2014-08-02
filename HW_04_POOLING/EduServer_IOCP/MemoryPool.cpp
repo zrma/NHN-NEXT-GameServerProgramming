@@ -13,7 +13,8 @@ SmallSizeMemoryPool::SmallSizeMemoryPool(DWORD allocSize) : mAllocSize(allocSize
 
 MemAllocInfo* SmallSizeMemoryPool::Pop()
 {
-	MemAllocInfo* mem = 0;//TODO: InterlockedPopEntrySList를 이용하여 mFreeList에서 pop으로 메모리를 가져올 수 있는지 확인. 
+	MemAllocInfo* mem = ( InterlockedPopEntrySList( &mFreeList ) ) ? reinterpret_cast<MemAllocInfo*>(InterlockedPopEntrySList(&mFreeList)) : NULL;
+	//TODO: InterlockedPopEntrySList를 이용하여 mFreeList에서 pop으로 메모리를 가져올 수 있는지 확인. 
 
 	if (NULL == mem)
 	{
@@ -32,6 +33,7 @@ MemAllocInfo* SmallSizeMemoryPool::Pop()
 void SmallSizeMemoryPool::Push(MemAllocInfo* ptr)
 {
 	//TODO: InterlockedPushEntrySList를 이용하여 메모리풀에 (재사용을 위해) 반납.
+	InterlockedPushEntrySList( &mFreeList, ptr );
 
 	InterlockedDecrement(&mAllocCount);
 }
@@ -65,9 +67,19 @@ MemoryPool::MemoryPool()
 	}
 
 	//TODO: [2048, 4096] 범위 내에서 256바이트 단위로 SmallSizeMemoryPool을 할당하고 
-	//TODO: mSmallSizeMemoryPoolTable에 O(1) access가 가능하도록 SmallSizeMemoryPool의 주소 기록
-
+	//AX_SMALL_POOL_COUNT = 1024 / 32 + 1024 / 128 + 2048 / 256, ///< ~1024까지 32단위, ~2048까지 128단위, ~4096까지 256단위
 	
+	for ( int i = 2048; i < 4096; i += 256 )
+	{
+		SmallSizeMemoryPool* pool = new SmallSizeMemoryPool( i );
+		for ( int j = recent+1; j <= i; ++j )
+		{
+			mSmallSizeMemoryPoolTable[j] = pool;
+		}
+	}
+
+	//TODO: mSmallSizeMemoryPoolTable에 O(1) access가 가능하도록 SmallSizeMemoryPool의 주소 기록
+	mSmallSizeMemoryPoolTable[0] = new SmallSizeMemoryPool( 32 );
 
 }
 
@@ -78,12 +90,15 @@ void* MemoryPool::Allocate(int size)
 
 	if (realAllocSize > MAX_ALLOC_SIZE)
 	{
+		//사이즈가 넘으면 원래 하던 방식의 기본 memoryalloc 사용하는 것
 		header = reinterpret_cast<MemAllocInfo*>(_aligned_malloc(realAllocSize, MEMORY_ALLOCATION_ALIGNMENT));
 	}
 	else
 	{
 		//TODO: SmallSizeMemoryPool에서 할당
 		//header = ...; 
+		header = mSmallSizeMemoryPoolTable[realAllocSize]->Pop();
+
 	}
 
 	return AttachMemAllocInfo(header, realAllocSize);
@@ -105,6 +120,7 @@ void MemoryPool::Deallocate(void* ptr, long extraInfo)
 	else
 	{
 		//TODO: SmallSizeMemoryPool에 (재사용을 위해) push..
+		mSmallSizeMemoryPoolTable[realAllocSize]->Push( header );
 		
 	}
 }
