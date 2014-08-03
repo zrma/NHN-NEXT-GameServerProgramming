@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Exception.h"
 #include "EduServer_IOCP.h"
 #include "ClientSession.h"
@@ -141,7 +141,7 @@ void ClientSession::AcceptCompletion()
 
 void ClientSession::DisconnectRequest(DisconnectReason dr)
 {
-	/// ÀÌ¹Ì ²÷°å°Å³ª ²÷±â´Â ÁßÀÌ°Å³ª
+	/// ì´ë¯¸ ëŠê²¼ê±°ë‚˜ ëŠê¸°ëŠ” ì¤‘ì´ê±°ë‚˜
 	if (0 == InterlockedExchange(&mConnected, 0))
 		return ;
 	

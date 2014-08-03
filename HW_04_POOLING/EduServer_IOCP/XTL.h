@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "MemoryPool.h"
 #include <list>
 #include <vector>
@@ -45,14 +45,14 @@ public:
 
 	T* allocate(size_t n)
 	{
-		//TODO: ¸Ş¸ğ¸®Ç®¿¡¼­ ÇÒ´çÇØ¼­ ¸®ÅÏ
+		//TODO: ë©”ëª¨ë¦¬í’€ì—ì„œ í• ë‹¹í•´ì„œ ë¦¬í„´
 		//return static_cast<T*>(malloc(n*sizeof(T)));
 		return static_cast<T*>( GMemoryPool->Allocate( sizeof( T ) * n ) );
 	}
 
 	void deallocate(T* ptr, size_t n)
 	{
-		//TODO: ¸Ş¸ğ¸®Ç®¿¡ ¹İ³³
+		//TODO: ë©”ëª¨ë¦¬í’€ì— ë°˜ë‚©
 		//free(ptr);
 		return ( GMemoryPool->Deallocate( ptr, n ) );
 	}
@@ -68,7 +68,7 @@ struct xvector
 template <class T>
 struct xdeque
 {
-	//TODO: STL ÇÒ´çÀÚ¸¦ »ç¿ëÇÏ´Â deque¸¦ typeÀ¸·Î ¼±¾ğ
+	//TODO: STL í• ë‹¹ìë¥¼ ì‚¬ìš©í•˜ëŠ” dequeë¥¼ typeìœ¼ë¡œ ì„ ì–¸
 	//typedef ... type;
 	typedef std::deque<T, STLAllocator<T>> type;
 };
@@ -76,14 +76,14 @@ struct xdeque
 template <class T>
 struct xlist
 {
-	//TODO: STL ÇÒ´çÀÚ »ç¿ë
+	//TODO: STL í• ë‹¹ì ì‚¬ìš©
 	typedef std::list<T> type;
 };
 
 template <class K, class T, class C = std::less<K> >
 struct xmap
 {
-	//TODO: STL ÇÒ´çÀÚ »ç¿ëÇÏ´Â mapÀ»  typeÀ¸·Î ¼±¾ğ
+	//TODO: STL í• ë‹¹ì ì‚¬ìš©í•˜ëŠ” mapì„  typeìœ¼ë¡œ ì„ ì–¸
 	//typedef ... type;
 	typedef std::map<K, T, C, STLAllocator<std::pair<K, T>>> type;
 };
@@ -91,7 +91,7 @@ struct xmap
 template <class T, class C = std::less<T> >
 struct xset
 {
-	//TODO: STL ÇÒ´çÀÚ »ç¿ëÇÏ´Â setÀ»  typeÀ¸·Î ¼±¾ğ
+	//TODO: STL í• ë‹¹ì ì‚¬ìš©í•˜ëŠ” setì„  typeìœ¼ë¡œ ì„ ì–¸
 	//typedef ... type;
 
 	typedef std::set < T, C, STLAllocator<T> > type;
@@ -112,7 +112,7 @@ struct xhash_set
 template <class T, class C = std::less<std::vector<T>::value_type> >
 struct xpriority_queue
 {
-	//TODO: STL ÇÒ´çÀÚ »ç¿ëÇÏ´Â priority_queueÀ»  typeÀ¸·Î ¼±¾ğ
+	//TODO: STL í• ë‹¹ì ì‚¬ìš©í•˜ëŠ” priority_queueì„  typeìœ¼ë¡œ ì„ ì–¸
 	//typedef ... type;
 	typedef std::priority_queue < T, std::vector<T>, C > type;
 };
