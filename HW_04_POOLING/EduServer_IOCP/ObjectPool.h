@@ -13,7 +13,7 @@ public:
 	static void* operator new(size_t objSize)
 	{
 		//TODO: TOBJECT 타입 단위로 lock 잠금
-		FastSpinlockGuard( TOBJECT );
+		FastSpinlockGuard criticalSection( TOBJECT );
 
 		if (!mFreeList)
 		{
@@ -43,7 +43,7 @@ public:
 	static void	operator delete(void* obj)
 	{
 		//TODO: TOBJECT 타입 단위로 lock 잠금
-		FastSpinlockGuard( TOBJECT );
+		FastSpinlockGuard criticalSection( TOBJECT );
 
 		CRASH_ASSERT(mCurrentUseCount > 0);
 
