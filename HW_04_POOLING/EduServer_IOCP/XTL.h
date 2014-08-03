@@ -47,14 +47,18 @@ public:
 	{
 		//TODO: 메모리풀에서 할당해서 리턴
 		//return static_cast<T*>(malloc(n*sizeof(T)));
-		return static_cast<T*>( GMemoryPool->Allocate( sizeof( T ) * n ) );
+
+		CRASH_ASSERT( GMemoryPool != nullptr );
+		return static_cast<T*>( GMemoryPool->Allocate( static_cast<long>( sizeof( T ) * n ) ) );
 	}
 
 	void deallocate(T* ptr, size_t n)
 	{
 		//TODO: 메모리풀에 반납
 		//free(ptr);
-		return ( GMemoryPool->Deallocate( ptr, sizeof( T ) * n ) );
+
+		CRASH_ASSERT( GMemoryPool != nullptr );
+		GMemoryPool->Deallocate( ptr, static_cast<long>(sizeof( T ) * n) );
 	}
 };
 
@@ -77,7 +81,8 @@ template <class T>
 struct xlist
 {
 	//TODO: STL 할당자 사용
-	typedef std::list<T> type;
+	// typedef std::list<T> type;
+	typedef std::list<T, STLAllocator<T>> type;
 };
 
 template <class K, class T, class C = std::less<K> >

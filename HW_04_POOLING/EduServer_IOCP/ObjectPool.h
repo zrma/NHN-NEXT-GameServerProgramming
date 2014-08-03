@@ -35,7 +35,7 @@ public:
 			mTotalAllocCount += ALLOC_COUNT;
 		}
 
-		CRASH_ASSERT( mCurrentUseCount <= mTotalAllocCount );
+		CRASH_ASSERT( mCurrentUseCount < mTotalAllocCount );
 		// printf_s( "할당 %d / %d \n", mCurrentUseCount, mTotalAllocCount );
 
 		uint8_t* pAvailable = mFreeList;

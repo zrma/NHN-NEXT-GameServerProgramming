@@ -85,13 +85,14 @@ T* xnew(Args... arg)
 	static_assert(true == std::is_convertible<T, PooledAllocatable>::value, "only allowed when PooledAllocatable");
 
 	//TODO: T* obj = xnew<T>(...); 처럼 사용할 수있도록 메모리풀에서 할당하고 생성자 불러주고 리턴.
-
 	void* alloc = nullptr; 
+
+	CRASH_ASSERT( GMemoryPool != nullptr );
+	alloc = GMemoryPool->Allocate( sizeof( T ) );
 	
 	//TODO: ... ...
-	alloc =  GMemoryPool->Allocate( sizeof( T ) );
 	new(alloc)T( arg... );
-
+	
 	return reinterpret_cast<T*>(alloc);
 }
 
@@ -102,6 +103,7 @@ void xdelete(T* object)
 
 	//TODO: object의 소멸자 불러주고 메모리풀에 반납.
 	object->~T();
-	GMemoryPool->Deallocate( object, NULL );
-	
+
+	CRASH_ASSERT( GMemoryPool != nullptr );
+	GMemoryPool->Deallocate( object, NULL );	
 }

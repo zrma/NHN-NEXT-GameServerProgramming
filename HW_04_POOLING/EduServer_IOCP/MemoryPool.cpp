@@ -69,6 +69,7 @@ MemoryPool::MemoryPool()
 	//TODO: [2048, 4096] 범위 내에서 256바이트 단위로 SmallSizeMemoryPool을 할당하고 
 	//AX_SMALL_POOL_COUNT = 1024 / 32 + 1024 / 128 + 2048 / 256, ///< ~1024까지 32단위, ~2048까지 128단위, ~4096까지 256단위
 	
+	//TODO: mSmallSizeMemoryPoolTable에 O(1) access가 가능하도록 SmallSizeMemoryPool의 주소 기록
 	for ( int i = 2048; i < 4096; i += 256 )
 	{
 		SmallSizeMemoryPool* pool = new SmallSizeMemoryPool( i );
@@ -76,11 +77,11 @@ MemoryPool::MemoryPool()
 		{
 			mSmallSizeMemoryPoolTable[j] = pool;
 		}
+
+		recent = i;
 	}
-
-	//TODO: mSmallSizeMemoryPoolTable에 O(1) access가 가능하도록 SmallSizeMemoryPool의 주소 기록
-	mSmallSizeMemoryPoolTable[0] = new SmallSizeMemoryPool( 32 );
-
+		
+	// mSmallSizeMemoryPoolTable[0] = new SmallSizeMemoryPool( 32 );
 }
 
 void* MemoryPool::Allocate(int size)
