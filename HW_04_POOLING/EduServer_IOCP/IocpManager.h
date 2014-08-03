@@ -8,6 +8,8 @@ struct OverlappedRecvContext;
 struct OverlappedDisconnectContext;
 struct OverlappedAcceptContext;
 
+
+
 class IocpManager
 {
 public:
@@ -25,6 +27,11 @@ public:
 	int	GetIoThreadCount()		{ return mIoThreadCount;  }
 
 	SOCKET* GetListenSocket()  { return &mListenSocket;  }
+
+	static BOOL DisconnectEx( SOCKET hSocket, LPOVERLAPPED lpOverlapped, DWORD dwFlags, DWORD reserved );
+
+	static BOOL AcceptEx( SOCKET sListenSocket, SOCKET sAcceptSocket, PVOID lpOutputBuffer, DWORD dwReceiveDataLength,
+						  DWORD dwLocalAddressLength, DWORD dwRemoteAddressLength, LPDWORD lpdwBytesReceived, LPOVERLAPPED lpOverlapped );
 
 	static char mAcceptBuf[64];
 	static LPFN_DISCONNECTEX mFnDisconnectEx;
@@ -50,7 +57,4 @@ extern __declspec(thread) int LIoThreadId;
 extern IocpManager* GIocpManager;
 
 
-BOOL DisconnectEx(SOCKET hSocket, LPOVERLAPPED lpOverlapped, DWORD dwFlags, DWORD reserved);
 
-BOOL AcceptEx(SOCKET sListenSocket, SOCKET sAcceptSocket, PVOID lpOutputBuffer, DWORD dwReceiveDataLength,
-	DWORD dwLocalAddressLength, DWORD dwRemoteAddressLength, LPDWORD lpdwBytesReceived, LPOVERLAPPED lpOverlapped);

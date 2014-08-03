@@ -147,7 +147,7 @@ void ClientSession::DisconnectRequest(DisconnectReason dr)
 	
 	OverlappedDisconnectContext* context = new OverlappedDisconnectContext(this, dr);
 
-	if (FALSE == DisconnectEx(mSocket, (LPWSAOVERLAPPED)context, TF_REUSE_SOCKET, 0))
+	if (FALSE == IocpManager::DisconnectEx(mSocket, (LPWSAOVERLAPPED)context, TF_REUSE_SOCKET, 0))
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
 		{
