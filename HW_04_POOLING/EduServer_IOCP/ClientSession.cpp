@@ -301,23 +301,23 @@ void DeleteIoContext(OverlappedIOContext* context)
 	switch (context->mIoType)
 	{
 	case IO_SEND:
-		delete static_cast<OverlappedSendContext*>(context);
+		xdelete<OverlappedIOContext>( static_cast<OverlappedSendContext*>( context ) );
 		break;
 
 	case IO_RECV_ZERO:
-		delete static_cast<OverlappedPreRecvContext*>(context);
+		xdelete<OverlappedIOContext>( static_cast<OverlappedPreRecvContext*>(context) );
 		break;
 
 	case IO_RECV:
-		delete static_cast<OverlappedRecvContext*>(context);
+		xdelete<OverlappedIOContext>( static_cast<OverlappedRecvContext*>( context ) );
 		break;
 
 	case IO_DISCONNECT:
-		delete static_cast<OverlappedDisconnectContext*>(context);
+		xdelete<OverlappedIOContext>( static_cast<OverlappedDisconnectContext*>( context ) );
 		break;
 
 	case IO_ACCEPT:
-		delete static_cast<OverlappedAcceptContext*>(context);
+		xdelete<OverlappedIOContext>( static_cast<OverlappedAcceptContext*>( context ) );
 		break;
 
 	default:

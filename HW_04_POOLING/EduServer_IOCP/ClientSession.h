@@ -42,10 +42,14 @@ struct OverlappedIOContext
 
 struct OverlappedSendContext: public OverlappedIOContext
 {
+	//struct 생성자니깐, 이친구를 지우고
+	//생성자 + 소멸자를 만들어야 됨
 	OverlappedSendContext( ClientSession* owner ): OverlappedIOContext( owner, IO_SEND )
 	{
-		
 	}
+
+	//요부분은 deleteIoContext님이 맡아주셨고
+	//~OverlappedSendContext( );
 };
 
 
