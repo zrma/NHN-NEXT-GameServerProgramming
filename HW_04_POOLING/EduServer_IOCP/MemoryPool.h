@@ -90,6 +90,7 @@ T* xnew(Args... arg)
 	
 	//TODO: ... ...
 	alloc =  GMemoryPool->Allocate( sizeof( T ) );
+	new(alloc)T( arg... );
 
 	return reinterpret_cast<T*>(alloc);
 }

@@ -54,7 +54,7 @@ public:
 	{
 		//TODO: 메모리풀에 반납
 		//free(ptr);
-		return ( GMemoryPool->Deallocate( ptr, n ) );
+		return ( GMemoryPool->Deallocate( ptr, sizeof( T ) * n ) );
 	}
 };
 

@@ -13,13 +13,13 @@ SmallSizeMemoryPool::SmallSizeMemoryPool(DWORD allocSize) : mAllocSize(allocSize
 
 MemAllocInfo* SmallSizeMemoryPool::Pop()
 {
-	MemAllocInfo* mem = ( InterlockedPopEntrySList( &mFreeList ) ) ? reinterpret_cast<MemAllocInfo*>(InterlockedPopEntrySList(&mFreeList)) : NULL;
+	MemAllocInfo* mem = reinterpret_cast<MemAllocInfo*>( InterlockedPopEntrySList( &mFreeList ) );
 	//TODO: InterlockedPopEntrySList를 이용하여 mFreeList에서 pop으로 메모리를 가져올 수 있는지 확인. 
 
-	if (NULL == mem)
+	if ( NULL == mem )
 	{
 		// 할당 불가능하면 직접 할당.
-		mem = reinterpret_cast<MemAllocInfo*>(_aligned_malloc(mAllocSize, MEMORY_ALLOCATION_ALIGNMENT));
+		mem = reinterpret_cast<MemAllocInfo*>( _aligned_malloc( mAllocSize, MEMORY_ALLOCATION_ALIGNMENT ) );
 	}
 	else
 	{
@@ -98,7 +98,6 @@ void* MemoryPool::Allocate(int size)
 		//TODO: SmallSizeMemoryPool에서 할당
 		//header = ...; 
 		header = mSmallSizeMemoryPoolTable[realAllocSize]->Pop();
-
 	}
 
 	return AttachMemAllocInfo(header, realAllocSize);
@@ -121,6 +120,5 @@ void MemoryPool::Deallocate(void* ptr, long extraInfo)
 	{
 		//TODO: SmallSizeMemoryPool에 (재사용을 위해) push..
 		mSmallSizeMemoryPoolTable[realAllocSize]->Push( header );
-		
 	}
 }
