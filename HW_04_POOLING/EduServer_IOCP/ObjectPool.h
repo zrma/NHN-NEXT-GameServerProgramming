@@ -6,14 +6,15 @@
 
 
 template <class TOBJECT, int ALLOC_COUNT = 100>
-class ObjectPool
+class ObjectPool : public ClassTypeLock<ObjectPool<TOBJECT>>
 {
 public:
 
 	static void* operator new(size_t objSize)
 	{
 		//TODO: TOBJECT 타입 단위로 lock 잠금
-		FastSpinlockGuard criticalSection( mLock );
+		// FastSpinlockGuard criticalSection( mLock );
+		ClassTypeLock<ObjectPool<TOBJECT>>::LockGuard criticalSection;
 
 		if (!mFreeList)
 		{
@@ -48,8 +49,9 @@ public:
 	static void	operator delete(void* obj)
 	{
 		//TODO: TOBJECT 타입 단위로 lock 잠금
-		FastSpinlockGuard criticalSection( mLock );
-
+		// FastSpinlockGuard criticalSection( mLock );
+		ClassTypeLock<ObjectPool<TOBJECT>>::LockGuard criticalSection;
+		
 		CRASH_ASSERT( mCurrentUseCount > 0 );
 
 		--mCurrentUseCount;
@@ -60,15 +62,10 @@ public:
 
 
 private:
-	static FastSpinlock		mLock;
-
 	static uint8_t*	mFreeList;
 	static int		mTotalAllocCount; ///< for tracing
 	static int		mCurrentUseCount; ///< for tracing
 };
-
-template <class TOBJECT, int ALLOC_COUNT>
-FastSpinlock ObjectPool<TOBJECT, ALLOC_COUNT>::mLock;
 
 template <class TOBJECT, int ALLOC_COUNT>
 uint8_t* ObjectPool<TOBJECT, ALLOC_COUNT>::mFreeList = nullptr;
