@@ -20,7 +20,8 @@ inline void* AttachMemAllocInfo(MemAllocInfo* header, int size)
 	
 	//실제 할당하는 메모리 사이즈를 헤더에 넣어주고
 	//실제 데이터를 기록할 부분 = 헤더 바로 뒷 부분으로 포인터를 뒤로 미룬다
-	header->mAllocSize = size;
+
+	header->mAllocSize = size; ///# new (header)MemAllocInfo(size); 생성자를 불러오도록
 	++header;
 
 	return reinterpret_cast<void*>(header);

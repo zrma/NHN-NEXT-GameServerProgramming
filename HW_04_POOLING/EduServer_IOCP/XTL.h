@@ -119,7 +119,7 @@ struct xpriority_queue
 {
 	//TODO: STL 할당자 사용하는 priority_queue을  type으로 선언
 	//typedef ... type;
-	typedef std::priority_queue < T, std::vector<T>, C > type;
+	typedef std::priority_queue < T, std::vector<T>, C > type; ///# 	typedef std::priority_queue<T, std::vector<T, STLAllocator<T>>, C> type;
 };
 
 typedef std::basic_string<wchar_t, std::char_traits<wchar_t>, STLAllocator<wchar_t>> xstring;
