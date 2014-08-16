@@ -21,7 +21,7 @@ void Timer::PushTimerJob(SyncExecutablePtr owner, const TimerTask& task, uint32_
 
 	int64_t timeStamped = after + GetTickCount64();
 
-	TimerJobElement temp(owner, task, after);
+	TimerJobElement temp(owner, task, timeStamped);
 	mTimerJobQueue.push( temp );
 }
 
