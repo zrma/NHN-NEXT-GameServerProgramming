@@ -11,13 +11,16 @@ Timer::Timer()
 	LTickCount = GetTickCount64();
 }
 
+//호출코드: LTimer->PushTimerJob( instance->GetSharedFromThis(), std::bind( memfunc, std::forward<Args>( args )... ), after );
 
 void Timer::PushTimerJob(SyncExecutablePtr owner, const TimerTask& task, uint32_t after)
 {
 	CRASH_ASSERT(LThreadType == THREAD_IO_WORKER);
 
 	//TODO: mTimerJobQueue에 TimerJobElement를 push..
-	
+
+	TimerJobElement temp(owner, task, after);
+	mTimerJobQueue.push( temp );
 }
 
 

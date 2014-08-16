@@ -66,6 +66,16 @@ void FastSpinlock::EnterReadLock()
 		// else
 			// mLockFlag 원복
 
+		//WriteFlag가 올라갔는지 확인할 필요가 있음
+		//그리고 read야 특별한 이슈가 없으니깐 그냥 숫자를 더했다가 뺀다
+		if ((InterlockedAdd(&mLockFlag, 1) & LF_WRITE_MASK) != LF_WRITE_FLAG)
+		{
+			return;
+		}
+		else
+		{
+			InterlockedAdd( &mLockFlag, -1 );
+		}
 
 		
 	}
@@ -74,7 +84,7 @@ void FastSpinlock::EnterReadLock()
 void FastSpinlock::LeaveReadLock()
 {
 	//TODO: mLockFlag 처리 
-	
+	InterlockedAdd( &mLockFlag, -LF_READ_MASK );
 
 	if (mLockOrder != LO_DONT_CARE)
 		LLockOrderChecker->Pop(this);

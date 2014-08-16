@@ -12,6 +12,9 @@ public:
 	{}
 	virtual ~SyncExecutable() {}
 
+	//호출 코드
+	//mPlayer->DoSync(&Player::PlayerReset);
+
 	template <class R, class T, class... Args>
 	R DoSync(R (T::*memfunc)(Args...), Args... args)
 	{
@@ -21,7 +24,13 @@ public:
 		static_assert(true == std::is_convertible<T, SyncExecutable>::value, "T should be derived from SyncExecutable");
 
 		//TODO: mLock으로 보호한 상태에서, memfunc를 실행하고 결과값 R을 리턴
-	
+		FastSpinlockGuard criticalSection( mLock );
+		
+		R temp;
+
+		temp = memfunc( args );
+
+		return temp;
 	}
 	
 
@@ -37,6 +46,10 @@ public:
 		//(HINT: 이 클래스는 std::enable_shared_from_this에서 상속받았다. 그리고 static_pointer_cast 사용)
 
 		//return std::shared_ptr<T>((Player*)this); ///< 이렇게 하면 안될걸???
+		//바로 this로 반환하게 되면 포인터 2번 삭제 오류 발생
+		//weak pointer로 넘겨줘야 하는데 그 방법이 enable_shared_from_this의 shared_from_this()를 사용하는 것
+		//자세한 설명은 링크
+		//https://www.evernote.com/shard/s335/sh/ff59ace2-9cea-42ae-8307-e881c1df5edc/f7e65e4901b33fe3a9cf26cd6dcc3244
 		return static_pointer_cast<Player*>(shared_from_this());
  	}
 
@@ -54,6 +67,10 @@ void DoSyncAfter(uint32_t after, T instance, F memfunc, Args&&... args)
 	static_assert(true == std::is_convertible<T, std::shared_ptr<SyncExecutable>>::value, "T should be shared_ptr SyncExecutable");
 
 	//TODO: instance의 memfunc를 bind로 묶어서 LTimer->PushTimerJob() 수행
+	//std::bind는 functor로 묶어주는 함수였지요
+	//http://la-stranger.tistory.com/32
 
-	
+	//std::forward()는 원래 좌측값인 것은 좌측값으로, 원래 우측값인 것은 우측값으로 캐스킨 해주는 역할
+	//http://frompt.egloos.com/viewer/2765424
+	LTimer->PushTimerJob( instance->GetSharedFromThis(), std::bind( memfunc, std::forward<Args>( args )... ), after );
 }
