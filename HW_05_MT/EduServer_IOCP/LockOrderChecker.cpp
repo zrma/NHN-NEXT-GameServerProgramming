@@ -17,7 +17,7 @@ void LockOrderChecker::Push(FastSpinlock* lock)
 	{
 		/// 현재 락이 걸려 있는 상태에 진입한경우는 반드시 이전 락의 우선순위가 높아야 한다.
 		//TODO: 그렇지 않은 경우 CRASH_ASSERT gogo
-		CRASH_ASSERT( mLockStack[mStackTopPos]->mLockOrder >= lock->mLockOrder );
+		CRASH_ASSERT( mLockStack[mStackTopPos - 1]->mLockOrder <= lock->mLockOrder );
 		
 	}
 
