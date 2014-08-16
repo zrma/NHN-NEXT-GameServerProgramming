@@ -26,18 +26,20 @@ public:
 		//TODO: mLock으로 보호한 상태에서, memfunc를 실행하고 결과값 R을 리턴
 		FastSpinlockGuard criticalSection( mLock );
 		
-		R temp;
-
-		temp = memfunc( args );
+		//대입은 될리가 없었다...
+		//auto temp = std::bind( memfunc, static_cast<T*>( this ), std::forward<Args>( args )... )( );
 		//std::bind( memfunc, static_cast<T*>( this ), std::forward<Args>( args )... )( );
 
-		return temp;
+		return std::bind( memfunc, static_cast<T*>( this ), std::forward<Args>( args )... )( );
 	}
 	
 
 	void EnterLock() { mLock.EnterWriteLock(); }
 	void LeaveLock() { mLock.LeaveWriteLock(); }
 	
+	//호출코드
+	//mPlayerId = GPlayerManager->RegisterPlayer(GetSharedFromThis<Player>());
+
  	template <class T>
 	std::shared_ptr<T> GetSharedFromThis()
  	{
@@ -51,7 +53,8 @@ public:
 		//weak pointer로 넘겨줘야 하는데 그 방법이 enable_shared_from_this의 shared_from_this()를 사용하는 것
 		//자세한 설명은 링크
 		//https://www.evernote.com/shard/s335/sh/ff59ace2-9cea-42ae-8307-e881c1df5edc/f7e65e4901b33fe3a9cf26cd6dcc3244
-		return static_pointer_cast<Player*>(shared_from_this());
+		//return static_pointer_cast<T>( T::shared_from_this() );
+		return std::static_pointer_cast<T>( shared_from_this() );
  	}
 
 private:
