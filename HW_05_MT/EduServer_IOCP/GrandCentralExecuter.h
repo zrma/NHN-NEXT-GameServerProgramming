@@ -20,8 +20,7 @@ public:
 		if (InterlockedIncrement64(&mRemainTaskCount) > 1)
 		{
 			//TODO: 이미 누군가 작업중이면 어떻게?
-			InterlockedDecrement64( &mRemainTaskCount );
-			return;
+			mCentralTaskQueue.push( task );
 		}
 		else
 		{
@@ -32,12 +31,15 @@ public:
 			while (true)
 			{
 				GCETask task;
+				//concurrent_queue에 대한 설명 참고
+				//http://daniel00.tistory.com/43
 				if (mCentralTaskQueue.try_pop(task))
 				{
 					//TODO: task를 수행하고 mRemainTaskCount를 하나 감소 
 					// mRemainTaskCount가 0이면 break;
 					task();
-					if ( InterlockedDecrement64( &mRemainTaskCount ) )
+					
+					if ( InterlockedDecrement64( &mRemainTaskCount ) == 0 )
 					{
 						break;
 					}

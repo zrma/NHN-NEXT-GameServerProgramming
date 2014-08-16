@@ -33,7 +33,6 @@ public:
 		return std::bind( memfunc, static_cast<T*>( this ), std::forward<Args>( args )... )( );
 	}
 	
-
 	void EnterLock() { mLock.EnterWriteLock(); }
 	void LeaveLock() { mLock.LeaveWriteLock(); }
 	
