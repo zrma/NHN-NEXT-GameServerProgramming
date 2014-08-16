@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Timer.h"
 #include "ThreadLocal.h"
 #include "ClientSession.h"
@@ -19,7 +19,7 @@ Player::~Player()
 
 void Player::PlayerReset()
 {
-	/// ÇÃ·¹ÀÌ¾î ¸Ê¿¡¼­ Á¦°Å
+	/// í”Œë ˆì´ì–´ ë§µì—ì„œ ì œê±°
 	GPlayerManager->UnregisterPlayer(mPlayerId);
 
 	mPlayerId = -1;
@@ -32,10 +32,10 @@ void Player::Start(int heartbeat)
 	mIsAlive = true;
 	mHeartBeat = heartbeat;
 	
-	/// ID ¹ß±Ş ¹× ÇÃ·¹À×¾î ¸Ê¿¡ µî·Ï
+	/// ID ë°œê¸‰ ë° í”Œë ˆì‰ì–´ ë§µì— ë“±ë¡
 	mPlayerId = GPlayerManager->RegisterPlayer(GetSharedFromThis<Player>());
 
-	/// »ı¸í ºÒ¾î³Ö±â ¤¡¤¡
+	/// ìƒëª… ë¶ˆì–´ë„£ê¸° ã„±ã„±
 	OnTick();
 
 }
@@ -46,27 +46,27 @@ void Player::OnTick()
 		return;
 
 	
-	/// ·£´ıÀ¸·Î ÀÌº¥Æ®¸¦ ¹ß»ı½ÃÄÑº¸±â (¿¹: ´Ù¸¥ ¸ğµç ÇÃ·¹ÀÌ¾î¿¡°Ô ¹öÇÁ ÁÖ±â)
-	if (rand() % 100 == 0) ///< 1% È®·ü
+	/// ëœë¤ìœ¼ë¡œ ì´ë²¤íŠ¸ë¥¼ ë°œìƒì‹œì¼œë³´ê¸° (ì˜ˆ: ë‹¤ë¥¸ ëª¨ë“  í”Œë ˆì´ì–´ì—ê²Œ ë²„í”„ ì£¼ê¸°)
+	if (rand() % 100 == 0) ///< 1% í™•ë¥ 
 	{
 		int buffId = mPlayerId * 100;
 		int duration = (rand() % 3 + 2) * 1000;
 	
-		//GCE ¿¹. (lock-order ±ÍÂú°í, Àü¿ªÀûÀ¸·Î ¼ø¼­ º¸Àå ÇÊ¿äÇÒ ¶§)
-		//make_shared´Â »ı¼ºÀÚ¿¡¼­ ¿ä±¸ÇÏ´Â ÆÄ¶ó¹ÌÅÍ °ª ÁÖ°í shared_ptr ¾òÀ½
+		//GCE ì˜ˆ. (lock-order ê·€ì°®ê³ , ì „ì—­ì ìœ¼ë¡œ ìˆœì„œ ë³´ì¥ í•„ìš”í•  ë•Œ)
+		//make_sharedëŠ” ìƒì„±ìì—ì„œ ìš”êµ¬í•˜ëŠ” íŒŒë¼ë¯¸í„° ê°’ ì£¼ê³  shared_ptr ì–»ìŒ
 		//http://gcstudy.tistory.com/56
 		auto playerEvent = std::make_shared<AllPlayerBuffEvent>(buffId, duration);
 		GCEDispatch(playerEvent, &AllPlayerBuffEvent::DoBuffToAllPlayers, mPlayerId);
 	}
 
 
-	//TODO: AllPlayerBuffDecay::CheckBuffTimeout¸¦ GrandCentralExecuter¸¦ ÅëÇØ ½ÇÇà
-	//timeout check´Â ¸Å Æ½¸¶´Ù ÇÏ´Ï±ñ Á¶°Ç ¾øÀÌµµ ±¦Âú¾Æ
+	//TODO: AllPlayerBuffDecay::CheckBuffTimeoutë¥¼ GrandCentralExecuterë¥¼ í†µí•´ ì‹¤í–‰
+	//timeout checkëŠ” ë§¤ í‹±ë§ˆë‹¤ í•˜ë‹ˆê¹ ì¡°ê±´ ì—†ì´ë„ ê´œì°®ì•„
 	auto playerBuffDecayEvent = std::make_shared<AllPlayerBuffDecay>();
 	GCEDispatch( playerBuffDecayEvent, &AllPlayerBuffDecay::CheckBuffTimeout );
 
 	
-	//¿ä°Ô 1ÃÊ¿¡ ÇÑ ¹ø¾¿ ºÒ·¯Áö°Ô µÇ¾î ÀÖ´Â ³à¼®ÀÌ±¸¸¸!
+	//ìš”ê²Œ 1ì´ˆì— í•œ ë²ˆì”© ë¶ˆëŸ¬ì§€ê²Œ ë˜ì–´ ìˆëŠ” ë…€ì„ì´êµ¬ë§Œ!
 	if (mHeartBeat > 0)
 		DoSyncAfter(mHeartBeat, GetSharedFromThis<Player>(), &Player::OnTick);
 		
@@ -76,17 +76,17 @@ void Player::AddBuff(int fromPlayerId, int buffId, int duration)
 {
 	printf_s("I am Buffed [%d]! from Player [%d]\n", buffId, fromPlayerId);
 
-	/// ÇÃ·¹ÀÌ¾îÀÇ ¹öÇÁ ¸®½ºÆ®¿¡ Ãß°¡
+	/// í”Œë ˆì´ì–´ì˜ ë²„í”„ ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€
 	mBuffList.insert(std::make_pair(buffId, duration));
 }
 
 void Player::DecayTickBuff()
 {
-	/// ¹öÇÁÀÇ ³²Àº ½Ã°£À» ÁÖ±âÀûÀ¸·Î ¼öÁ¤ÇÏ°í, ½Ã°£ÀÌ Á¾·áµÇ¸é Á¦°ÅÇÏ±â
+	/// ë²„í”„ì˜ ë‚¨ì€ ì‹œê°„ì„ ì£¼ê¸°ì ìœ¼ë¡œ ìˆ˜ì •í•˜ê³ , ì‹œê°„ì´ ì¢…ë£Œë˜ë©´ ì œê±°í•˜ê¸°
 	for (auto it = mBuffList.begin(); it != mBuffList.end();)
 	{
-		//mHeartBeat´Â 1000À¸·Î °íÁ¤µÇ¾î ÀÖ´Ù¿Ë
-		//±×·¡¼­ ¸Å¹ø ¿©±â Áö³¯ ¶© 1ÃÊ¾¿ °¨¼ÒÇÏ´Â °ÍÀÌÁö...
+		//mHeartBeatëŠ” 1000ìœ¼ë¡œ ê³ ì •ë˜ì–´ ìˆë‹¤ì˜¹
+		//ê·¸ë˜ì„œ ë§¤ë²ˆ ì—¬ê¸° ì§€ë‚  ë• 1ì´ˆì”© ê°ì†Œí•˜ëŠ” ê²ƒì´ì§€...
 		it->second -= mHeartBeat;
 
 		if (it->second <= 0)

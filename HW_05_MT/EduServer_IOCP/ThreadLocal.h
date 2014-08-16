@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #define MAX_IO_THREAD	4
 
@@ -13,9 +13,9 @@ enum THREAD_TYPE
 class Timer;
 class LockOrderChecker;
 
-//TLS¸¦ È°¿ëÇÏ´Â °Í
-//TLS¿¡ °¢°¢ÀÇ Á¤º¸¸¦ ´ã¾Æ¼­ »ç¿ëÇÏ´Â °ÍÀÔ´Ï´Ù.
-//http://kimsk99.blog.me/50002386480 Âü°í
+//TLSë¥¼ í™œìš©í•˜ëŠ” ê²ƒ
+//TLSì— ê°ê°ì˜ ì •ë³´ë¥¼ ë‹´ì•„ì„œ ì‚¬ìš©í•˜ëŠ” ê²ƒì…ë‹ˆë‹¤.
+//http://kimsk99.blog.me/50002386480 ì°¸ê³ 
 
 extern __declspec(thread) int LThreadType;
 extern __declspec(thread) int LIoThreadId;

@@ -1,4 +1,4 @@
-// EduServer_IOCP.cpp : Defines the entry point for the console application.
+Ôªø// EduServer_IOCP.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -27,7 +27,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	GGrandCentralExecuter = new GrandCentralExecuter;
 	GPlayerManager = new PlayerManager;
 
-	/// main threadµµ lock order check...
+	/// main threadÎèÑ lock order check...
 	LLockOrderChecker = new LockOrderChecker(-1);
 
 

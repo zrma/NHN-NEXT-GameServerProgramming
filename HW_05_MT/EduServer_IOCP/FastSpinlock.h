@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 enum LockOrder
 {
@@ -34,7 +34,7 @@ private:
 	{
 		LF_WRITE_MASK	= 0x7FF00000,
 		LF_WRITE_FLAG	= 0x00100000,
-		LF_READ_MASK	= 0x000FFFFF ///< ÇÏÀ§ 20ºñÆ®¸¦ readlockÀ» À§ÇÑ ÇÃ·¡±×·Î »ç¿ëÇÑ´Ù.
+		LF_READ_MASK	= 0x000FFFFF ///< í•˜ìœ„ 20ë¹„íŠ¸ë¥¼ readlockì„ ìœ„í•œ í”Œëž˜ê·¸ë¡œ ì‚¬ìš©í•œë‹¤.
 	};
 
 	FastSpinlock(const FastSpinlock& rhs);

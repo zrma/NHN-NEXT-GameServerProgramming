@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Exception.h"
 #include "ThreadLocal.h"
 #include "Timer.h"
@@ -142,7 +142,7 @@ void IocpManager::Finalize()
 
 unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 {
-	//TLS »ı¼ººÎ
+	//TLS ìƒì„±ë¶€
 	LThreadType = THREAD_IO_WORKER;
 	LIoThreadId = reinterpret_cast<int>(lpParam);
 	LTimer = new Timer;
@@ -152,10 +152,10 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 
 	while (true)
 	{
-		/// Å¸ÀÌ¸Ó ÀÛ¾÷Àº Ç×»ó µ¹¸®°í
+		/// íƒ€ì´ë¨¸ ì‘ì—…ì€ í•­ìƒ ëŒë¦¬ê³ 
 		LTimer->DoTimerJob();
 
-		/// IOCP ÀÛ¾÷ µ¹¸®±â
+		/// IOCP ì‘ì—… ëŒë¦¬ê¸°
 		DWORD dwTransferred = 0;
 		OverlappedIOContext* context = nullptr;
 		ULONG_PTR completionKey = 0;

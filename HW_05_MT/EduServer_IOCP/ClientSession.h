@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ObjectPool.h"
 #include "MemoryPool.h"
 #include "CircularBuffer.h"

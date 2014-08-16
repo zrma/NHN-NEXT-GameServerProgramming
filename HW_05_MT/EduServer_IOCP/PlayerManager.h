@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "FastSpinlock.h"
 #include "XTL.h"
@@ -11,10 +11,10 @@ class PlayerManager
 public:
 	PlayerManager();
 
-	/// ÇÃ·¹ÀÌ¾î¸¦ µî·ÏÇÏ°í ID¸¦ ¹ß±Ş
+	/// í”Œë ˆì´ì–´ë¥¼ ë“±ë¡í•˜ê³  IDë¥¼ ë°œê¸‰
 	int RegisterPlayer(std::shared_ptr<Player> player);
 
-	/// ID¿¡ ÇØ´çÇÏ´Â ÇÃ·¹ÀÌ¾î Á¦°Å
+	/// IDì— í•´ë‹¹í•˜ëŠ” í”Œë ˆì´ì–´ ì œê±°
 	void UnregisterPlayer(int playerId);
 
 	int GetCurrentPlayers(PlayerList& outList);

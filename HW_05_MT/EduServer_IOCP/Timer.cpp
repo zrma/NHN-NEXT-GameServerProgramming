@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "ThreadLocal.h"
 #include "Exception.h"
 #include "SyncExecutable.h"
@@ -11,13 +11,13 @@ Timer::Timer()
 	LTickCount = GetTickCount64();
 }
 
-//È£ÃâÄÚµå: LTimer->PushTimerJob( instance, std::bind( memfunc, std::forward<Args>( args )... ), after );
+//í˜¸ì¶œì½”ë“œ: LTimer->PushTimerJob( instance, std::bind( memfunc, std::forward<Args>( args )... ), after );
 
 void Timer::PushTimerJob(SyncExecutablePtr owner, const TimerTask& task, uint32_t after)
 {
 	CRASH_ASSERT(LThreadType == THREAD_IO_WORKER);
 
-	//TODO: mTimerJobQueue¿¡ TimerJobElement¸¦ push..
+	//TODO: mTimerJobQueueì— TimerJobElementë¥¼ push..
 
 	int64_t timeStamped = after + GetTickCount64();
 
@@ -33,7 +33,7 @@ void Timer::DoTimerJob()
 
 	while (!mTimerJobQueue.empty())
 	{
-		//Á¦ÀÏ ¿ì¼± µÇ´Â °ÍÀ» °¡Á®¿ÀÁö¸¸ »©´Â °ÍÀº ¾Æ´Ï´Ù
+		//ì œì¼ ìš°ì„  ë˜ëŠ” ê²ƒì„ ê°€ì ¸ì˜¤ì§€ë§Œ ë¹¼ëŠ” ê²ƒì€ ì•„ë‹ˆë‹¤
 		const TimerJobElement& timerJobElem = mTimerJobQueue.top(); 
 
 		if (LTickCount < timerJobElem.mExecutionTick)
@@ -45,7 +45,7 @@ void Timer::DoTimerJob()
 
 		timerJobElem.mOwner->LeaveLock();
 
-		//Ã³¸® ÇßÀ¸´Ï±ñ Á¦ÀÏ ¿ì¼± µÇ´Â °ÍÀ» Á¦°Å
+		//ì²˜ë¦¬ í–ˆìœ¼ë‹ˆê¹ ì œì¼ ìš°ì„  ë˜ëŠ” ê²ƒì„ ì œê±°
 		mTimerJobQueue.pop();
 	}
 

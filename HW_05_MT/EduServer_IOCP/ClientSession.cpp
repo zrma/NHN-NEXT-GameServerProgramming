@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Exception.h"
 #include "ThreadLocal.h"
 #include "EduServer_IOCP.h"
@@ -45,7 +45,7 @@ void ClientSession::SessionReset()
 
 	mSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
 
-	/// ÇÃ·¹ÀÌ¾î ¸®¼Â
+	/// í”Œë ˆì´ì–´ ë¦¬ì…‹
 	mPlayer->DoSync(&Player::PlayerReset);
 }
 
@@ -78,9 +78,9 @@ void ClientSession::AcceptCompletion()
 {
 	CRASH_ASSERT(LThreadType == THREAD_IO_WORKER);
 	
-	//ÇÑ ¹ø µé¾î¿Â ³à¼®ÀÌ ´Ù½Ã µé¾î¿À´Â °ÍÀ» ¹æÁöÇÏ±â À§ÇÑ °Í
-	//Ã³À½ µé¾î¿Ã ¶§ mConnected¸¦ 1·Î º¯°æ
-	//ÀÌÈÄ·Î µé¾î¿À¸é ÀÌ¹Ì 1ÀÌ´Ï±ñ Crash
+	//í•œ ë²ˆ ë“¤ì–´ì˜¨ ë…€ì„ì´ ë‹¤ì‹œ ë“¤ì–´ì˜¤ëŠ” ê²ƒì„ ë°©ì§€í•˜ê¸° ìœ„í•œ ê²ƒ
+	//ì²˜ìŒ ë“¤ì–´ì˜¬ ë•Œ mConnectedë¥¼ 1ë¡œ ë³€ê²½
+	//ì´í›„ë¡œ ë“¤ì–´ì˜¤ë©´ ì´ë¯¸ 1ì´ë‹ˆê¹ Crash
 	if (1 == InterlockedExchange(&mConnected, 1))
 	{
 		/// already exists?
@@ -130,9 +130,9 @@ void ClientSession::AcceptCompletion()
 			break;
 		}
 
-		//while false? ÀÌ°Ç ¹«Á¶°Ç ÇÑ ¹ø¸¸ ½ÇÇàÇÏ´Â °Çµ¥ ÀÌ·¸°Ô ÇØ¾ßÇÒ ÀÌÀ¯°¡ ÀÖ³ª?
-		//ÀÖ´Ù! switch case ¹® º¯ÇüÀÌ¶ó°í º¸¸é
-		//¾îµğ¼­ ¿¡·¯°¡ ³ªµçÁö ÈÄ¼ÓÀ» ´õÀÌ»ó ½ÇÇàÇÏÁö ¾Ê°í ¹Ù·Î ÇÏ´Ü ¿¡·¯ Ã³¸®·Î °¥ ¼ö ÀÖÀ½
+		//while false? ì´ê±´ ë¬´ì¡°ê±´ í•œ ë²ˆë§Œ ì‹¤í–‰í•˜ëŠ” ê±´ë° ì´ë ‡ê²Œ í•´ì•¼í•  ì´ìœ ê°€ ìˆë‚˜?
+		//ìˆë‹¤! switch case ë¬¸ ë³€í˜•ì´ë¼ê³  ë³´ë©´
+		//ì–´ë””ì„œ ì—ëŸ¬ê°€ ë‚˜ë“ ì§€ í›„ì†ì„ ë”ì´ìƒ ì‹¤í–‰í•˜ì§€ ì•Šê³  ë°”ë¡œ í•˜ë‹¨ ì—ëŸ¬ ì²˜ë¦¬ë¡œ ê°ˆ ìˆ˜ ìˆìŒ
 
 	} while (false);
 
@@ -150,15 +150,15 @@ void ClientSession::AcceptCompletion()
 		printf_s("[DEBUG] PreRecv error: %d\n", GetLastError());
 	}
 
-	//¿©±â°¡ thread °úÁ¦¿ÍÀÇ Á¢Á¢ÀÌ´å!!
-	/// Å¸ÀÌ¸Ó Å×½ºÆ®¸¦ À§ÇØ 10ms ÈÄ¿¡ player °¡µ¿ ¤¡¤¡
+	//ì—¬ê¸°ê°€ thread ê³¼ì œì™€ì˜ ì ‘ì ‘ì´ë‹·!!
+	/// íƒ€ì´ë¨¸ í…ŒìŠ¤íŠ¸ë¥¼ ìœ„í•´ 10ms í›„ì— player ê°€ë™ ã„±ã„±
 	DoSyncAfter(10, mPlayer, &Player::Start, 1000);
 }
 
 
 void ClientSession::DisconnectRequest(DisconnectReason dr)
 {
-	/// ÀÌ¹Ì ²÷°å°Å³ª ²÷±â´Â ÁßÀÌ°Å³ª
+	/// ì´ë¯¸ ëŠê²¼ê±°ë‚˜ ëŠê¸°ëŠ” ì¤‘ì´ê±°ë‚˜
 	if (0 == InterlockedExchange(&mConnected, 0))
 		return ;
 	

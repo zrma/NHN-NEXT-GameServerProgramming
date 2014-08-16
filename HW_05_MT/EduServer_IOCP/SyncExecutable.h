@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "TypeTraits.h"
 #include "FastSpinlock.h"
@@ -12,21 +12,21 @@ public:
 	{}
 	virtual ~SyncExecutable() {}
 
-	//È£Ãâ ÄÚµå
+	//í˜¸ì¶œ ì½”ë“œ
 	//mPlayer->DoSync(&Player::PlayerReset);
 
 	template <class R, class T, class... Args>
 	R DoSync(R (T::*memfunc)(Args...), Args... args)
 	{
-		//¿¹¿Ü Á¶°Ç Æò°¡¸¦ ÄÄÆÄÀÏ Å¸ÀÓ¿¡¼­ È®ÀÎÇØ ¹ö±×¸¦ Àâ¾Æ ³»µµ·Ï ÇÔ
+		//ì˜ˆì™¸ ì¡°ê±´ í‰ê°€ë¥¼ ì»´íŒŒì¼ íƒ€ì„ì—ì„œ í™•ì¸í•´ ë²„ê·¸ë¥¼ ì¡ì•„ ë‚´ë„ë¡ í•¨
 		//http://frompt.egloos.com/viewer/2742204
-		//SyncExecutableÀ» »ó¼Ó ¹ŞÀº ³à¼®¸¸ »ç¿ë °¡´ÉÇÏµµ·Ï ÇÔ
+		//SyncExecutableì„ ìƒì† ë°›ì€ ë…€ì„ë§Œ ì‚¬ìš© ê°€ëŠ¥í•˜ë„ë¡ í•¨
 		static_assert(true == std::is_convertible<T, SyncExecutable>::value, "T should be derived from SyncExecutable");
 
-		//TODO: mLockÀ¸·Î º¸È£ÇÑ »óÅÂ¿¡¼­, memfunc¸¦ ½ÇÇàÇÏ°í °á°ú°ª RÀ» ¸®ÅÏ
+		//TODO: mLockìœ¼ë¡œ ë³´í˜¸í•œ ìƒíƒœì—ì„œ, memfuncë¥¼ ì‹¤í–‰í•˜ê³  ê²°ê³¼ê°’ Rì„ ë¦¬í„´
 		FastSpinlockGuard criticalSection( mLock );
 		
-		//´ëÀÔÀº µÉ¸®°¡ ¾ø¾ú´Ù...
+		//ëŒ€ì…ì€ ë ë¦¬ê°€ ì—†ì—ˆë‹¤...
 		//auto temp = std::bind( memfunc, static_cast<T*>( this ), std::forward<Args>( args )... )( );
 		//std::bind( memfunc, static_cast<T*>( this ), std::forward<Args>( args )... )( );
 
@@ -36,7 +36,7 @@ public:
 	void EnterLock() { mLock.EnterWriteLock(); }
 	void LeaveLock() { mLock.LeaveWriteLock(); }
 	
-	//È£ÃâÄÚµå
+	//í˜¸ì¶œì½”ë“œ
 	//mPlayerId = GPlayerManager->RegisterPlayer(GetSharedFromThis<Player>());
 
  	template <class T>
@@ -44,13 +44,13 @@ public:
  	{
 		static_assert(true == std::is_convertible<T, SyncExecutable>::value, "T should be derived from SyncExecutable");
  		
-		//TODO: this Æ÷ÀÎÅÍ¸¦ std::shared_ptr<T>ÇüÅÂ·Î ¹İÈ¯.
-		//(HINT: ÀÌ Å¬·¡½º´Â std::enable_shared_from_this¿¡¼­ »ó¼Ó¹Ş¾Ò´Ù. ±×¸®°í static_pointer_cast »ç¿ë)
+		//TODO: this í¬ì¸í„°ë¥¼ std::shared_ptr<T>í˜•íƒœë¡œ ë°˜í™˜.
+		//(HINT: ì´ í´ë˜ìŠ¤ëŠ” std::enable_shared_from_thisì—ì„œ ìƒì†ë°›ì•˜ë‹¤. ê·¸ë¦¬ê³  static_pointer_cast ì‚¬ìš©)
 
-		//return std::shared_ptr<T>((Player*)this); ///< ÀÌ·¸°Ô ÇÏ¸é ¾ÈµÉ°É???
-		//¹Ù·Î this·Î ¹İÈ¯ÇÏ°Ô µÇ¸é Æ÷ÀÎÅÍ 2¹ø »èÁ¦ ¿À·ù ¹ß»ı
-		//weak pointer·Î ³Ñ°ÜÁà¾ß ÇÏ´Âµ¥ ±× ¹æ¹ıÀÌ enable_shared_from_thisÀÇ shared_from_this()¸¦ »ç¿ëÇÏ´Â °Í
-		//ÀÚ¼¼ÇÑ ¼³¸íÀº ¸µÅ©
+		//return std::shared_ptr<T>((Player*)this); ///< ì´ë ‡ê²Œ í•˜ë©´ ì•ˆë ê±¸???
+		//ë°”ë¡œ thisë¡œ ë°˜í™˜í•˜ê²Œ ë˜ë©´ í¬ì¸í„° 2ë²ˆ ì‚­ì œ ì˜¤ë¥˜ ë°œìƒ
+		//weak pointerë¡œ ë„˜ê²¨ì¤˜ì•¼ í•˜ëŠ”ë° ê·¸ ë°©ë²•ì´ enable_shared_from_thisì˜ shared_from_this()ë¥¼ ì‚¬ìš©í•˜ëŠ” ê²ƒ
+		//ìì„¸í•œ ì„¤ëª…ì€ ë§í¬
 		//https://www.evernote.com/shard/s335/sh/ff59ace2-9cea-42ae-8307-e881c1df5edc/f7e65e4901b33fe3a9cf26cd6dcc3244
 		//return static_pointer_cast<T>( T::shared_from_this() );
 		return std::static_pointer_cast<T>( shared_from_this() );
@@ -61,7 +61,7 @@ private:
 	FastSpinlock mLock;
 };
 
-//È£Ãâ¹® ¿¹Á¦ DoSyncAfter(10, mPlayer, &Player::Start, 1000);
+//í˜¸ì¶œë¬¸ ì˜ˆì œ DoSyncAfter(10, mPlayer, &Player::Start, 1000);
 
 template <class T, class F, class... Args>
 void DoSyncAfter(uint32_t after, T instance, F memfunc, Args&&... args)
@@ -69,16 +69,16 @@ void DoSyncAfter(uint32_t after, T instance, F memfunc, Args&&... args)
 	static_assert(true == is_shared_ptr<T>::value, "T should be shared_ptr");
 	static_assert(true == std::is_convertible<T, std::shared_ptr<SyncExecutable>>::value, "T should be shared_ptr SyncExecutable");
 
-	//TODO: instanceÀÇ memfunc¸¦ bind·Î ¹­¾î¼­ LTimer->PushTimerJob() ¼öÇà
-	//std::bind´Â functor·Î ¹­¾îÁÖ´Â ÇÔ¼ö¿´Áö¿ä
+	//TODO: instanceì˜ memfuncë¥¼ bindë¡œ ë¬¶ì–´ì„œ LTimer->PushTimerJob() ìˆ˜í–‰
+	//std::bindëŠ” functorë¡œ ë¬¶ì–´ì£¼ëŠ” í•¨ìˆ˜ì˜€ì§€ìš”
 	//http://la-stranger.tistory.com/32
 
-	//std::forward()´Â ¿ø·¡ ÁÂÃø°ªÀÎ °ÍÀº ÁÂÃø°ªÀ¸·Î, ¿ø·¡ ¿ìÃø°ªÀÎ °ÍÀº ¿ìÃø°ªÀ¸·Î Ä³½ºÅ² ÇØÁÖ´Â ¿ªÇÒ
+	//std::forward()ëŠ” ì›ë˜ ì¢Œì¸¡ê°’ì¸ ê²ƒì€ ì¢Œì¸¡ê°’ìœ¼ë¡œ, ì›ë˜ ìš°ì¸¡ê°’ì¸ ê²ƒì€ ìš°ì¸¡ê°’ìœ¼ë¡œ ìºìŠ¤í‚¨ í•´ì£¼ëŠ” ì—­í• 
 	//http://frompt.egloos.com/viewer/2765424
 	
-	//ÇÔ¼ö È£Ãâ¼º °³Ã¼´Â µÎ Á¾·ù°¡ ÀÖ´Ù
-	//¿ì¸®°¡ ÈçÈ÷ »ç¿ëÇÏ´Â Àü¿ª ÇÔ¼ö Æ÷ÀÎÅÍ / ¸â¹ö ÇÔ¼ö Æ÷ÀÎÅÍ
-	//¿©±â¼­ »ç¿ëÇÏ´Â °ÍÀº ¸â¹ö ÇÔ¼ö Æ÷ÀÎÅÍ±â ¶§¹®¿¡ 2¹øÂ° ÀÎÀÚ·Î °´Ã¼°¡ µé¾î°£´Ù
+	//í•¨ìˆ˜ í˜¸ì¶œì„± ê°œì²´ëŠ” ë‘ ì¢…ë¥˜ê°€ ìˆë‹¤
+	//ìš°ë¦¬ê°€ í”íˆ ì‚¬ìš©í•˜ëŠ” ì „ì—­ í•¨ìˆ˜ í¬ì¸í„° / ë©¤ë²„ í•¨ìˆ˜ í¬ì¸í„°
+	//ì—¬ê¸°ì„œ ì‚¬ìš©í•˜ëŠ” ê²ƒì€ ë©¤ë²„ í•¨ìˆ˜ í¬ì¸í„°ê¸° ë•Œë¬¸ì— 2ë²ˆì§¸ ì¸ìë¡œ ê°ì²´ê°€ ë“¤ì–´ê°„ë‹¤
 	//http://en.cppreference.com/w/cpp/utility/functional/bind
 
 	LTimer->PushTimerJob( instance, std::bind( memfunc, instance, std::forward<Args>( args )... ), after );

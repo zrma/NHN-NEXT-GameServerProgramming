@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Exception.h"
 #include "TypeTraits.h"
 #include "XTL.h"
@@ -14,29 +14,29 @@ public:
 
 	void DoDispatch(const GCETask& task)
 	{
-		CRASH_ASSERT(LThreadType == THREAD_IO_WORKER); ///< ÀÏ´Ü IO thread Àü¿ë
+		CRASH_ASSERT(LThreadType == THREAD_IO_WORKER); ///< ì¼ë‹¨ IO thread ì „ìš©
 
 		
 		if (InterlockedIncrement64(&mRemainTaskCount) > 1)
 		{
-			//TODO: ÀÌ¹Ì ´©±º°¡ ÀÛ¾÷ÁßÀÌ¸é ¾î¶»°Ô?
+			//TODO: ì´ë¯¸ ëˆ„êµ°ê°€ ì‘ì—…ì¤‘ì´ë©´ ì–´ë–»ê²Œ?
 			mCentralTaskQueue.push( task );
 		}
 		else
 		{
-			/// Ã³À½ ÁøÀÔÇÑ ³ğÀÌ Ã¥ÀÓÁö°í ´ÙÇØÁÖÀÚ -.-;
+			/// ì²˜ìŒ ì§„ì…í•œ ë†ˆì´ ì±…ì„ì§€ê³  ë‹¤í•´ì£¼ì -.-;
 
 			mCentralTaskQueue.push(task);
 			
 			while (true)
 			{
 				GCETask task;
-				//concurrent_queue¿¡ ´ëÇÑ ¼³¸í Âü°í
+				//concurrent_queueì— ëŒ€í•œ ì„¤ëª… ì°¸ê³ 
 				//http://daniel00.tistory.com/43
 				if (mCentralTaskQueue.try_pop(task))
 				{
-					//TODO: task¸¦ ¼öÇàÇÏ°í mRemainTaskCount¸¦ ÇÏ³ª °¨¼Ò 
-					// mRemainTaskCount°¡ 0ÀÌ¸é break;
+					//TODO: taskë¥¼ ìˆ˜í–‰í•˜ê³  mRemainTaskCountë¥¼ í•˜ë‚˜ ê°ì†Œ 
+					// mRemainTaskCountê°€ 0ì´ë©´ break;
 					task();
 					
 					if ( InterlockedDecrement64( &mRemainTaskCount ) == 0 )
@@ -58,17 +58,17 @@ private:
 
 extern GrandCentralExecuter* GGrandCentralExecuter;
 
-//È£Ãâ
+//í˜¸ì¶œ
 // GCEDispatch( playerEvent, &AllPlayerBuffEvent::DoBuffToAllPlayers, mPlayerId );
 // GCEDispatch( playerBuffDecayEvent, &AllPlayerBuffDecay::CheckBuffTimeout );
 
 template <class T, class F, class... Args>
 void GCEDispatch(T instance, F memfunc, Args&&... args)
 {
-	/// shared_ptrÀÌ ¾Æ´Ñ ³à¼®Àº ¹ŞÀ¸¸é ¾ÈµÈ´Ù. ÀÛ¾÷Å¥¿¡ µé¾îÀÖ´ÂÁß¿¡ ¾ø¾îÁú ¼ö ÀÖÀ¸´Ï..
+	/// shared_ptrì´ ì•„ë‹Œ ë…€ì„ì€ ë°›ìœ¼ë©´ ì•ˆëœë‹¤. ì‘ì—…íì— ë“¤ì–´ìˆëŠ”ì¤‘ì— ì—†ì–´ì§ˆ ìˆ˜ ìˆìœ¼ë‹ˆ..
 	static_assert(true == is_shared_ptr<T>::value, "T should be shared_ptr");
 
-	//TODO: intanceÀÇ memfunc¸¦ std::bind·Î ¹­¾î¼­ Àü´Ş
+	//TODO: intanceì˜ memfuncë¥¼ std::bindë¡œ ë¬¶ì–´ì„œ ì „ë‹¬
 	GGrandCentralExecuter->DoDispatch( std::bind( memfunc, instance, std::forward<Args>( args )... ) );
 
 	//GGrandCentralExecuter->DoDispatch(bind);

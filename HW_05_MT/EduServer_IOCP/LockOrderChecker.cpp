@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Exception.h"
 #include "ThreadLocal.h"
 #include "FastSpinlock.h"
@@ -15,8 +15,8 @@ void LockOrderChecker::Push(FastSpinlock* lock)
 
 	if (mStackTopPos > 0)
 	{
-		/// ÇöÀç ¶ôÀÌ °É·Á ÀÖ´Â »óÅÂ¿¡ ÁøÀÔÇÑ°æ¿ì´Â ¹Ýµå½Ã ÀÌÀü ¶ôÀÇ ¿ì¼±¼øÀ§°¡ ³ô¾Æ¾ß ÇÑ´Ù.
-		//TODO: ±×·¸Áö ¾ÊÀº °æ¿ì CRASH_ASSERT gogo
+		/// í˜„ìž¬ ë½ì´ ê±¸ë ¤ ìžˆëŠ” ìƒíƒœì— ì§„ìž…í•œê²½ìš°ëŠ” ë°˜ë“œì‹œ ì´ì „ ë½ì˜ ìš°ì„ ìˆœìœ„ê°€ ë†’ì•„ì•¼ í•œë‹¤.
+		//TODO: ê·¸ë ‡ì§€ ì•Šì€ ê²½ìš° CRASH_ASSERT gogo
 		CRASH_ASSERT( mLockStack[mStackTopPos - 1]->mLockOrder <= lock->mLockOrder );
 		
 	}
@@ -27,15 +27,15 @@ void LockOrderChecker::Push(FastSpinlock* lock)
 void LockOrderChecker::Pop(FastSpinlock* lock)
 {
 
-	/// ÃÖ¼ÒÇÑ ¶ôÀÌ ÀâÇô ÀÖ´Â »óÅÂ¿©¾ß ÇÒ °ÍÀÌ°í
+	/// ìµœì†Œí•œ ë½ì´ ìž¡í˜€ ìžˆëŠ” ìƒíƒœì—¬ì•¼ í•  ê²ƒì´ê³ 
 	CRASH_ASSERT(mStackTopPos > 0);
 	
-	//TODO: ´ç¿¬È÷ ÃÖ±Ù¿¡ pushÇß´ø ³à¼®ÀÌ¶û °°ÀºÁö Ã¼Å©.. Æ²¸®¸é CRASH_ASSERT
-	//stackÀ» ³õ°í stack¿¡¼­ ³Ö¾ú´Ù°¡ »©´Â °Í
-	//push¿Í popÀÌ ½ÖÀ¸·Î µÇ¾î¾ß ÇÔ
+	//TODO: ë‹¹ì—°ížˆ ìµœê·¼ì— pushí–ˆë˜ ë…€ì„ì´ëž‘ ê°™ì€ì§€ ì²´í¬.. í‹€ë¦¬ë©´ CRASH_ASSERT
+	//stackì„ ë†“ê³  stackì—ì„œ ë„£ì—ˆë‹¤ê°€ ë¹¼ëŠ” ê²ƒ
+	//pushì™€ popì´ ìŒìœ¼ë¡œ ë˜ì–´ì•¼ í•¨
 	CRASH_ASSERT( mLockStack[mStackTopPos-1] == lock );
 
-	//ÀüÇ×À¸·Î µ¹¸®¸é¼­ µ¿½Ã¿¡ nullptr ÀÔ·Â
+	//ì „í•­ìœ¼ë¡œ ëŒë¦¬ë©´ì„œ ë™ì‹œì— nullptr ìž…ë ¥
 	mLockStack[--mStackTopPos] = nullptr;
 
 }

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Exception.h"
 #include "FastSpinlock.h"
 #include "LockOrderChecker.h"
@@ -16,19 +16,19 @@ FastSpinlock::~FastSpinlock()
 
 void FastSpinlock::EnterWriteLock()
 {
-	/// ¶ô ¼ø¼­ ½Å°æ ¾È½áµµ µÇ´Â °æ¿ì´Â ±×³É ÆĞ½º
+	/// ë½ ìˆœì„œ ì‹ ê²½ ì•ˆì¨ë„ ë˜ëŠ” ê²½ìš°ëŠ” ê·¸ëƒ¥ íŒ¨ìŠ¤
 	if ( mLockOrder != LO_DONT_CARE)
 		LLockOrderChecker->Push(this);
 
 	while (true)
 	{
-		/// ´Ù¸¥³ğÀÌ writelock Ç®¾îÁÙ¶§±îÁö ±â´Ù¸°´Ù.
+		/// ë‹¤ë¥¸ë†ˆì´ writelock í’€ì–´ì¤„ë•Œê¹Œì§€ ê¸°ë‹¤ë¦°ë‹¤.
 		while (mLockFlag & LF_WRITE_MASK)
 			YieldProcessor();
 
 		if ((InterlockedAdd(&mLockFlag, LF_WRITE_FLAG) & LF_WRITE_MASK) == LF_WRITE_FLAG)
 		{
-			/// ´Ù¸¥³ğÀÌ readlock Ç®¾îÁÙ¶§±îÁö ±â´Ù¸°´Ù.
+			/// ë‹¤ë¥¸ë†ˆì´ readlock í’€ì–´ì¤„ë•Œê¹Œì§€ ê¸°ë‹¤ë¦°ë‹¤.
 			while (mLockFlag & LF_READ_MASK)
 				YieldProcessor();
 
@@ -44,7 +44,7 @@ void FastSpinlock::LeaveWriteLock()
 {
 	InterlockedAdd(&mLockFlag, -LF_WRITE_FLAG);
 
-	/// ¶ô ¼ø¼­ ½Å°æ ¾È½áµµ µÇ´Â °æ¿ì´Â ±×³É ÆĞ½º
+	/// ë½ ìˆœì„œ ì‹ ê²½ ì•ˆì¨ë„ ë˜ëŠ” ê²½ìš°ëŠ” ê·¸ëƒ¥ íŒ¨ìŠ¤
 	if (mLockOrder != LO_DONT_CARE)
 		LLockOrderChecker->Pop(this);
 }
@@ -56,18 +56,18 @@ void FastSpinlock::EnterReadLock()
 
 	while (true)
 	{
-		/// ´Ù¸¥³ğÀÌ writelock Ç®¾îÁÙ¶§±îÁö ±â´Ù¸°´Ù.
+		/// ë‹¤ë¥¸ë†ˆì´ writelock í’€ì–´ì¤„ë•Œê¹Œì§€ ê¸°ë‹¤ë¦°ë‹¤.
 		while (mLockFlag & LF_WRITE_MASK)
 			YieldProcessor();
 
-		//TODO: Readlock ÁøÀÔ ±¸Çö (mLockFlag¸¦ ¾î¶»°Ô Ã³¸®ÇÏ¸é µÇ´ÂÁö?)
-		// if ( readlockÀ» ¾òÀ¸¸é )
+		//TODO: Readlock ì§„ì… êµ¬í˜„ (mLockFlagë¥¼ ì–´ë–»ê²Œ ì²˜ë¦¬í•˜ë©´ ë˜ëŠ”ì§€?)
+		// if ( readlockì„ ì–»ìœ¼ë©´ )
 			//return;
 		// else
-			// mLockFlag ¿øº¹
+			// mLockFlag ì›ë³µ
 
-		//WriteFlag°¡ ¿Ã¶ó°¬´ÂÁö È®ÀÎÇÒ ÇÊ¿ä°¡ ÀÖÀ½
-		//±×¸®°í read¾ß Æ¯º°ÇÑ ÀÌ½´°¡ ¾øÀ¸´Ï±ñ ±×³É ¼ıÀÚ¸¦ ´õÇß´Ù°¡ »«´Ù
+		//WriteFlagê°€ ì˜¬ë¼ê°”ëŠ”ì§€ í™•ì¸í•  í•„ìš”ê°€ ìˆìŒ
+		//ê·¸ë¦¬ê³  readì•¼ íŠ¹ë³„í•œ ì´ìŠˆê°€ ì—†ìœ¼ë‹ˆê¹ ê·¸ëƒ¥ ìˆ«ìë¥¼ ë”í–ˆë‹¤ê°€ ëº€ë‹¤
 		if ((InterlockedAdd(&mLockFlag, 1) & LF_WRITE_MASK) != LF_WRITE_FLAG)
 		{
 			return;
@@ -83,7 +83,7 @@ void FastSpinlock::EnterReadLock()
 
 void FastSpinlock::LeaveReadLock()
 {
-	//TODO: mLockFlag Ã³¸® 
+	//TODO: mLockFlag ì²˜ë¦¬ 
 	InterlockedAdd( &mLockFlag, -1 );
 
 	if (mLockOrder != LO_DONT_CARE)
