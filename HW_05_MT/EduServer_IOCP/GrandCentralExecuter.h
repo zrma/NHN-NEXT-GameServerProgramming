@@ -20,7 +20,8 @@ public:
 		if (InterlockedIncrement64(&mRemainTaskCount) > 1)
 		{
 			//TODO: 이미 누군가 작업중이면 어떻게?
-			
+			InterlockedDecrement64( &mRemainTaskCount );
+			return;
 		}
 		else
 		{
@@ -35,7 +36,11 @@ public:
 				{
 					//TODO: task를 수행하고 mRemainTaskCount를 하나 감소 
 					// mRemainTaskCount가 0이면 break;
-					
+					task();
+					if ( InterlockedDecrement64( &mRemainTaskCount ) )
+					{
+						break;
+					}
 				}
 			}
 		}
@@ -51,7 +56,9 @@ private:
 
 extern GrandCentralExecuter* GGrandCentralExecuter;
 
-
+//호출
+// GCEDispatch( playerEvent, &AllPlayerBuffEvent::DoBuffToAllPlayers, mPlayerId );
+// GCEDispatch( playerBuffDecayEvent, &AllPlayerBuffDecay::CheckBuffTimeout );
 
 template <class T, class F, class... Args>
 void GCEDispatch(T instance, F memfunc, Args&&... args)
@@ -60,7 +67,7 @@ void GCEDispatch(T instance, F memfunc, Args&&... args)
 	static_assert(true == is_shared_ptr<T>::value, "T should be shared_ptr");
 
 	//TODO: intance의 memfunc를 std::bind로 묶어서 전달
-	
+	GGrandCentralExecuter->DoDispatch( std::bind( memfunc, instance, std::forward<Args>( args )... ) );
 
 	//GGrandCentralExecuter->DoDispatch(bind);
 }

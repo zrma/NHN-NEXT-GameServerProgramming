@@ -29,6 +29,7 @@ public:
 		R temp;
 
 		temp = memfunc( args );
+		//std::bind( memfunc, static_cast<T*>( this ), std::forward<Args>( args )... )( );
 
 		return temp;
 	}
@@ -72,5 +73,11 @@ void DoSyncAfter(uint32_t after, T instance, F memfunc, Args&&... args)
 
 	//std::forward()는 원래 좌측값인 것은 좌측값으로, 원래 우측값인 것은 우측값으로 캐스킨 해주는 역할
 	//http://frompt.egloos.com/viewer/2765424
-	LTimer->PushTimerJob( instance->GetSharedFromThis(), std::bind( memfunc, std::forward<Args>( args )... ), after );
+	
+	//함수 호출성 개체는 두 종류가 있다
+	//우리가 흔히 사용하는 전역 함수 포인터 / 멤버 함수 포인터
+	//여기서 사용하는 것은 멤버 함수 포인터기 때문에 2번째 인자로 객체가 들어간다
+	//http://en.cppreference.com/w/cpp/utility/functional/bind
+
+	LTimer->PushTimerJob( instance, std::bind( memfunc, instance, std::forward<Args>( args )... ), after );
 }
