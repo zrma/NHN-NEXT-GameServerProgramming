@@ -20,6 +20,8 @@ public:
 		if (InterlockedIncrement64(&mRemainTaskCount) > 1)
 		{
 			//TODO: 이미 누군가 작업중이면 어떻게?
+			//이미 잡은 녀석이 계속 작업하도록 던져두고 집에 간다
+			//다른 작업하러 간다
 			mCentralTaskQueue.push( task );
 		}
 		else
@@ -33,6 +35,10 @@ public:
 				GCETask task;
 				//concurrent_queue에 대한 설명 참고
 				//http://daniel00.tistory.com/43
+
+				//여기 task는 전달 인자로 받은 task가 아니다
+				//지역 변수로 만들어진 task이며, 매 루프마다 다른 task가 되는 변신형
+				//따라서 매번 같은 task를 pop하는게 아니라 매 루프마다 다른 것을 요청
 				if (mCentralTaskQueue.try_pop(task))
 				{
 					//TODO: task를 수행하고 mRemainTaskCount를 하나 감소 
