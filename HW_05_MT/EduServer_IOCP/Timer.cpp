@@ -19,7 +19,7 @@ void Timer::PushTimerJob(SyncExecutablePtr owner, const TimerTask& task, uint32_
 
 	//TODO: mTimerJobQueue에 TimerJobElement를 push..
 
-	int64_t timeStamped = after + GetTickCount64();
+	int64_t timeStamped = after + GetTickCount64(); ///# LTickCount 사용하는게 의도
 
 	TimerJobElement temp(owner, task, timeStamped);
 	mTimerJobQueue.push( temp );

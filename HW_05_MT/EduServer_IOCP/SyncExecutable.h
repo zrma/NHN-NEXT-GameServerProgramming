@@ -30,7 +30,10 @@ public:
 		//auto temp = std::bind( memfunc, static_cast<T*>( this ), std::forward<Args>( args )... )( );
 		//std::bind( memfunc, static_cast<T*>( this ), std::forward<Args>( args )... )( );
 
-		return std::bind( memfunc, static_cast<T*>( this ), std::forward<Args>( args )... )( );
+		//return std::bind( memfunc, static_cast<T*>( this ), std::forward<Args>( args )... )( );
+		///# 바료 여기서 실행할거라 바인드 필요 없다.
+
+		return (static_cast<T*>(this)->*memfunc)(std::forward<Args>(args)...);
 	}
 	
 	void EnterLock() { mLock.EnterWriteLock(); }
@@ -81,5 +84,7 @@ void DoSyncAfter(uint32_t after, T instance, F memfunc, Args&&... args)
 	//여기서 사용하는 것은 멤버 함수 포인터기 때문에 2번째 인자로 객체가 들어간다
 	//http://en.cppreference.com/w/cpp/utility/functional/bind
 
+	///# 첫번째 인자는 std::static_pointer_cast<SyncExecutable>(instance)
+	///# std::forward 사용은 good
 	LTimer->PushTimerJob( instance, std::bind( memfunc, instance, std::forward<Args>( args )... ), after );
 }

@@ -68,15 +68,20 @@ void FastSpinlock::EnterReadLock()
 
 		//WriteFlag가 올라갔는지 확인할 필요가 있음
 		//그리고 read야 특별한 이슈가 없으니깐 그냥 숫자를 더했다가 뺀다
-		if ((InterlockedAdd(&mLockFlag, 1) & LF_WRITE_MASK) != LF_WRITE_FLAG)
+		/*if ((InterlockedAdd(&mLockFlag, 1) & LF_WRITE_MASK) != LF_WRITE_FLAG)
 		{
 			return;
 		}
 		else
 		{
 			InterlockedAdd( &mLockFlag, -1 );
-		}
+		}*/
 
+		///# 요렇게 하면 더 깔끔
+		if ((InterlockedIncrement(&mLockFlag) & LF_WRITE_MASK) == 0)
+			return;
+
+		InterlockedDecrement(&mLockFlag);
 		
 	}
 }
