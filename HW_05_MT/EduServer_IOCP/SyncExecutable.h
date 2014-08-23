@@ -84,7 +84,8 @@ void DoSyncAfter(uint32_t after, T instance, F memfunc, Args&&... args)
 	//여기서 사용하는 것은 멤버 함수 포인터기 때문에 2번째 인자로 객체가 들어간다
 	//http://en.cppreference.com/w/cpp/utility/functional/bind
 
-	///# 첫번째 인자는 std::static_pointer_cast<SyncExecutable>(instance)
+	///# 첫번째 인자는 std::static_pointer_cast<SyncExecutable>(instance) // by sm9
 	///# std::forward 사용은 good
-	LTimer->PushTimerJob( instance, std::bind( memfunc, instance, std::forward<Args>( args )... ), after );
+	LTimer->PushTimerJob( std::static_pointer_cast<SyncExecutable>( instance ),
+						  std::bind( memfunc, instance, std::forward<Args>( args )... ), after );
 }

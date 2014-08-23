@@ -77,7 +77,7 @@ void FastSpinlock::EnterReadLock()
 			InterlockedAdd( &mLockFlag, -1 );
 		}*/
 
-		///# 요렇게 하면 더 깔끔
+		///# 요렇게 하면 더 깔끔  by sm9
 		if ((InterlockedIncrement(&mLockFlag) & LF_WRITE_MASK) == 0)
 			return;
 

@@ -19,8 +19,11 @@ void Timer::PushTimerJob(SyncExecutablePtr owner, const TimerTask& task, uint32_
 
 	//TODO: mTimerJobQueue에 TimerJobElement를 push..
 
-	int64_t timeStamped = after + GetTickCount64(); ///# LTickCount 사용하는게 의도
+	// LTickCount는 해당 IOCP Worker Thread에서 매 주기마다
+	// DoTimerJob()을 수행 할 때 갱신하는 대표적인 표준 시간의 개념이다.
 
+	int64_t timeStamped = after + LTickCount; ///# LTickCount 사용하는게 의도 by sm9
+	
 	TimerJobElement temp(owner, task, timeStamped);
 	mTimerJobQueue.push( temp );
 }
