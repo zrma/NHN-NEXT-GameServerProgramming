@@ -45,6 +45,7 @@ void Player::OnTick()
 	if (!IsAlive())
 		return;
 
+	return;
 	
 	/// 랜덤으로 이벤트를 발생시켜보기 (예: 다른 모든 플레이어에게 버프 주기)
 	if (rand() % 100 == 0) ///< 1% 확률
@@ -56,20 +57,19 @@ void Player::OnTick()
 		//make_shared는 생성자에서 요구하는 파라미터 값 주고 shared_ptr 얻음
 		//http://gcstudy.tistory.com/56
 		auto playerEvent = std::make_shared<AllPlayerBuffEvent>(buffId, duration);
-		GCEDispatch(playerEvent, &AllPlayerBuffEvent::DoBuffToAllPlayers, mPlayerId);
+		// GCEDispatch(playerEvent, &AllPlayerBuffEvent::DoBuffToAllPlayers, mPlayerId);
 	}
 
 
 	//TODO: AllPlayerBuffDecay::CheckBuffTimeout를 GrandCentralExecuter를 통해 실행
 	//timeout check는 매 틱마다 하니깐 조건 없이도 괜찮아
 	auto playerBuffDecayEvent = std::make_shared<AllPlayerBuffDecay>();
-	GCEDispatch( playerBuffDecayEvent, &AllPlayerBuffDecay::CheckBuffTimeout );
+	// GCEDispatch( playerBuffDecayEvent, &AllPlayerBuffDecay::CheckBuffTimeout );
 
 	
 	//요게 1초에 한 번씩 불러지게 되어 있는 녀석이구만!
 	if (mHeartBeat > 0)
 		DoSyncAfter(mHeartBeat, GetSharedFromThis<Player>(), &Player::OnTick);
-		
 }
 
 void Player::AddBuff(int fromPlayerId, int buffId, int duration)

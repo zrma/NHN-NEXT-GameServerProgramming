@@ -42,11 +42,11 @@ void FastSpinlock::EnterWriteLock()
 
 void FastSpinlock::LeaveWriteLock()
 {
-	InterlockedAdd(&mLockFlag, -LF_WRITE_FLAG);
-
 	/// 락 순서 신경 안써도 되는 경우는 그냥 패스
-	if (mLockOrder != LO_DONT_CARE)
-		LLockOrderChecker->Pop(this);
+	if ( mLockOrder != LO_DONT_CARE )
+		LLockOrderChecker->Pop( this );
+
+	InterlockedAdd(&mLockFlag, -LF_WRITE_FLAG);
 }
 
 void FastSpinlock::EnterReadLock()
@@ -88,9 +88,9 @@ void FastSpinlock::EnterReadLock()
 
 void FastSpinlock::LeaveReadLock()
 {
+	if ( mLockOrder != LO_DONT_CARE )
+		LLockOrderChecker->Pop( this );
+
 	//TODO: mLockFlag 처리 
 	InterlockedAdd( &mLockFlag, -1 );
-
-	if (mLockOrder != LO_DONT_CARE)
-		LLockOrderChecker->Pop(this);
 }
