@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <list>
 #include <WinSock2.h>
 #include "FastSpinlock.h"

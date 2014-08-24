@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Exception.h"
 #include "EduServer_IOCP.h"
 #include "OverlappedIOContext.h"

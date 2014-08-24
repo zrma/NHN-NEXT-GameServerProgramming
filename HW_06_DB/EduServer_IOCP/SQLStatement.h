@@ -1,6 +1,6 @@
-#pragma once
+ï»¿#pragma once
 
-//todo: ¾Æ·¡ÀÇ SP¸¦ È£ÃâÇÏ´Â SQL ½ºÆ®¸µÀ» Á¦´ë·Î Á¤ÀÇ
+//todo: ì•„ë˜ì˜ SPë¥¼ í˜¸ì¶œí•˜ëŠ” SQL ìŠ¤íŠ¸ë§ì„ ì œëŒ€ë¡œ ì •ì˜
 
 const wchar_t* SQL_LoadPlayer = L"{ call dbo.spLoadPlayer (?) }"; ///< uid
 

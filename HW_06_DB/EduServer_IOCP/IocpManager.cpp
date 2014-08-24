@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Exception.h"
 #include "ThreadLocal.h"
 #include "IocpManager.h"

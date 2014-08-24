@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "CircularBuffer.h"
 #include "OverlappedIOContext.h"
 

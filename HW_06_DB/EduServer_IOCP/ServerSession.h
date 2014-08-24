@@ -1,8 +1,8 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Session.h"
 
-/// ´Ù¸¥ ¼­¹ö·ÎÀÇ Á¢¼ÓÀ» À§ÇÑ ¼¼¼Ç
+/// ë‹¤ë¥¸ ì„œë²„ë¡œì˜ ì ‘ì†ì„ ìœ„í•œ ì„¸ì…˜
 class ServerSession : public Session, public ObjectPool<ServerSession>
 {
 public:

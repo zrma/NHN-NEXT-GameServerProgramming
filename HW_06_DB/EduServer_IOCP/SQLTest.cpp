@@ -1,8 +1,8 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SQLStatement.h"
 #include "DBHelper.h"
 
-//todo: ¾Æ·¡ÀÇ DbTestFunc ·ÎÁ÷ÀÌ Àß ¼öÇàµÇ´ÂÁö Å×½ºÆ®! (¾Æ·¡ÀÇ ÇÔ¼ö¸¦ ClientSession³»ÀÇ ÀûÀıÇÑ °÷¿¡¼­ ¿©·¯¹ø È£Ãâ½ÃÄÑº¼ °Í)
+//todo: ì•„ë˜ì˜ DbTestFunc ë¡œì§ì´ ì˜ ìˆ˜í–‰ë˜ëŠ”ì§€ í…ŒìŠ¤íŠ¸! (ì•„ë˜ì˜ í•¨ìˆ˜ë¥¼ ClientSessionë‚´ì˜ ì ì ˆí•œ ê³³ì—ì„œ ì—¬ëŸ¬ë²ˆ í˜¸ì¶œì‹œì¼œë³¼ ê²ƒ)
 
 void DbTestFunc()
 {
@@ -47,7 +47,7 @@ void DbTestFunc()
 		int uid = 100;
 
 		dbHelper.BindParamInt(&uid);
-		dbHelper.BindParamText(L"UpdateµÈ ÄÚ¸àÆ®..ÀÔ´Ï´Ù.");
+		dbHelper.BindParamText(L"Updateëœ ì½”ë©˜íŠ¸..ì…ë‹ˆë‹¤.");
 		if (dbHelper.Execute(SQL_UpdatePlayerComment))
 		{
 			if (dbHelper.FetchRow())

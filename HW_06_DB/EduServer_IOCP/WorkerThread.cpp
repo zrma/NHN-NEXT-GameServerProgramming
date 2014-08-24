@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Exception.h"
 #include "ThreadLocal.h"
 #include "EduServer_IOCP.h"
@@ -134,7 +134,7 @@ void WorkerThread::DoSendJob()
 	
 		if (session->FlushSend())
 		{
-			/// true ¸®ÅÏ µÇ¸é »©¹ö¸°´Ù.
+			/// true ë¦¬í„´ ë˜ë©´ ë¹¼ë²„ë¦°ë‹¤.
 			LSendRequestSessionList->pop_front();
 		}
 	}

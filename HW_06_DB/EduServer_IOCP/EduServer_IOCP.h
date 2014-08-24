@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 
 #define LISTEN_PORT		9000
@@ -7,7 +7,7 @@
 #define CONNECT_SERVER_ADDR	"127.0.0.1"
 #define CONNECT_SERVER_PORT 9001
 
-//todo: SQL ¿¬°á ½ºÆ®¸µ ¿©·¯ºĞÀÇ »óÈ²¿¡ ¸Â°Ô ¼öÁ¤
+//todo: SQL ì—°ê²° ìŠ¤íŠ¸ë§ ì—¬ëŸ¬ë¶„ì˜ ìƒí™©ì— ë§ê²Œ ìˆ˜ì •
 //#define SQL_SERVER_CONN_STR	L"Driver={SQL Server};Server=127.0.0.1,1433\\TRIZDREAMING-PC;Database=GameDB;UID=triztest;PWD=next11223344;"
 #define SQL_SERVER_CONN_STR	L"Driver={SQL Server};Server=TRIZDREAMING-PC\\SQLEXPRESS;Database=GameDB;UID=triztest;PWD=next11223344;"
 //#define SQL_SERVER_CONN_STR	L"Provider=SQLOLEDB.1;Password=next11223344;User ID=triztest;Initial Catalog=GameDB;Data Source=TRIZDREAMING-PC\\SQLEXPRESS"
