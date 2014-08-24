@@ -42,11 +42,17 @@ void Timer::DoTimerJob()
 		if (LTickCount < timerJobElem.mExecutionTick)
 			break;
 
+		
 		timerJobElem.mOwner->EnterLock();
 		
+		const TimerJobElement& timerJobElem2 = mTimerJobQueue.top();
+
 		timerJobElem.mTask();
 
-		timerJobElem.mOwner->LeaveLock();
+		const TimerJobElement& timerJobElem3 = mTimerJobQueue.top();
+
+		// timerJobElem.mOwner->LeaveLock();
+		timerJobElem3.mOwner->LeaveLock();
 
 		//처리 했으니깐 제일 우선 되는 것을 제거
 		mTimerJobQueue.pop();
