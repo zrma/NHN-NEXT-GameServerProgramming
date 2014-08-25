@@ -26,6 +26,8 @@ DbHelper::~DbHelper()
 {
 	//todo: SQLFreeStmt를 이용하여 현재 SQLHSTMT 해제(unbind, 파라미터리셋, close 순서로)
 	//순서의 이유를 찾다가 보니 ms와 좀 다르던데... 왜죠
+	///# CLOSE를 먼저 해도 됨. 지켜줘야 하는 것은 unbind 다음에 reset_param하면 됨
+
 	//http://msdn.microsoft.com/en-us/library/ms709284(v=vs.85).aspx
 	SQLFreeStmt( mCurrentSqlHstmt, SQL_UNBIND );
 	SQLFreeStmt( mCurrentSqlHstmt, SQL_RESET_PARAMS );
@@ -67,7 +69,14 @@ bool DbHelper::Initialize(const wchar_t* connInfoStr, int workerThreadCount)
 	for (int i = 0; i < mDbWorkerThreadCount; ++i)
 	{
 		//todo: SQLAllocHandle을 이용하여 SQL_CONN의 mSqlHdbc 핸들 사용가능하도록 처리
-		SQLAllocHandle( SQL_HANDLE_DBC, mSqlHenv, &mSqlConnPool[i].mSqlHdbc );
+		///# 왜 에러처리 안함? SQLAllocHandle( SQL_HANDLE_DBC, mSqlHenv, &mSqlConnPool[i].mSqlHdbc );
+
+		
+		if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_DBC, mSqlHenv, &mSqlConnPool[i].mSqlHdbc))
+		{
+			printf_s("DbHelper Initialize SQLAllocHandle failed\n");
+			return false;
+		}
 		
 		//이거 어디서 쓰지?
 		//http://msdn.microsoft.com/en-us/library/ms715433(v=vs.85).aspx
@@ -93,7 +102,14 @@ bool DbHelper::Initialize(const wchar_t* connInfoStr, int workerThreadCount)
 		}
 
 		//todo: SQLAllocHandle를 이용하여 SQL_CONN의 mSqlHstmt 핸들 사용가능하도록 처리
-		SQLAllocHandle(SQL_HANDLE_STMT, mSqlConnPool[i].mSqlHdbc, &mSqlConnPool[i].mSqlHstmt);
+		///# 에러처리... SQLAllocHandle(SQL_HANDLE_STMT, mSqlConnPool[i].mSqlHdbc, &mSqlConnPool[i].mSqlHstmt);
+
+		if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_STMT, mSqlConnPool[i].mSqlHdbc, &mSqlConnPool[i].mSqlHstmt))
+		{
+			printf_s("DbHelper Initialize SQLAllocHandle SQL_HANDLE_STMT failed\n");
+			return false;
+		}
+
 	
 	}
 
@@ -162,6 +178,7 @@ bool DbHelper::BindParamInt(int* param)
 	//http://publib.boulder.ibm.com/infocenter/idshelp/v111/index.jsp?topic=/com.ibm.odbc.doc/sii-04-26325.htm
 	SQLRETURN ret =SQLBindParameter(mCurrentSqlHstmt,mCurrentBindParam++,SQL_PARAM_INPUT, 
 									 SQL_C_LONG, SQL_INTEGER, 10, 0, param, 0, NULL ); // = SQLBindParameter(...);
+	///# 굿! 유일하게 제대로 한 팀.
 
 	if (SQL_SUCCESS != ret && SQL_SUCCESS_WITH_INFO != ret)
 	{
@@ -235,7 +252,7 @@ void DbHelper::BindResultColumnFloat(float* r)
 {
 	SQLLEN len = 0;
 	//todo: float형 결과 컬럼 바인딩
-	SQLRETURN ret = SQLBindCol( mCurrentSqlHstmt, mCurrentResultCol++, SQL_C_FLOAT, r, 7, &len );
+	SQLRETURN ret = SQLBindCol( mCurrentSqlHstmt, mCurrentResultCol++, SQL_C_FLOAT, r, 7, &len ); ///# 왜 7?? 버퍼 크기를 넣어줘야 함
 
 	if (SQL_SUCCESS != ret && SQL_SUCCESS_WITH_INFO != ret)
 	{
@@ -257,7 +274,7 @@ void DbHelper::BindResultColumnText(wchar_t* text, size_t count)
 {
 	SQLLEN len = 0;
 	//todo: wchar_t*형 결과 컬럼 바인딩
-	SQLRETURN ret = SQLBindCol( mCurrentSqlHstmt, mCurrentResultCol++, SQL_C_WCHAR, text, count, &len );
+	SQLRETURN ret = SQLBindCol( mCurrentSqlHstmt, mCurrentResultCol++, SQL_C_WCHAR, text, count, &len ); ///# 버퍼 크기를 넣어줘야지... count*2
 
 	if (SQL_SUCCESS != ret && SQL_SUCCESS_WITH_INFO != ret)
 	{

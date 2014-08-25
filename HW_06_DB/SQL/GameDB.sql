@@ -39,7 +39,8 @@ BEGIN
     --todo: 해당 이름의 플레이어를 생성하고 플레이어의 identity를 리턴, [createTime]는 현재 생성 날짜로 설정
 	SET NOCOUNT ON
 	INSERT INTO PlayerTable(playerName, createTime, isValid, comment) VALUES(@name,GETDATE(), 0, 'none')
-	SELECT playerUID FROM PlayerTable WHERE playerName = @name
+	--SELECT playerUID FROM PlayerTable WHERE playerName = @name
+	SELECT @@IDENTITY
 END
 GO
 
