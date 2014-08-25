@@ -207,8 +207,10 @@ bool DbHelper::BindParamBool(bool* param)
 {
 	//todo: bool형 파라미터 바인딩
 	//http://msdn.microsoft.com/en-us/library/ms714556(v=vs.85).aspx
-	SQLRETURN ret = SQLBindParameter(mCurrentSqlHstmt, mCurrentBindParam++, SQL_PARAM_INPUT,
-									  SQL_C_TINYINT, SQL_TINYINT, 1,0, param, 0, NULL); // = SQLBindParameter(...);
+	SQLRETURN ret = SQLBindParameter( mCurrentSqlHstmt, mCurrentBindParam++, SQL_PARAM_INPUT,
+									  SQL_C_TINYINT, SQL_TINYINT, 1, 0, param, 0, NULL ); // = SQLBindParameter(...);
+	// 3으로 넣을 수 있다.
+	// Why?  실제 bool은 1바이트(0~255까지 가능)이므로 3자리까지 넣을 수 있음  by sm9
 
 	if (SQL_SUCCESS != ret && SQL_SUCCESS_WITH_INFO != ret)
 	{
@@ -252,7 +254,8 @@ void DbHelper::BindResultColumnFloat(float* r)
 {
 	SQLLEN len = 0;
 	//todo: float형 결과 컬럼 바인딩
-	SQLRETURN ret = SQLBindCol( mCurrentSqlHstmt, mCurrentResultCol++, SQL_C_FLOAT, r, 7, &len ); ///# 왜 7?? 버퍼 크기를 넣어줘야 함
+	SQLRETURN ret = SQLBindCol( mCurrentSqlHstmt, mCurrentResultCol++, SQL_C_FLOAT, r, sizeof( float ), &len ); ///# 왜 7?? 버퍼 크기를 넣어줘야 함
+	// 버퍼 크기 = sizeof( float ) = 4  by sm9
 
 	if (SQL_SUCCESS != ret && SQL_SUCCESS_WITH_INFO != ret)
 	{
@@ -274,7 +277,7 @@ void DbHelper::BindResultColumnText(wchar_t* text, size_t count)
 {
 	SQLLEN len = 0;
 	//todo: wchar_t*형 결과 컬럼 바인딩
-	SQLRETURN ret = SQLBindCol( mCurrentSqlHstmt, mCurrentResultCol++, SQL_C_WCHAR, text, count, &len ); ///# 버퍼 크기를 넣어줘야지... count*2
+	SQLRETURN ret = SQLBindCol( mCurrentSqlHstmt, mCurrentResultCol++, SQL_C_WCHAR, text, count * 2, &len ); ///# 버퍼 크기를 넣어줘야지... count*2
 
 	if (SQL_SUCCESS != ret && SQL_SUCCESS_WITH_INFO != ret)
 	{
