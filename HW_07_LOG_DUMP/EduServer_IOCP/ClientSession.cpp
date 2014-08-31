@@ -171,6 +171,7 @@ void ClientSession::OnRelease()
 	TRACE_THIS;
 	TRACE_PERF;
 
+
 	GClientSessionManager->ReturnClientSession(this);
 }
 

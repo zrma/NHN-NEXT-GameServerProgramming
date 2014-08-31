@@ -44,7 +44,7 @@ namespace LoggerUtil
 		//todo: gLogEvents내용 ost 스트림에 쓰기
 		uint64_t count = gCurrentLogIndex < MAX_LOG_SIZE ? gCurrentLogIndex : MAX_LOG_SIZE;
 
-		for ( int i = 0; i <= count; ++i )
+		for ( int i = 1; i <= count; ++i )
 		{
 			ost << " THREAD ID:" << gLogEvents[count - i].mThreadId
 				<< " EVENT MSG:" << gLogEvents[count - i].mMessage

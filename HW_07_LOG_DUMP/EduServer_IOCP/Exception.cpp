@@ -75,16 +75,16 @@ LONG WINAPI ExceptionFilter(EXCEPTION_POINTERS* exceptionInfo)
 				if (te32.th32ThreadID != myThreadId)
 				{
 					//이건 어떤지?
-//					SuspendThread( (HANDLE)te32.th32ThreadID );
+					SuspendThread( (HANDLE)te32.th32ThreadID );
 
-					HANDLE hThread = OpenThread( THREAD_ALL_ACCESS, false, te32.th32ThreadID );
-					if ( !hThread )
-					{
-						printf_s( "Openthread error %d\n", GetLastError() );
-						continue;
-					}
-					
-					SuspendThread( hThread );
+// 					HANDLE hThread = OpenThread( THREAD_ALL_ACCESS, false, te32.th32ThreadID );
+// 					if ( !hThread )
+// 					{
+// 						printf_s( "Openthread error %d\n", GetLastError() );
+// 						continue;
+// 					}
+// 					
+// 					SuspendThread( hThread );
 				}
 
 			} while (Thread32Next(hThreadSnap, &te32));
@@ -157,13 +157,17 @@ LONG WINAPI ExceptionFilter(EXCEPTION_POINTERS* exceptionInfo)
 	}
 	*/
 
-	StackWalker sw = StackWalker( myProcessId, OpenProcess( PROCESS_ALL_ACCESS, TRUE, myProcessId) );
+	StackWalker sw; //= StackWalker( myProcessId, OpenProcess( PROCESS_ALL_ACCESS, TRUE, myProcessId) );
 	sw.LoadModules();
 	sw.SetOutputStream( &historyOut );
 	sw.ShowCallstack();
-	
+ 	
 	/// 이벤트 로그 남기고
+	historyOut << "========== Exception Event Log ==========" << std::endl << std::endl;
+
 	LoggerUtil::EventLogDumpOut(historyOut);
+
+	historyOut << "========== Exception Event End ==========" << std::endl << std::endl;
 
 	historyOut.flush();
 	historyOut.close();

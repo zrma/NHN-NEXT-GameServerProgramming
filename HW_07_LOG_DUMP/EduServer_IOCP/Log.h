@@ -41,6 +41,7 @@ private:
 	LThreadCallHistory->Append(__FUNCSIG__);\
 }	
 
+//여기도 todo:
 //http://stackoverflow.com/questions/224397/why-do-people-use-double-underscore-so-much-in-c
 //__는 이런 의미가 있다는
 
@@ -58,7 +59,7 @@ public:
 	{
 		//todo: mElapsedFuncSig, mElapsedTime에 정보(funcsig, elapsed) 남기기
 		mElapsedFuncSig[mCounter++ % MAX_ELAPSED_RECORD] = funcsig;
-		mElapsedTime[mCounter++ % MAX_ELAPSED_RECORD] = elapsed;
+		mElapsedTime[mCounter % MAX_ELAPSED_RECORD] = elapsed;
 	}
 
 	void DumpOut(std::ostream& ost = std::cout);

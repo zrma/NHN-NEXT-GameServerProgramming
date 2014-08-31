@@ -60,6 +60,10 @@ void DeletePlayerDataContext::OnFail()
 
 bool LoadPlayerDataContext::OnSQLExecute()
 {
+	//ScopeElapsedCheck __scope_elapsed_check__( __FUNCSIG__ );
+	TRACE_THIS;
+	TRACE_PERF;
+
 	DBHelper dbHelper;
 
 	dbHelper.BindParamInt(&mPlayerId);
