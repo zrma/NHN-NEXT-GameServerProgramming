@@ -58,8 +58,8 @@ public:
 	inline void Append(const char* funcsig, int64_t elapsed)
 	{
 		//todo: mElapsedFuncSig, mElapsedTime에 정보(funcsig, elapsed) 남기기
-		mElapsedFuncSig[mCounter++ % MAX_ELAPSED_RECORD] = funcsig;
-		mElapsedTime[mCounter % MAX_ELAPSED_RECORD] = elapsed;
+		mElapsedFuncSig[mCounter % MAX_ELAPSED_RECORD] = funcsig;
+		mElapsedTime[mCounter++ % MAX_ELAPSED_RECORD] = elapsed;
 		///# counter++은 끝나고 해줘야지?
 	}
 
