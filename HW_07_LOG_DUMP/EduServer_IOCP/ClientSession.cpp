@@ -152,7 +152,9 @@ void ClientSession::AcceptCompletion()
 
 	//todo: 플레이어 id는 여러분의 플레이어 테이블 상황에 맞게 적절히 고쳐서 로딩하도록 
 	static int id = 101;
- 	mPlayer.RequestLoad(id++);
+	mPlayer.ResponseCreatePlayerData( L"newPlayer 뿅" );
+ 	mPlayer.RequestLoad(id);
+	mPlayer.ResponseDeletePlayerData( id++ );
 }
 
 

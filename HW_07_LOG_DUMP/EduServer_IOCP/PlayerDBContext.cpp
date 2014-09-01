@@ -126,8 +126,8 @@ void LoadPlayerDataContext::OnSuccess()
 	mSessionObject->mPlayer.ResponseLoad( mPlayerId, mPosX, mPosY, mPosZ, mIsValid, mPlayerName, mComment );
 
 	///# 플레이어 정보 로드 못했다고 서버를 죽이냠? ㅋㅋ 그럼 해커들이 없는 ID로 시도 했다고 서버를?? 
-	//강제 에러
-	CRASH_ASSERT( false );
+	//강제 에러 이거 테스트였는데...
+	//CRASH_ASSERT( false );
 }
 
 void LoadPlayerDataContext::OnFail()
