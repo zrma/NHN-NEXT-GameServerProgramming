@@ -36,6 +36,7 @@ void MakeDump(EXCEPTION_POINTERS* e)
 	exceptionInfo.ClientPointers = FALSE;
 
 	//todo: MiniDumpWriteDump를 사용하여 hFile에 덤프 기록
+	///# 옵션의 의미는 알고 한건가?
 	MINIDUMP_TYPE mdt = (MINIDUMP_TYPE)( MiniDumpWithPrivateReadWriteMemory |
 										 MiniDumpWithDataSegs | MiniDumpWithHandleData | MiniDumpWithFullMemoryInfo |
 										 MiniDumpWithThreadInfo | MiniDumpWithUnloadedModules );
@@ -71,12 +72,15 @@ LONG WINAPI ExceptionFilter(EXCEPTION_POINTERS* exceptionInfo)
 		{
 			do
 			{
+
 				//todo: 내 프로세스 내의 스레드중 나 자신 스레드만 빼고 멈추게..
-				if (te32.th32ThreadID != myThreadId)
+				///# 아래 것이 맞다. if (te32.th32ThreadID != myThreadId)
+				if (te32.th32OwnerProcessID == myProcessId && te32.th32ThreadID != myThreadId)
 				{
-					//이건 어떤지?
+					//이건 어떤지? ///# 스레드 ID와 스레드 핸들은 다른거다.
 					SuspendThread( (HANDLE)te32.th32ThreadID );
 
+					///# 아래의 OpenThread로 하는게 맞는겨..
 // 					HANDLE hThread = OpenThread( THREAD_ALL_ACCESS, false, te32.th32ThreadID );
 // 					if ( !hThread )
 // 					{
@@ -85,6 +89,7 @@ LONG WINAPI ExceptionFilter(EXCEPTION_POINTERS* exceptionInfo)
 // 					}
 // 					
 // 					SuspendThread( hThread );
+					
 				}
 
 			} while (Thread32Next(hThreadSnap, &te32));
@@ -122,7 +127,7 @@ LONG WINAPI ExceptionFilter(EXCEPTION_POINTERS* exceptionInfo)
 
 	//todo: StackWalker를 사용하여 historyOut에 현재 스레드의 콜스택 정보 남기기
 	//exceptionInfo->ContextRecord
-	// 허허 갓동찬님 이걸 다 만드시다니
+	// 허허 갓동찬님 이걸 다 만드시다니 ///# 좋은 자세.
 	/*
 	STACKFRAME64 stk;
 	memset( &stk, 0, sizeof( stk ) );

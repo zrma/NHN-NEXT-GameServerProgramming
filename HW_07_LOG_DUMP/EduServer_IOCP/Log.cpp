@@ -49,6 +49,11 @@ namespace LoggerUtil
 			ost << " THREAD ID:" << gLogEvents[count - i].mThreadId
 				<< " EVENT MSG:" << gLogEvents[count - i].mMessage
 				<< " ADDTIONAL INFO:" << gLogEvents[count - i].mAdditionalInfo << std::endl;
+
+			///# ±ò²ûÇÏ°Ô ÀÌ·¸°Ô
+			//const LogEvent& log = gLogEvents[(gCurrentLogIndex - i) % MAX_LOG_SIZE];
+			//ost << "TID[" << log.mThreadId << "] MSG[ " << log.mMessage << " ] INFO [" << log.mAdditionalInfo << "]" << std::endl;
+
 		}
 		ost << "===== End of Recent Global Event" << std::endl << std::endl;
 	}

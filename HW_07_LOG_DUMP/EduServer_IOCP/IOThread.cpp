@@ -47,6 +47,10 @@ void IOThread::DoIocpJob()
 		//todo: DB 처리 결과가 담겨오는 경우 처리
 		DatabaseJobContext* dbContext = reinterpret_cast<DatabaseJobContext*>(overlapped);
 		dbContext->OnResult();
+
+		///# 이걸 안해주면 메모리 누수
+		delete dbContext;
+
 		return;
 	}
 

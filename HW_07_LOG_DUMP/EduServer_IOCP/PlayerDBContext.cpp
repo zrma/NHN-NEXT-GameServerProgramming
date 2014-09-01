@@ -10,6 +10,8 @@
 bool CreatePlayerDataContext::OnSQLExecute()
 {
 	DBHelper dbHelper;
+
+	/*
 	dbHelper.BindParamText( mPlayerName );
 
 	if ( dbHelper.Execute( SQL_CreatePlayer ) )
@@ -19,6 +21,22 @@ bool CreatePlayerDataContext::OnSQLExecute()
 			return true;
 		}
 	}
+	*/
+
+	///# 왜 SP에서 SELECT @@... 하는지 생각해보삼.
+	int result = 0;
+
+	dbHelper.BindParamText(mPlayerName);
+	dbHelper.BindResultColumnInt(&result);
+
+	if (dbHelper.Execute(SQL_CreatePlayer))
+	{
+		if (dbHelper.FetchRow())
+		{
+			return result != 0;
+		}
+	}
+
 	return false;
 }
 
@@ -35,7 +53,7 @@ void CreatePlayerDataContext::OnSuccess()
 bool DeletePlayerDataContext::OnSQLExecute()
 {
 	DBHelper dbHelper;
-
+	/*
 	dbHelper.BindParamInt( &mPlayerId );
 	if ( dbHelper.Execute( SQL_DeletePlayer ) )
 	{
@@ -44,6 +62,22 @@ bool DeletePlayerDataContext::OnSQLExecute()
 			return true;
 		}
 	}
+	*/
+
+	int result = 0;
+
+	dbHelper.BindParamInt(&mPlayerId);
+	dbHelper.BindResultColumnInt(&result);
+
+	if (dbHelper.Execute(SQL_DeletePlayer))
+	{
+		if (dbHelper.FetchRow())
+		{
+			/// 적용받은 행이 하나도 없다면, 실패라고 간주하자
+			return result != 0;
+		}
+	}
+
 	return false;
 }
 
@@ -91,6 +125,7 @@ void LoadPlayerDataContext::OnSuccess()
 	//todo: 플레이어 로드 성공시 처리하기
 	mSessionObject->mPlayer.ResponseLoad( mPlayerId, mPosX, mPosY, mPosZ, mIsValid, mPlayerName, mComment );
 
+	///# 플레이어 정보 로드 못했다고 서버를 죽이냠? ㅋㅋ 그럼 해커들이 없는 ID로 시도 했다고 서버를?? 
 	//강제 에러
 	CRASH_ASSERT( false );
 }

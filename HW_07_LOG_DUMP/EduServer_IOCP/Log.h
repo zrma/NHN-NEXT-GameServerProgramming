@@ -60,6 +60,7 @@ public:
 		//todo: mElapsedFuncSig, mElapsedTime에 정보(funcsig, elapsed) 남기기
 		mElapsedFuncSig[mCounter++ % MAX_ELAPSED_RECORD] = funcsig;
 		mElapsedTime[mCounter % MAX_ELAPSED_RECORD] = elapsed;
+		///# counter++은 끝나고 해줘야지?
 	}
 
 	void DumpOut(std::ostream& ost = std::cout);
@@ -129,7 +130,14 @@ namespace LoggerUtil
 		//todo: gLogEvents에 LogEvent정보 남기기
 		gLogEvents[index % MAX_LOG_SIZE].mAdditionalInfo = info;
 		gLogEvents[index % MAX_LOG_SIZE].mMessage = msg;
-		gLogEvents[index % MAX_LOG_SIZE].mThreadId = GetCurrentThreadId();
+		gLogEvents[index % MAX_LOG_SIZE].mThreadId = GetCurrentThreadId(); ///# 이건 LWorkerThreadId와는 다른거다..
+
+		///# 더 깔끔하게 하려면
+		//LogEvent& event = gLogEvents[index & (MAX_LOG_SIZE - 1)];
+		//event.mThreadId = LWorkerThreadId;
+		//event.mMessage = msg;
+		//event.mAdditionalInfo = info;
+
 	}
 
 	void EventLogDumpOut(std::ostream& ost = std::cout);
