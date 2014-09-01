@@ -1,8 +1,8 @@
-#pragma once
+ï»¿#pragma once
 #include "ContentsConfig.h"
 #include "DBContext.h"
 
-//todo: Player »ı¼º ÀÛ¾÷ DB context¸¸µé±â
+//todo: Player ìƒì„± ì‘ì—… DB contextë§Œë“¤ê¸°
 //struct CreatePlayerDataContext
 //{
 //	 ... ...
@@ -25,7 +25,7 @@ struct CreatePlayerDataContext: public DatabaseJobContext, public ObjectPool<Cre
 
 
 
-//todo: Player »èÁ¦ ÀÛ¾÷ DB context ¸¸µé±â
+//todo: Player ì‚­ì œ ì‘ì—… DB context ë§Œë“¤ê¸°
 
 //struct DeletePlayerDataContext
 //{
@@ -46,7 +46,7 @@ struct DeletePlayerDataContext: public DatabaseJobContext, public ObjectPool < D
 
 
 
-/// player load ÀÛ¾÷
+/// player load ì‘ì—…
 struct LoadPlayerDataContext : public DatabaseJobContext, public ObjectPool<LoadPlayerDataContext>
 {
 	LoadPlayerDataContext(ClientSession* owner, int pid) : DatabaseJobContext(owner)
@@ -73,7 +73,7 @@ struct LoadPlayerDataContext : public DatabaseJobContext, public ObjectPool<Load
 
 
 
-/// Player ¾÷µ¥ÀÌÆ® ÀÛ¾÷
+/// Player ì—…ë°ì´íŠ¸ ì‘ì—…
 
 struct UpdatePlayerPositionContext : public DatabaseJobContext, public ObjectPool<UpdatePlayerPositionContext>
 {

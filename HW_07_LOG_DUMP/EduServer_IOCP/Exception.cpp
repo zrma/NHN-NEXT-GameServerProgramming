@@ -81,10 +81,10 @@ LONG WINAPI ExceptionFilter(EXCEPTION_POINTERS* exceptionInfo)
 					SuspendThread( (HANDLE)te32.th32ThreadID );
 
 					///# 아래의 OpenThread로 하는게 맞는겨..
-// 					HANDLE hThread = OpenThread( THREAD_ALL_ACCESS, false, te32.th32ThreadID );
+// 					HANDLE hThread = OpenThread( THREAD_ALL_ACCESS, FALSE, te32.th32ThreadID );
 // 					if ( !hThread )
 // 					{
-// 						printf_s( "Openthread error %d\n", GetLastError() );
+// 						printf_s( "Open thread error %d\n", GetLastError() );
 // 						continue;
 // 					}
 // 					

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "ThreadLocal.h"
 #include "Exception.h"
 #include "DBContext.h"
@@ -41,9 +41,9 @@ void DBThread::DoDatabaseJob()
 	
 	DatabaseJobContext* dbContext = reinterpret_cast<DatabaseJobContext*>(overlapped);
 	
-	//todo: dbContextÀÇ SQLÀ» ½ÇÇàÇÏ°í ±× °á°ú¸¦ IO threadÇ®·Î º¸³»±â
-	//db ½ÇÇà Á¤µµ·Î »¶Àº ³»´Â°Ô ¸Â´Â°¡! ///# db Äõ¸® ÇÏ³ª failÇß´Ù°í »¶³»¸é ¾ÈµÇÁö ¤¾¤¾
-	//³Ê¹« °­·ÂÅ©ÇÑ db jobÀÎµ¥...
+	//todo: dbContextì˜ SQLì„ ì‹¤í–‰í•˜ê³  ê·¸ ê²°ê³¼ë¥¼ IO threadí’€ë¡œ ë³´ë‚´ê¸°
+	//db ì‹¤í–‰ ì •ë„ë¡œ ë»‘ì€ ë‚´ëŠ”ê²Œ ë§žëŠ”ê°€! ///# db ì¿¼ë¦¬ í•˜ë‚˜ failí–ˆë‹¤ê³  ë»‘ë‚´ë©´ ì•ˆë˜ì§€ ã…Žã…Ž
+	//ë„ˆë¬´ ê°•ë ¥í¬í•œ db jobì¸ë°...
 
 	if ( dbContext->SQLExecute() )
 	{

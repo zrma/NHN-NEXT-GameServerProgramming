@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <iostream>
 #include "Exception.h"
@@ -41,9 +41,9 @@ private:
 	LThreadCallHistory->Append(__FUNCSIG__);\
 }	
 
-//¿©±âµµ todo:
+//ì—¬ê¸°ë„ todo:
 //http://stackoverflow.com/questions/224397/why-do-people-use-double-underscore-so-much-in-c
-//__´Â ÀÌ·± ÀÇ¹Ì°¡ ÀÖ´Ù´Â
+//__ëŠ” ì´ëŸ° ì˜ë¯¸ê°€ ìˆë‹¤ëŠ”
 
 
 class ThreadCallElapsedRecord
@@ -57,10 +57,10 @@ public:
 
 	inline void Append(const char* funcsig, int64_t elapsed)
 	{
-		//todo: mElapsedFuncSig, mElapsedTime¿¡ Á¤º¸(funcsig, elapsed) ³²±â±â
+		//todo: mElapsedFuncSig, mElapsedTimeì— ì •ë³´(funcsig, elapsed) ë‚¨ê¸°ê¸°
 		mElapsedFuncSig[mCounter++ % MAX_ELAPSED_RECORD] = funcsig;
 		mElapsedTime[mCounter % MAX_ELAPSED_RECORD] = elapsed;
-		///# counter++Àº ³¡³ª°í ÇØÁà¾ßÁö?
+		///# counter++ì€ ëë‚˜ê³  í•´ì¤˜ì•¼ì§€?
 	}
 
 	void DumpOut(std::ostream& ost = std::cout);
@@ -83,8 +83,8 @@ public:
 	ScopeElapsedCheck(const char* funcsig) : mFuncSig(funcsig)
 	{
 		/* FYI
-		 * 10~16 ms ÇØ»óµµ·Î Ã¼Å©ÇÏ·Á¸é GetTickCount »ç¿ë
-		 * 1 us ÇØ»óµµ·Î Ã¼Å©ÇÏ·Á¸é  QueryPerformanceCounter »ç¿ë
+		 * 10~16 ms í•´ìƒë„ë¡œ ì²´í¬í•˜ë ¤ë©´ GetTickCount ì‚¬ìš©
+		 * 1 us í•´ìƒë„ë¡œ ì²´í¬í•˜ë ¤ë©´  QueryPerformanceCounter ì‚¬ìš©
 		*/ 
 		mStartTick = GetTickCount64();
 	}
@@ -93,7 +93,7 @@ public:
 	{
 		if (LThreadType != THREAD_MAIN)
 		{
-			//todo: LThreadCallElapsedRecord¿¡ ÇÔ¼ö ¼öÇà ½Ã°£ ³²±â±â
+			//todo: LThreadCallElapsedRecordì— í•¨ìˆ˜ ìˆ˜í–‰ ì‹œê°„ ë‚¨ê¸°ê¸°
 			LThreadCallElapsedRecord->Append( mFuncSig, GetTickCount64() - mStartTick );
 		}
 	}
@@ -127,12 +127,12 @@ namespace LoggerUtil
 	{
 		__int64 index = _InterlockedIncrement64(&gCurrentLogIndex) - 1;
 		
-		//todo: gLogEvents¿¡ LogEventÁ¤º¸ ³²±â±â
+		//todo: gLogEventsì— LogEventì •ë³´ ë‚¨ê¸°ê¸°
 		gLogEvents[index % MAX_LOG_SIZE].mAdditionalInfo = info;
 		gLogEvents[index % MAX_LOG_SIZE].mMessage = msg;
-		gLogEvents[index % MAX_LOG_SIZE].mThreadId = GetCurrentThreadId(); ///# ÀÌ°Ç LWorkerThreadId¿Í´Â ´Ù¸¥°Å´Ù..
+		gLogEvents[index % MAX_LOG_SIZE].mThreadId = GetCurrentThreadId(); ///# ì´ê±´ LWorkerThreadIdì™€ëŠ” ë‹¤ë¥¸ê±°ë‹¤..
 
-		///# ´õ ±ò²ûÇÏ°Ô ÇÏ·Á¸é
+		///# ë” ê¹”ë”í•˜ê²Œ í•˜ë ¤ë©´
 		//LogEvent& event = gLogEvents[index & (MAX_LOG_SIZE - 1)];
 		//event.mThreadId = LWorkerThreadId;
 		//event.mMessage = msg;

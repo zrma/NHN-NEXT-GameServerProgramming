@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SQLStatement.h"
 #include "Log.h"
 #include "PlayerDBContext.h"
@@ -6,7 +6,7 @@
 #include "ClientSession.h"
 
 
-//todo: CreatePlayerDataContext ±¸Çö
+//todo: CreatePlayerDataContext êµ¬í˜„
 bool CreatePlayerDataContext::OnSQLExecute()
 {
 	DBHelper dbHelper;
@@ -23,7 +23,7 @@ bool CreatePlayerDataContext::OnSQLExecute()
 	}
 	*/
 
-	///# ¿Ö SP¿¡¼­ SELECT @@... ÇÏ´ÂÁö »ý°¢ÇØº¸»ï.
+	///# ì™œ SPì—ì„œ SELECT @@... í•˜ëŠ”ì§€ ìƒê°í•´ë³´ì‚¼.
 	int result = 0;
 
 	dbHelper.BindParamText(mPlayerName);
@@ -42,14 +42,14 @@ bool CreatePlayerDataContext::OnSQLExecute()
 
 void CreatePlayerDataContext::OnSuccess()
 {
-	// ¿ø·¡´Â ¼º°ø½Ã ÇÒÀÏÀ» ³Ö´Â °Í
+	// ì›ëž˜ëŠ” ì„±ê³µì‹œ í• ì¼ì„ ë„£ëŠ” ê²ƒ
 	mSessionObject->mPlayer.ResponseCreatePlayerData( mPlayerName );
 }
 
 
 
 
-//todo: DeletePlayerDataContext ±¸Çö
+//todo: DeletePlayerDataContext êµ¬í˜„
 bool DeletePlayerDataContext::OnSQLExecute()
 {
 	DBHelper dbHelper;
@@ -73,7 +73,7 @@ bool DeletePlayerDataContext::OnSQLExecute()
 	{
 		if (dbHelper.FetchRow())
 		{
-			/// Àû¿ë¹ÞÀº ÇàÀÌ ÇÏ³ªµµ ¾ø´Ù¸é, ½ÇÆÐ¶ó°í °£ÁÖÇÏÀÚ
+			/// ì ìš©ë°›ì€ í–‰ì´ í•˜ë‚˜ë„ ì—†ë‹¤ë©´, ì‹¤íŒ¨ë¼ê³  ê°„ì£¼í•˜ìž
 			return result != 0;
 		}
 	}
@@ -122,11 +122,11 @@ bool LoadPlayerDataContext::OnSQLExecute()
 
 void LoadPlayerDataContext::OnSuccess()
 {
-	//todo: ÇÃ·¹ÀÌ¾î ·Îµå ¼º°ø½Ã Ã³¸®ÇÏ±â
+	//todo: í”Œë ˆì´ì–´ ë¡œë“œ ì„±ê³µì‹œ ì²˜ë¦¬í•˜ê¸°
 	mSessionObject->mPlayer.ResponseLoad( mPlayerId, mPosX, mPosY, mPosZ, mIsValid, mPlayerName, mComment );
 
-	///# ÇÃ·¹ÀÌ¾î Á¤º¸ ·Îµå ¸øÇß´Ù°í ¼­¹ö¸¦ Á×ÀÌ³È? ¤»¤» ±×·³ ÇØÄ¿µéÀÌ ¾ø´Â ID·Î ½Ãµµ Çß´Ù°í ¼­¹ö¸¦?? 
-	//°­Á¦ ¿¡·¯
+	///# í”Œë ˆì´ì–´ ì •ë³´ ë¡œë“œ ëª»í–ˆë‹¤ê³  ì„œë²„ë¥¼ ì£½ì´ëƒ ? ã…‹ã…‹ ê·¸ëŸ¼ í•´ì»¤ë“¤ì´ ì—†ëŠ” IDë¡œ ì‹œë„ í–ˆë‹¤ê³  ì„œë²„ë¥¼?? 
+	//ê°•ì œ ì—ëŸ¬
 	CRASH_ASSERT( false );
 }
 

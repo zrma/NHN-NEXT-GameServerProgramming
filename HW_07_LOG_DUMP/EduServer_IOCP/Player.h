@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "ContentsConfig.h"
 
 class ClientSession;
@@ -23,7 +23,7 @@ public:
 	void RequestUpdateValidation(bool isValid);
 	void ResponseUpdateValidation(bool isValid);
 
-	//Ãß°¡ Å×½ºÆ® ÇÔ¼ö
+	//ì¶”ê°€ í…ŒìŠ¤íŠ¸ í•¨ìˆ˜
 	void ResponseCreatePlayerData( const wchar_t* generatedName );
 	void ResponseDeletePlayerData( int playerId );
 
@@ -31,7 +31,7 @@ private:
 
 	void PlayerReset();
 
-	//TODO: ¾Æ·¡ 2°³ Å×½ºÆ® ÇÔ¼ö°¡ ¼º°øÀûÀ¸·Î µ¿ÀÛÇÏ´ÂÁö È®ÀÎÇÏ±â
+	//TODO: ì•„ë˜ 2ê°œ í…ŒìŠ¤íŠ¸ í•¨ìˆ˜ê°€ ì„±ê³µì ìœ¼ë¡œ ë™ì‘í•˜ëŠ”ì§€ í™•ì¸í•˜ê¸°
 	void TestCreatePlayerData(const wchar_t* newName);
 	void TestDeletePlayerData(int playerId);
 	

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "ObjectPool.h"
 
@@ -6,7 +6,7 @@
 
 class ClientSession;
 
-/// ¸ğµç DB°ü·Ã ÀÛ¾÷Àº ¾Æ·¡ÀÇ Ãß»ó Å¬·¡½º¸¦ »ó¼Ó¹Ş¾Æ »ç¿ëÇØ¾ß ÇÔ
+/// ëª¨ë“  DBê´€ë ¨ ì‘ì—…ì€ ì•„ë˜ì˜ ì¶”ìƒ í´ë˜ìŠ¤ë¥¼ ìƒì†ë°›ì•„ ì‚¬ìš©í•´ì•¼ í•¨
 struct DatabaseJobContext
 {
 	DatabaseJobContext(ClientSession* owner);
@@ -16,9 +16,9 @@ struct DatabaseJobContext
 
 	bool SQLExecute();
 
-	virtual bool OnSQLExecute() = 0;	///< DBÇ®¿¡¼­ ¼öÇàµÇ´Â SQL ÀÛ¾÷
-	virtual void OnSuccess() {}		///< SQL ÀÛ¾÷ ¼º°ø½Ã ·ÎÁ÷Ç®¿¡¼­ ÃÖÁ¾ ¼öÇàµÇ¾î¾ß ÇÏ´Â ³»¿ë
-	virtual void OnFail() {}		///< SQL ÀÛ¾÷ ½ÇÆĞ½Ã ·ÎÁ÷Ç®¿¡¼­ ÃÖÁ¾ ¼öÇàµÇ¾î¾ß ÇÏ´Â ³»¿ë
+	virtual bool OnSQLExecute() = 0;	///< DBí’€ì—ì„œ ìˆ˜í–‰ë˜ëŠ” SQL ì‘ì—…
+	virtual void OnSuccess() {}		///< SQL ì‘ì—… ì„±ê³µì‹œ ë¡œì§í’€ì—ì„œ ìµœì¢… ìˆ˜í–‰ë˜ì–´ì•¼ í•˜ëŠ” ë‚´ìš©
+	virtual void OnFail() {}		///< SQL ì‘ì—… ì‹¤íŒ¨ì‹œ ë¡œì§í’€ì—ì„œ ìµœì¢… ìˆ˜í–‰ë˜ì–´ì•¼ í•˜ëŠ” ë‚´ìš©
 
 
 	ClientSession* mSessionObject;

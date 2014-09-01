@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "ThreadLocal.h"
 #include "FastSpinlock.h"
 #include "ClientSession.h"
@@ -17,7 +17,7 @@ DatabaseJobContext::~DatabaseJobContext()
 
 bool DatabaseJobContext::SQLExecute()
 {
-	//todo: ÀÌ ÇÔ¼ö´Â ¹İµå½Ã DB½º·¹µåÇ®¿¡¼­ ¼öÇàµÇ¾î¾ß ÇÑ´Ù. ±×·¸Áö ¾ÊÀ¸¸é CRASH½ÃÅ°±â
+	//todo: ì´ í•¨ìˆ˜ëŠ” ë°˜ë“œì‹œ DBìŠ¤ë ˆë“œí’€ì—ì„œ ìˆ˜í–‰ë˜ì–´ì•¼ í•œë‹¤. ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ CRASHì‹œí‚¤ê¸°
 	CRASH_ASSERT( LThreadType == THREAD_DB_WORKER );
 
 	return OnSQLExecute();
@@ -25,7 +25,7 @@ bool DatabaseJobContext::SQLExecute()
 
 void DatabaseJobContext::OnResult()
 {
-	//todo: ÀÌ ÇÔ¼ö´Â ¹İµå½Ã IO½º·¹µåÇ®¿¡¼­ ¼öÇàµÇ¾î¾ß ÇÑ´Ù. ±×·¸Áö ¾ÊÀ¸¸é CRASH½ÃÅ°±â
+	//todo: ì´ í•¨ìˆ˜ëŠ” ë°˜ë“œì‹œ IOìŠ¤ë ˆë“œí’€ì—ì„œ ìˆ˜í–‰ë˜ì–´ì•¼ í•œë‹¤. ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ CRASHì‹œí‚¤ê¸°
 	CRASH_ASSERT( LThreadType == THREAD_IO_WORKER );
 
 	if (mSuccess)

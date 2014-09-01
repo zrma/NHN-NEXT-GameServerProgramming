@@ -1,4 +1,4 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include "ThreadLocal.h"
 #include "EduServer_IOCP.h"
 #include "Log.h"
@@ -51,11 +51,11 @@ bool DBManager::StartDatabaseThreads()
 	for (int i = 0; i < MAX_DB_THREAD; ++i)
 	{
 		DWORD dwThreadId;
-		//create ø°º≠ suspended«œ∞‘ ∏∏µÈæ˙±‚∂ßπÆø° æ∆∑°ø°º≠ ResumeThread∏¶ «ÿ¡‡æﬂ «‘
-		//±◊∑±µ• ø÷ ±◊∑∏∞‘ «ﬂ¿ª±Ó?
-		//DB Threadø°º≠ « ø‰∑Œ «œ¥¬ ¿Œ¿⁄∞° completionPort∞° ¿÷¥¬µ• ±◊∞‘ æ¯±‚ ∂ßπÆø°
-		//thread∏¶ ∏∏µÈ∞Ì ≈¨∑°Ω∫∏¶ √§øˆ¡ÿ ¥Ÿ¿Ωø° ¡§ªÛ ¡¯«‡«œµµ∑œ «œ±‚ ¿ß«ÿº≠?
-		//∏¬∞⁄≥◊... run¿Ã dbWorkerThreadø° ¿÷¿∏¥œ±Ò
+		//create ÏóêÏÑú suspendedÌïòÍ≤å ÎßåÎì§ÏóàÍ∏∞ÎïåÎ¨∏Ïóê ÏïÑÎûòÏóêÏÑú ResumeThreadÎ•º Ìï¥Ï§òÏïº Ìï®
+		//Í∑∏Îü∞Îç∞ Ïôú Í∑∏Î†áÍ≤å ÌñàÏùÑÍπå?
+		//DB ThreadÏóêÏÑú ÌïÑÏöîÎ°ú ÌïòÎäî Ïù∏ÏûêÍ∞Ä completionPortÍ∞Ä ÏûàÎäîÎç∞ Í∑∏Í≤å ÏóÜÍ∏∞ ÎïåÎ¨∏Ïóê
+		//threadÎ•º ÎßåÎì§Í≥† ÌÅ¥ÎûòÏä§Î•º Ï±ÑÏõåÏ§Ä Îã§ÏùåÏóê Ï†ïÏÉÅ ÏßÑÌñâÌïòÎèÑÎ°ù ÌïòÍ∏∞ ÏúÑÌï¥ÏÑú?
+		//ÎßûÍ≤†ÎÑ§... runÏù¥ dbWorkerThreadÏóê ÏûàÏúºÎãàÍπê
 		//http://blog.naver.com/lhk0523/140168956254
 		HANDLE hThread = (HANDLE)_beginthreadex(NULL, 0, DbWorkerThread, (LPVOID)i, CREATE_SUSPENDED, (unsigned int*)&dwThreadId);
 		if (hThread == NULL)
@@ -81,7 +81,7 @@ unsigned int WINAPI DBManager::DbWorkerThread(LPVOID lpParam)
 	GThreadCallHistory[LWorkerThreadId] = LThreadCallHistory = new ThreadCallHistory(LWorkerThreadId);
 	GThreadCallElapsedRecord[LWorkerThreadId] = LThreadCallElapsedRecord = new ThreadCallElapsedRecord(LWorkerThreadId);
 
-	/// π›µÂΩ√ DB æ≤∑πµÂ∞° ∏’¿˙ ∂ÁøÏµµ∑œ..
+	/// Î∞òÎìúÏãú DB Ïì∞Î†àÎìúÍ∞Ä Î®ºÏ†Ä ÎùÑÏö∞ÎèÑÎ°ù..
 	CRASH_ASSERT(LWorkerThreadId < MAX_DB_THREAD);
 
 	return GDatabaseManager->mDbWorkerThread[LWorkerThreadId]->Run();
@@ -89,10 +89,11 @@ unsigned int WINAPI DBManager::DbWorkerThread(LPVOID lpParam)
 
 void DBManager::PostDatabsaseRequest(DatabaseJobContext* dbContext)
 {
-	//todo: PQCS∏¶ ¿ÃøÎ«œø© dbContext∏¶ mDbCompletionPortø° ∫∏≥ª±‚
+	//todo: PQCSÎ•º Ïù¥Ïö©ÌïòÏó¨ dbContextÎ•º mDbCompletionPortÏóê Î≥¥ÎÇ¥Í∏∞
 	if ( FALSE == PostQueuedCompletionStatus( mDbCompletionPort, 0, (ULONG_PTR)CK_DB_REQUEST, (LPOVERLAPPED)dbContext ) )
 	{
 		printf_s( "DBManager::PostDatabaseResult PostQueuedCompletionStatus Error: %d\n", GetLastError() );
+
 		CRASH_ASSERT( false );
 	}
 }

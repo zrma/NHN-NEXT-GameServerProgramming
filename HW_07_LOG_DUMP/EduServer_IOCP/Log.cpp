@@ -1,11 +1,11 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Log.h"
 
 #include <iostream>
 
 void ThreadCallHistory::DumpOut(std::ostream& ost)
 {
-	//todo: ÇöÀç ½º·¹µåÀÇ call history¸¦ ost ½ºÆ®¸²¿¡ ¾²±â
+	//todo: í˜„ì¬ ìŠ¤ë ˆë“œì˜ call historyë¥¼ ost ìŠ¤íŠ¸ë¦¼ì— ì“°ê¸°
 	uint64_t count = mCounter < MAX_HISTORY ? mCounter : MAX_HISTORY;
 
 	ost << "===== Recent Call history [Thread:" << mThreadId << "]" << std::endl;
@@ -41,7 +41,7 @@ namespace LoggerUtil
 
 	void EventLogDumpOut(std::ostream& ost)
 	{
-		//todo: gLogEvents³»¿ë ost ½ºÆ®¸²¿¡ ¾²±â
+		//todo: gLogEventsë‚´ìš© ost ìŠ¤íŠ¸ë¦¼ì— ì“°ê¸°
 		uint64_t count = gCurrentLogIndex < MAX_LOG_SIZE ? gCurrentLogIndex : MAX_LOG_SIZE;
 
 		for ( int i = 1; i <= count; ++i )
@@ -50,7 +50,7 @@ namespace LoggerUtil
 				<< " EVENT MSG:" << gLogEvents[count - i].mMessage
 				<< " ADDTIONAL INFO:" << gLogEvents[count - i].mAdditionalInfo << std::endl;
 
-			///# ±ò²ûÇÏ°Ô ÀÌ·¸°Ô
+			///# ê¹”ë”í•˜ê²Œ ì´ë ‡ê²Œ
 			//const LogEvent& log = gLogEvents[(gCurrentLogIndex - i) % MAX_LOG_SIZE];
 			//ost << "TID[" << log.mThreadId << "] MSG[ " << log.mMessage << " ] INFO [" << log.mAdditionalInfo << "]" << std::endl;
 
