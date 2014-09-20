@@ -1,4 +1,4 @@
-use GameDB
+ï»¿use GameDB
 go
 
 SET NOCOUNT ON
@@ -117,10 +117,10 @@ BEGIN
 END		   
 GO		   
 
---EXEC spCreatePlayer 'Å×½ºÆ®ÇÃ·¹ÀÌ¾î'
+--EXEC spCreatePlayer 'í…ŒìŠ¤íŠ¸í”Œë ˆì´ì–´'
 --GO
 
---EXEC spUpdatePlayerComment 100, "°¡³ª´Ù¶ó ÇÃ·¹ÀÌ¾î ÄÚ¸àÆ® Å×½ºÆ® kekeke"
+--EXEC spUpdatePlayerComment 100, "ê°€ë‚˜ë‹¤ë¼ í”Œë ˆì´ì–´ ì½”ë©˜íŠ¸ í…ŒìŠ¤íŠ¸ kekeke"
 --GO
 
 --EXEC spUpdatePlayerValid 100, 1

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "FastSpinlock.h"
 #include "EduServer_IOCP.h"
 #include "ClientSession.h"

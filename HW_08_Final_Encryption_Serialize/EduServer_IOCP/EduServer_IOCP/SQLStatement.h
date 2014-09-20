@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 const wchar_t* SQL_LoadPlayer = L"{ call dbo.spLoadPlayer (?) }"; ///< uid
 

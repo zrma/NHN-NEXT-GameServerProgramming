@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Exception.h"
 #include "EduServer_IOCP.h"
 #include "OverlappedIOContext.h"
@@ -22,7 +22,7 @@ bool ServerSession::ConnectRequest()
 {
 	if (mConnected)
 	{
-		/// ÀÌ¹Ì Á¢¼Ó µÈ »óÅÂÀÎµ¥ ÀÌÂÊÀ¸·Î µé¾î¿À¸é Àß¸øµÈ °Í
+		/// ì´ë¯¸ ì ‘ì† ëœ ìƒíƒœì¸ë° ì´ìª½ìœ¼ë¡œ ë“¤ì–´ì˜¤ë©´ ì˜ëª»ëœ ê²ƒ
 		CRASH_ASSERT(false);
 		return false;
 	}

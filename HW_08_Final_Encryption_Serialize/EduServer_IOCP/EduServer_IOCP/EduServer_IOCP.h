@@ -1,6 +1,6 @@
-#pragma once
+ï»¿#pragma once
 
-//todo: ¾Æ·¡ ¼³Á¤Àº ¿©·¯ºÐµéÀÇ »óÈ²¿¡ ¸Â°Ô °íÄ¡±â
+//todo: ì•„ëž˜ ì„¤ì •ì€ ì—¬ëŸ¬ë¶„ë“¤ì˜ ìƒí™©ì— ë§žê²Œ ê³ ì¹˜ê¸°
 
 #define LISTEN_PORT		9000
 #define MAX_CONNECTION	10000
@@ -8,7 +8,7 @@
 #define CONNECT_SERVER_ADDR	"127.0.0.1"
 #define CONNECT_SERVER_PORT 9001
 
-///# ½ÇÁ¦·Î IP·Î Á¢±ÙÇÏ´Â °ÍÀÌ ÁÁ´Ù. ½Ç ¼­ºñ½º È¯°æ¿¡¼­ TRIZDREAMINGÀÇ ÄÄÇ»ÅÍ ÀÌ¸§À» ÀÏÀÏÀÌ È®ÀÎÇÒ ¼ö°¡ ¾øÀÝ¾Æ ¤¾¤¾
+///# ì‹¤ì œë¡œ IPë¡œ ì ‘ê·¼í•˜ëŠ” ê²ƒì´ ì¢‹ë‹¤. ì‹¤ ì„œë¹„ìŠ¤ í™˜ê²½ì—ì„œ TRIZDREAMINGì˜ ì»´í“¨í„° ì´ë¦„ì„ ì¼ì¼ì´ í™•ì¸í•  ìˆ˜ê°€ ì—†ìž–ì•„ ã…Žã…Ž
 #define SQL_SERVER_CONN_STR	L"Driver={SQL Server};Server=TRIZDREAMING-PC\\SQLEXPRESS;Database=GameDB;UID=triztest;PWD=next11223344;"
 
 #define GQCS_TIMEOUT	10 //INFINITE

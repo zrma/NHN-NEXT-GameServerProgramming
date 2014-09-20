@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #define MAX_IO_THREAD	4
 #define MAX_DB_THREAD	4

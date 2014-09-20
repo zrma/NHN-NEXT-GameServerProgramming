@@ -156,6 +156,7 @@
     <ClInclude Include="EduServer_IOCP.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FastSpinlock.h" />
+    <ClInclude Include="mypacket.pb.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="IocpManager.h" />
     <ClInclude Include="Log.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="IocpManager.cpp" />
     <ClCompile Include="ClientSessionManager.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="mypacket.pb.cc" />
     <ClCompile Include="OverlappedIOContext.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerDBContext.cpp" />

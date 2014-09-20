@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Exception.h"
 #include "ThreadLocal.h"
 #include "Log.h"
@@ -112,7 +112,7 @@ bool IocpManager::StartIoThreads()
 	for (int i = 0; i < MAX_IO_THREAD; ++i)
 	{
 		DWORD dwThreadId;
-		/// ½º·¹µåID´Â DB ½º·¹µå ÀÌÈÄ¿¡ IO ½º·¹µå·Î..
+		/// ìŠ¤ë ˆë“œIDëŠ” DB ìŠ¤ë ˆë“œ ì´í›„ì— IO ìŠ¤ë ˆë“œë¡œ..
 		HANDLE hThread = (HANDLE)_beginthreadex(NULL, 0, IoWorkerThread, (LPVOID)(i+MAX_DB_THREAD), CREATE_SUSPENDED, (unsigned int*)&dwThreadId);
 		if (hThread == NULL)
 			return false;
@@ -169,7 +169,7 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 	GThreadCallHistory[LWorkerThreadId] = LThreadCallHistory = new ThreadCallHistory(LWorkerThreadId);
 	GThreadCallElapsedRecord[LWorkerThreadId] = LThreadCallElapsedRecord = new ThreadCallElapsedRecord(LWorkerThreadId);
 	
-	/// ¹Ýµå½Ã DB ¾²·¹µå¸¦ ¸ÕÀú ¶ç¿î ÈÄ¿¡ ÁøÀÔÇØ¾ß ÇÑ´Ù.
+	/// ë°˜ë“œì‹œ DB ì“°ë ˆë“œë¥¼ ë¨¼ì € ë„ìš´ í›„ì— ì§„ìž…í•´ì•¼ í•œë‹¤.
 	CRASH_ASSERT(LWorkerThreadId >= MAX_DB_THREAD);
 
 	return GIocpManager->mIoWorkerThread[LWorkerThreadId-MAX_DB_THREAD]->Run();

@@ -18,6 +18,9 @@
     <Filter Include="Contents">
       <UniqueIdentifier>{b8204af9-e7c6-4dc1-a487-84870b517819}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Packet">
+      <UniqueIdentifier>{c05d12b5-e5b2-4776-97e7-f838d1101d15}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -98,6 +101,9 @@
     <ClInclude Include="SQLStatement.h">
       <Filter>Contents</Filter>
     </ClInclude>
+    <ClInclude Include="mypacket.pb.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -162,6 +168,9 @@
     </ClCompile>
     <ClCompile Include="PlayerDBContext.cpp">
       <Filter>Contents</Filter>
+    </ClCompile>
+    <ClCompile Include="mypacket.pb.cc">
+      <Filter>Packet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

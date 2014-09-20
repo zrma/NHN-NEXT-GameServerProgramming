@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Exception.h"
 #include "ThreadLocal.h"
 #include "Log.h"
@@ -21,7 +21,7 @@ void Session::DisconnectRequest(DisconnectReason dr)
 {
 	TRACE_THIS;
 
-	/// ÀÌ¹Ì ²÷°å°Å³ª ²÷±â´Â ÁßÀÌ°Å³ª
+	/// ì´ë¯¸ ëŠê²¼ê±°ë‚˜ ëŠê¸°ëŠ” ì¤‘ì´ê±°ë‚˜
 	if (0 == InterlockedExchange(&mConnected, 0))
 		return;
 
@@ -139,17 +139,17 @@ bool Session::FlushSend()
 
 	FastSpinlockGuard criticalSection(mSendBufferLock);
 
-	/// º¸³¾ µ¥ÀÌÅÍ°¡ ¾ø´Â °æ¿ì
+	/// ë³´ë‚¼ ë°ì´í„°ê°€ ì—†ëŠ” ê²½ìš°
 	if (0 == mSendBuffer.GetContiguiousBytes())
 	{
-		/// º¸³¾ µ¥ÀÌÅÍµµ ¾ø´Â °æ¿ì
+		/// ë³´ë‚¼ ë°ì´í„°ë„ ì—†ëŠ” ê²½ìš°
 		if (0 == mSendPendingCount)
 			return true;
 		
 		return false;
 	}
 
-	/// ÀÌÀüÀÇ send°¡ ¿Ï·á ¾ÈµÈ °æ¿ì
+	/// ì´ì „ì˜ sendê°€ ì™„ë£Œ ì•ˆëœ ê²½ìš°
 	if (mSendPendingCount > 0)
 		return false;
 
