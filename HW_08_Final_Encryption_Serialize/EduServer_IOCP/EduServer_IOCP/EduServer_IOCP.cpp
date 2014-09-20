@@ -25,7 +25,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	if (false == GIocpManager->Initialize())
 		return -1;
-
+	
 	if (false == GDatabaseManager->Initialize())
 		return -1;
 
