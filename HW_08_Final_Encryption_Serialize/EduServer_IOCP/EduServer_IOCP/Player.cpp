@@ -1,8 +1,7 @@
 ﻿#include "stdafx.h"
 #include "ClientSession.h"
 #include "Player.h"
-#include "PlayerDBContext.h"
-#include "DBManager.h"
+
 
 Player::Player(ClientSession* session) : mSession(session)
 {
@@ -26,8 +25,10 @@ void Player::PlayerReset()
 
 void Player::RequestLoad(int pid)
 {
+	/*
  	LoadPlayerDataContext* context = new LoadPlayerDataContext(mSession, pid);
  	GDatabaseManager->PostDatabsaseRequest(context);
+	*/
 }
 
 void Player::ResponseLoad(int pid, float x, float y, float z, bool valid, wchar_t* name, wchar_t* comment)
@@ -48,11 +49,12 @@ void Player::ResponseLoad(int pid, float x, float y, float z, bool valid, wchar_
 
 void Player::RequestUpdatePosition(float x, float y, float z)
 {
-	//todo: DB에 플레이어 위치를 x,y,z로 업데이트 요청하기
+	/*
 	UpdatePlayerPositionContext* context = new UpdatePlayerPositionContext( mSession, mPlayerId );
 	context->SetNewPosition( x, y, z );
 
 	GDatabaseManager->PostDatabsaseRequest( context );
+	*/
 }
 
 void Player::ResponseUpdatePosition(float x, float y, float z)
@@ -65,9 +67,11 @@ void Player::ResponseUpdatePosition(float x, float y, float z)
 
 void Player::RequestUpdateComment(const wchar_t* comment)
 {
+	/*
 	UpdatePlayerCommentContext* context = new UpdatePlayerCommentContext(mSession, mPlayerId);
 	context->SetNewComment(comment);
 	GDatabaseManager->PostDatabsaseRequest(context);
+	*/
 }
 
 void Player::ResponseUpdateComment(const wchar_t* comment)
@@ -78,9 +82,11 @@ void Player::ResponseUpdateComment(const wchar_t* comment)
 
 void Player::RequestUpdateValidation(bool isValid)
 {
+	/*
 	UpdatePlayerValidContext* context = new UpdatePlayerValidContext(mSession, mPlayerId);
 	context->mIsValid = isValid;
 	GDatabaseManager->PostDatabsaseRequest(context);
+	*/
 }
 
 void Player::ResponseUpdateValidation(bool isValid)
@@ -92,10 +98,11 @@ void Player::ResponseUpdateValidation(bool isValid)
 
 void Player::TestCreatePlayerData(const wchar_t* newName)
 {
-	//todo: DB스레드풀에 newName에 해당하는 플레이어 생성 작업을 수행시켜보기
+	/*
 	CreatePlayerDataContext* context = new CreatePlayerDataContext( mSession, newName );
 
 	GDatabaseManager->PostDatabsaseRequest( context );
+	*/
 
 }
 
@@ -106,9 +113,10 @@ void Player::ResponseCreatePlayerData( const wchar_t* generatedName )
 
 void Player::TestDeletePlayerData(int playerId)
 {
-	//todo: DB스레드풀에 playerId에 해당하는 플레이어 생성 삭제 작업을 수행시켜보기
+	/*
 	DeletePlayerDataContext* context = new DeletePlayerDataContext( mSession, playerId );
 	GDatabaseManager->PostDatabsaseRequest( context );
+	*/
 }
 
 void Player::ResponseDeletePlayerData( int playerId )

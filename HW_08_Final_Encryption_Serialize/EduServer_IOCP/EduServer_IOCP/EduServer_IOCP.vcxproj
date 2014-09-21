@@ -167,6 +167,7 @@
     <ClInclude Include="OverlappedIOContext.h" />
     <ClInclude Include="PacketHandler.h" />
     <ClInclude Include="PacketHeader.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="ServerSession.h" />
     <ClInclude Include="Session.h" />
     <ClInclude Include="StackWalker.h" />
@@ -187,6 +188,7 @@
     <ClCompile Include="mypacket.pb.cc" />
     <ClCompile Include="OverlappedIOContext.cpp" />
     <ClCompile Include="PacketHandler.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="ServerSession.cpp" />
     <ClCompile Include="Session.cpp" />
     <ClCompile Include="StackWalker.cpp">

@@ -14,3 +14,11 @@ struct MessageHeader
 };
 
 const int MessageHeaderSize = sizeof( MessageHeader );
+/*
+#ifndef _ITERATOR_DEBUG_LEVEL
+#define _ITERATOR_DEBUG_LEVEL 0
+#else
+#undef _ITERATOR_DEBUG_LEVEL
+#define _ITERATOR_DEBUG_LEVEL 0
+#endif
+*/

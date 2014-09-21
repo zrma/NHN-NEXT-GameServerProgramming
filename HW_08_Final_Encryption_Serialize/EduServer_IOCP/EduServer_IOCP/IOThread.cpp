@@ -6,7 +6,7 @@
 #include "ClientSession.h"
 #include "ServerSession.h"
 #include "IocpManager.h"
-#include "DBContext.h"
+
 
 IOThread::IOThread(HANDLE hThread, HANDLE hCompletionPort) : mThreadHandle(hThread), mCompletionPort(hCompletionPort)
 {
