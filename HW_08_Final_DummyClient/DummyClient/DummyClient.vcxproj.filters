@@ -107,11 +107,11 @@
     <ClCompile Include="FastSpinlock.cpp">
       <Filter>Thread</Filter>
     </ClCompile>
-    <ClCompile Include="IoThread.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="mypacket.pb.cc">
       <Filter>Protobuf</Filter>
+    </ClCompile>
+    <ClCompile Include="IoThread.cpp">
+      <Filter>Thread</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
