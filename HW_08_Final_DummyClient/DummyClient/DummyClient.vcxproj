@@ -86,6 +86,7 @@
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FastSpinlock.h" />
     <ClInclude Include="IocpManager.h" />
+    <ClInclude Include="IoThread.h" />
     <ClInclude Include="MemoryPool.h" />
     <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="SessionManager.h" />
@@ -102,6 +103,7 @@
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="FastSpinlock.cpp" />
     <ClCompile Include="IocpManager.cpp" />
+    <ClCompile Include="IoThread.cpp" />
     <ClCompile Include="MemoryPool.cpp" />
     <ClCompile Include="SessionManager.cpp" />
     <ClCompile Include="stdafx.cpp">

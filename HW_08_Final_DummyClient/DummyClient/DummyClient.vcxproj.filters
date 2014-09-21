@@ -63,6 +63,9 @@
     <ClInclude Include="DummyClient.h">
       <Filter>Main</Filter>
     </ClInclude>
+    <ClInclude Include="IoThread.h">
+      <Filter>Thread</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -94,6 +97,9 @@
     </ClCompile>
     <ClCompile Include="FastSpinlock.cpp">
       <Filter>Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="IoThread.cpp">
+      <Filter>Main</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

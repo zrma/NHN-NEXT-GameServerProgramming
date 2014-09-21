@@ -5,9 +5,8 @@
 #include "ClientSession.h"
 #include "SessionManager.h"
 #include "DummyClient.h"
+#include "IoThread.h"
 
-#define GQCS_TIMEOUT			20 // INFINITE
-#define THREAD_QUIT_KEY		9999
 
 IocpManager* GIocpManager = nullptr;
 
@@ -15,7 +14,6 @@ LPFN_CONNECTEX IocpManager::mFnConnectEx = nullptr;
 LPFN_DISCONNECTEX IocpManager::mFnDisconnectEx = nullptr;
 
 char IocpManager::mConnectBuf[64] = { 0, };
-
 
 BOOL IocpManager::ConnectEx( SOCKET hSocket, const struct sockaddr *name, int nameLen, 
 							 PVOID lpSendBuffer, DWORD dwSendDataLength, LPDWORD lpdwBytesSent, LPOVERLAPPED lpOverlapped )
@@ -35,15 +33,6 @@ IocpManager::IocpManager() : mCompletionPort(NULL), mIoThreadCount(2)
 
 IocpManager::~IocpManager()
 {
-	if ( mThreadHandle && mIoThreadCount > 0 )
-	{
-		for ( int i = 0; i < mIoThreadCount; ++i )
-		{
-			CloseHandle( mThreadHandle[i] );
-		}
-
-		delete[] mThreadHandle;
-	}
 }
 
 bool IocpManager::Initialize()
@@ -126,9 +115,16 @@ bool IocpManager::StartIoThreads()
 	for (int i = 0; i < mIoThreadCount; ++i)
 	{
 		DWORD dwThreadId;
-		mThreadHandle[i] = (HANDLE)_beginthreadex( NULL, 0, IoWorkerThread, (LPVOID)( i + 1 ), 0, (unsigned int*)&dwThreadId );
+		mThreadHandle[i] = (HANDLE)_beginthreadex( NULL, 0, IoWorkerThread, (LPVOID)( i + 1 ), CREATE_SUSPENDED, (unsigned int*)&dwThreadId );
 		if ( mThreadHandle[i] == NULL )
 			return false;
+
+		mIoWorkerThread[i] = new IOThread( mThreadHandle[i], mCompletionPort );
+	}
+
+	for ( int i = 0; i < mIoThreadCount; ++i )
+	{
+		ResumeThread( mIoWorkerThread[i]->GetHandle() );
 	}
 
 	return true;
@@ -160,6 +156,16 @@ void IocpManager::StartConnect()
 
 void IocpManager::Finalize()
 {
+	if ( mThreadHandle && mIoThreadCount > 0 )
+	{
+		for ( int i = 0; i < mIoThreadCount; ++i )
+		{
+			CloseHandle( mThreadHandle[i] );
+		}
+
+		delete[] mThreadHandle;
+	}
+
 	CloseHandle(mCompletionPort);
 
 	/// winsock finalizing
@@ -170,118 +176,8 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 {
 	LThreadType = THREAD_IO_WORKER;
 	LIoThreadId = reinterpret_cast<int>(lpParam);
-
-	HANDLE hComletionPort = GIocpManager->GetComletionPort();
+	LSendRequestSessionList = new std::deque < ClientSession* > ;
+	LSendRequestFailedSessionList = new std::deque < ClientSession* > ;
 	
-	while ( true )
-	{
-		/// IOCP 작업 돌리기
-		DWORD dwTransferred = 0;
-		OverlappedIOContext* context = nullptr;
-		ULONG_PTR completionKey = 0;
-
-		int ret = GetQueuedCompletionStatus(hComletionPort, &dwTransferred, (PULONG_PTR)&completionKey, (LPOVERLAPPED*)&context, GQCS_TIMEOUT);
-
-		if ( completionKey == THREAD_QUIT_KEY )
-		{
-			break;
-		}
-
-		ClientSession* theClient = context ? context->mSessionObject : nullptr ;
-		
-		if (ret == 0 || dwTransferred == 0)
-		{
-			int gle = GetLastError();
-
-			/// check time out first 
-			if ( gle == WAIT_TIMEOUT && context == nullptr )
-			{
-				continue;
-			}
-		
-			if (context->mIoType == IO_RECV || context->mIoType == IO_SEND )
-			{
-				CRASH_ASSERT(nullptr != theClient);
-
-				/// In most cases in here: ERROR_NETNAME_DELETED(64)
-
-				theClient->DisconnectRequest(DR_COMPLETION_ERROR);
-
-				DeleteIoContext(context);
-
-				continue;
-			}
-		}
-
-		CRASH_ASSERT(nullptr != theClient);
-	
-		bool completionOk = false;
-		switch (context->mIoType)
-		{
-		case IO_DISCONNECT:
-			theClient->DisconnectCompletion(static_cast<OverlappedDisconnectContext*>(context)->mDisconnectReason);
-			completionOk = true;
-			break;
-
-		case IO_CONNECT:
-			theClient->ConnectCompletion();
-			completionOk = true;
-			break;
-
-		case IO_RECV_ZERO:
-			completionOk = PreReceiveCompletion(theClient, static_cast<OverlappedPreRecvContext*>(context), dwTransferred);
-			break;
-
-		case IO_SEND:
-			completionOk = SendCompletion(theClient, static_cast<OverlappedSendContext*>(context), dwTransferred);
-			break;
-
-		case IO_RECV:
-			completionOk = ReceiveCompletion(theClient, static_cast<OverlappedRecvContext*>(context), dwTransferred);
-			break;
-
-		default:
-			printf_s("Unknown I/O Type: %d\n", context->mIoType);
-			CRASH_ASSERT(false);
-			break;
-		}
-
-		if ( !completionOk )
-		{
-			/// connection closing
-			theClient->DisconnectRequest(DR_IO_REQUEST_ERROR);
-		}
-
-		DeleteIoContext(context);
-	}
-
-	return 0;
-}
-
-bool IocpManager::PreReceiveCompletion(ClientSession* client, OverlappedPreRecvContext* context, DWORD dwTransferred)
-{
-	/// real receive...
-	return client->PostRecv();
-}
-
-bool IocpManager::ReceiveCompletion(ClientSession* client, OverlappedRecvContext* context, DWORD dwTransferred)
-{
-	client->RecvCompletion(dwTransferred);
-
-	/// echo back
-	return client->PostSend();
-}
-
-bool IocpManager::SendCompletion(ClientSession* client, OverlappedSendContext* context, DWORD dwTransferred)
-{
-	client->SendCompletion(dwTransferred);
-
-	if (context->mWsaBuf.len != dwTransferred)
-	{
-		printf_s("Partial SendCompletion requested [%d], sent [%d]\n", context->mWsaBuf.len, dwTransferred) ;
-		return false;
-	}
-	
-	/// zero receive
-	return client->PreRecv();
+	return GIocpManager->mIoWorkerThread[LIoThreadId]->Run();
 }

@@ -15,8 +15,8 @@ enum IOType
 	IO_SEND,
 	IO_RECV,
 	IO_RECV_ZERO,
-	IO_CONNECT,
-	IO_DISCONNECT
+	IO_DISCONNECT,
+	IO_CONNECT
 } ;
 
 enum DisconnectReason
@@ -26,6 +26,7 @@ enum DisconnectReason
 	DR_ONCONNECT_ERROR,
 	DR_IO_REQUEST_ERROR,
 	DR_COMPLETION_ERROR,
+	DR_SENDFLUSH_ERROR
 };
 
 struct OverlappedIOContext
@@ -98,8 +99,12 @@ public:
 	bool	PostRecv();
 	void	RecvCompletion( DWORD transferred );
 
-	bool	PostSend();
+	bool	PostSend( const char* data, size_t len );
+	bool	FlushSend();
+
 	void	SendCompletion( DWORD transferred );
+
+	void	EchoBack();
 
 	void	DisconnectRequest( DisconnectReason dr );
 	void	DisconnectCompletion( DisconnectReason dr );
@@ -118,12 +123,15 @@ private:
 	SOCKET			mSocket;
 	SOCKADDR_IN		mClientAddr;
 
-	FastSpinlock	mBufferLock;
+	FastSpinlock	mSendBufferLock;
 
-	CircularBuffer	mBuffer;
+	CircularBuffer	mRecvBuffer;
+	CircularBuffer	mSendBuffer;
 
 	volatile long	mRefCount;
 	volatile long	mConnected;
+
+	int				mSendPendingCount;
 
 	long long		mSendBytes = 0;
 	long long		mRecvBytes = 0;
@@ -140,3 +148,6 @@ private:
 
 	friend class SessionManager;
 };
+
+extern __declspec( thread ) std::deque<ClientSession*>* LSendRequestSessionList;
+extern __declspec( thread ) std::deque<ClientSession*>* LSendRequestFailedSessionList;
