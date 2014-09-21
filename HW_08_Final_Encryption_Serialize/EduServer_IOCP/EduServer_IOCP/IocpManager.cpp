@@ -165,7 +165,10 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 {
 	LThreadType = THREAD_IO_WORKER;
 	LWorkerThreadId = reinterpret_cast<int>(lpParam);
-	LSendRequestSessionList = new std::deque<Session*>;
+
+	LSendRequestSessionList = new std::deque < Session* > ;
+	LSendRequestFailedSessionList = new std::deque < Session* > ;
+
 	GThreadCallHistory[LWorkerThreadId] = LThreadCallHistory = new ThreadCallHistory(LWorkerThreadId);
 	GThreadCallElapsedRecord[LWorkerThreadId] = LThreadCallElapsedRecord = new ThreadCallElapsedRecord(LWorkerThreadId);
 	
