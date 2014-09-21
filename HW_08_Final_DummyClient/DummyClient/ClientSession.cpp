@@ -21,7 +21,7 @@ OverlappedIOContext::OverlappedIOContext(ClientSession* owner, IOType ioType)
 }
 
 ClientSession::ClientSession() : mRecvBuffer(BUFFER_SIZE), mSendBuffer(BUFFER_SIZE)
-, mConnected(0), mRefCount(0), mSendBufferLock(LO_LUGGAGE_CLASS), mSendPendingCount(0)
+, mConnected(0), mRefCount(0), mSendPendingCount(0)
 , mPlayer( new Player( this ) )
 {
 	memset(&mClientAddr, 0, sizeof(SOCKADDR_IN));
@@ -177,58 +177,14 @@ void ClientSession::ConnectCompletion()
 		return;
 	}
 
-	FastSpinlockGuard criticalSection( mSendBufferLock );
-
 	//////////////////////////////////////////////////////////////////////////
 	// 여기부터 로그인 리퀘스트 패킷 조합 -> 시리얼라이즈 -> 암호화 해서 전송 요청 시작하면 됨
 	//
 	// 하단 코드는 날려버릴 예정
 
-// 	if ( BUFFER_SIZE <= 0 || BUFFER_SIZE > BUFSIZE )
-// 	{
-// 		BUFFER_SIZE = 4096;
-// 	}
-// 
-// 	char* temp = new char[BUFFER_SIZE];
-// 	
-// 	ZeroMemory( temp, sizeof( char ) * BUFFER_SIZE );
-// 	for ( int i = 0; i < BUFFER_SIZE - 1; ++i )
-// 	{
-// 		temp[i] = 'a' + ( mSocket % 26 );
-// 	}
-// 
-// 	temp[BUFFER_SIZE - 1] = '\0';
-// 
-// 	char* bufferStart = mSendBuffer.GetBuffer();
-// 	memcpy( bufferStart, temp, BUFFER_SIZE );
-// 
-// 	mSendBuffer.Commit( BUFFER_SIZE );
-// 		
-// 	CRASH_ASSERT( 0 != mSendBuffer.GetContiguiousBytes() );
-// 		
-// 
-// 
-// 	delete[] temp;
-// 
-// 
-// 	OverlappedSendContext* sendContext = new OverlappedSendContext( this );
-// 
-// 	DWORD sendbytes = 0;
-// 	DWORD flags = 0;
-// 	sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
-// 	sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
-// 
-// 
-// 	/// start async send
-// 	if ( SOCKET_ERROR == WSASend( mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL ) )
-// 	{
-// 		if ( WSAGetLastError() != WSA_IO_PENDING )
-// 		{
-// 			DeleteIoContext( sendContext );
-// 			printf_s( "ClientSession::PostSend Error : %d\n", GetLastError() );
-// 		}
-// 	}
-	
+	char* testText = "TempTextArrayForTest";
+	PostSend( testText, strlen( testText ) );
+
 	// proto
 	
 	MyPacket::LoginRequest loginRequest;
@@ -237,6 +193,11 @@ void ClientSession::ConnectCompletion()
 	WriteMessageToStream( MyPacket::MessageType::PKT_CS_LOGIN, loginRequest, *m_pCodedOutputStream );
 	
 	++mUseCount;
+
+	if ( false == PreRecv() )
+	{
+		printf_s( "[DEBUG] PreRecv error: %d\n", GetLastError() );
+	}
 }
 
 void ClientSession::DisconnectRequest(DisconnectReason dr)
@@ -339,7 +300,7 @@ void ClientSession::RecvCompletion(DWORD transferred)
 	mRecvBytes += transferred;
 
 	// mRecvBuffer.GetBuffer();
-	OnRead(transferred);
+	// OnRead(transferred);
 }
 
 bool ClientSession::PostSend( const char* data, size_t len )
@@ -426,6 +387,7 @@ void ClientSession::SendCompletion(DWORD transferred)
 	FastSpinlockGuard criticalSection( mSendBufferLock );
 
 	mSendBuffer.Remove( transferred );
+	mSendBytes += transferred;
 
 	--mSendPendingCount;
 }

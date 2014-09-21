@@ -48,10 +48,13 @@ void IOThread::DoIocpJob()
 
 	if ( ret == 0 || dwTransferred == 0 )
 	{
-		/// check time out first 
-		if ( context == nullptr && GetLastError() == WAIT_TIMEOUT )
-			return;
+		int gle = GetLastError();
 
+		/// check time out first 
+		if ( gle == WAIT_TIMEOUT && context == nullptr )
+		{
+			return;
+		}
 
 		if ( context->mIoType == IO_RECV || context->mIoType == IO_SEND )
 		{
@@ -93,9 +96,9 @@ void IOThread::DoIocpJob()
 				printf_s( "Partial SendCompletion requested [%d], sent [%d]\n", context->mWsaBuf.len, dwTransferred );
 			else
 				completionOk = true;
-
+			
 			break;
-
+			
 		case IO_RECV:
 			session->RecvCompletion( dwTransferred );
 
@@ -128,11 +131,24 @@ void IOThread::DoSendJob()
 	while ( !LSendRequestSessionList->empty() )
 	{
 		auto& session = LSendRequestSessionList->front();
+		LSendRequestSessionList->pop_front();
 
-		if ( session->FlushSend() )
+		if ( !(session->FlushSend()) )
 		{
-			/// true 리턴 되면 빼버린다.
-			LSendRequestSessionList->pop_front();
+			// false 되면 가비지 수집한다
+			LSendRequestFailedSessionList->push_back( session );
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	// Swap!
+	
+	// 비어 있는 녀석이다
+	std::deque<ClientSession*>* tempDeq = LSendRequestSessionList;
+
+	// 남아 있는 녀석을 다음번에 이어서 쓰고
+	LSendRequestSessionList = LSendRequestFailedSessionList;
+	
+	// 가비지 수집할 녀석을 비어 있는 녀석으로 교체
+	LSendRequestFailedSessionList = tempDeq;
 }

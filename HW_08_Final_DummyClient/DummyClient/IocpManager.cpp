@@ -116,16 +116,11 @@ bool IocpManager::StartIoThreads()
 	for (int i = 0; i < mIoThreadCount; ++i)
 	{
 		DWORD dwThreadId;
-		mThreadHandle[i] = (HANDLE)_beginthreadex( NULL, 0, IoWorkerThread, (LPVOID)( i + 1 ), CREATE_SUSPENDED, (unsigned int*)&dwThreadId );
+		mThreadHandle[i] = (HANDLE)_beginthreadex( NULL, 0, IoWorkerThread, (LPVOID)( i ), 0, (unsigned int*)&dwThreadId );
 		if ( mThreadHandle[i] == NULL )
 			return false;
 
 		mIoWorkerThread[i] = new IOThread( mThreadHandle[i], mCompletionPort );
-	}
-
-	for ( int i = 0; i < mIoThreadCount; ++i )
-	{
-		ResumeThread( mIoWorkerThread[i]->GetHandle() );
 	}
 
 	return true;

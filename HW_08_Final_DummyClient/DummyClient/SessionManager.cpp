@@ -10,7 +10,7 @@
 
 SessionManager* GSessionManager = nullptr;
 
-SessionManager::SessionManager() : mCurrentIssueCount(0), mCurrentReturnCount(0), mLock(LO_FIRST_CLASS)
+SessionManager::SessionManager() : mCurrentIssueCount(0), mCurrentReturnCount(0)
 {
 }
 
