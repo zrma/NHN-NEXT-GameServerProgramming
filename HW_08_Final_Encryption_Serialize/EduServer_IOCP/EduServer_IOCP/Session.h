@@ -32,6 +32,9 @@ public:
 	void	SetSocket(SOCKET sock) { mSocket = sock; }
 	SOCKET	GetSocket() const { return mSocket; }
 
+	CircularBuffer GetRecvBuffer() const { return mRecvBuffer; }
+	CircularBuffer GetSendBuffer() const { return mSendBuffer; }
+
 	void EchoBack();
 
 protected:

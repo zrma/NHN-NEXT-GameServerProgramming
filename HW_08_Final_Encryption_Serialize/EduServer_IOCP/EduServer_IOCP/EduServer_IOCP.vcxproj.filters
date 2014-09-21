@@ -15,6 +15,9 @@
     <Filter Include="Packet">
       <UniqueIdentifier>{c05d12b5-e5b2-4776-97e7-f838d1101d15}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PacketHandler">
+      <UniqueIdentifier>{15c95cc7-deb6-4d13-a7c7-a6c41151810d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -74,6 +77,12 @@
     <ClInclude Include="mypacket.pb.h">
       <Filter>Packet</Filter>
     </ClInclude>
+    <ClInclude Include="PacketHeader.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler.h">
+      <Filter>PacketHandler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -123,6 +132,9 @@
     </ClCompile>
     <ClCompile Include="mypacket.pb.cc">
       <Filter>Packet</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHandler.cpp">
+      <Filter>PacketHandler</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

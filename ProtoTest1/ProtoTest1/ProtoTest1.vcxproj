@@ -41,8 +41,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\Administrator\Documents\Visual Studio 2013\Projects\ProtoTest1\ProtoTest1\google_proto_buffer\src;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Administrator\Documents\Visual Studio 2013\Projects\ProtoTest1\ProtoTest1\google_proto_buffer\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Trizdreaming\Documents\GitHub\NHN-NEXT-GameServerProgramming\HW_08_Final_DummyClient\DummyClient\google_proto_buffer\src;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Trizdreaming\Documents\GitHub\NHN-NEXT-GameServerProgramming\HW_08_Final_DummyClient\DummyClient\google_proto_buffer\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

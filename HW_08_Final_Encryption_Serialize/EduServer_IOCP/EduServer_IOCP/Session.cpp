@@ -6,6 +6,7 @@
 #include "OverlappedIOContext.h"
 #include "Session.h"
 #include "IocpManager.h"
+#include "PacketHeader.h"
 
 __declspec(thread) std::deque<Session*>* LSendRequestSessionList = nullptr;
 
@@ -160,6 +161,14 @@ bool Session::FlushSend()
 	DWORD flags = 0;
 	sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
 	sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
+
+	//////////////////////////////////////////////////////////////////////////
+	// 여기서 보낼 버퍼를 시리얼라이징 및 암호 설정해야 함 tirz
+	//////////////////////////////////////////////////////////////////////////
+
+
+
+	//////////////////////////////////////////////////////////////////////////
 
 	/// start async send
 	if (SOCKET_ERROR == WSASend(mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL))
