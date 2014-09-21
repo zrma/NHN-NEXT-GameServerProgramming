@@ -1,6 +1,151 @@
-Ôªø#include "stdafx.h"
+#include "stdafx.h"
 #include "CircularBuffer.h"
 #include <assert.h>
+
+
+bool CircularBuffer::Peek(OUT char* destbuf, size_t bytes) const
+{
+	assert(mBuffer != nullptr);
+
+	if (mARegionSize + mBRegionSize < bytes)
+		return false;
+
+	size_t cnt = bytes;
+	size_t aRead = 0;
+
+	/// A, B øµø™ µ—¥Ÿ µ•¿Ã≈Õ∞° ¿÷¥¬ ∞ÊøÏ¥¬ A∏’¿˙ ¿–¥¬¥Ÿ
+	if (mARegionSize > 0)
+	{
+		aRead = (cnt > mARegionSize) ? mARegionSize : cnt;
+		memcpy(destbuf, mARegionPointer, aRead);
+		cnt -= aRead;
+	}
+
+	/// ¿–±‚ ø‰±∏«— µ•¿Ã≈Õ∞° ¥ı ¿÷¥Ÿ∏È B øµø™ø°º≠ ¿–¥¬¥Ÿ
+	if (cnt > 0 && mBRegionSize > 0)
+	{
+		assert(cnt <= mBRegionSize);
+
+		/// ≥≤¿∫∞≈ ∏∂¿˙ ¥Ÿ ¿–±‚
+		size_t bRead = cnt;
+
+		memcpy(destbuf + aRead, mBRegionPointer, bRead);
+		cnt -= bRead;
+	}
+
+	assert(cnt == 0);
+
+	return true;
+
+}
+
+bool CircularBuffer::Read(OUT char* destbuf, size_t bytes)
+{
+	assert(mBuffer != nullptr);
+
+	if (mARegionSize + mBRegionSize < bytes)
+		return false;
+
+	size_t cnt = bytes;
+	size_t aRead = 0;
+
+
+	/// A, B øµø™ µ—¥Ÿ µ•¿Ã≈Õ∞° ¿÷¥¬ ∞ÊøÏ¥¬ A∏’¿˙ ¿–¥¬¥Ÿ
+	if (mARegionSize > 0)
+	{
+		aRead = (cnt > mARegionSize) ? mARegionSize : cnt;
+		memcpy(destbuf, mARegionPointer, aRead);
+		mARegionSize -= aRead;
+		mARegionPointer += aRead;
+		cnt -= aRead;
+	}
+
+	/// ¿–±‚ ø‰±∏«— µ•¿Ã≈Õ∞° ¥ı ¿÷¥Ÿ∏È B øµø™ø°º≠ ¿–¥¬¥Ÿ
+	if (cnt > 0 && mBRegionSize > 0)
+	{
+		assert(cnt <= mBRegionSize);
+
+		/// ≥≤¿∫∞≈ ∏∂¿˙ ¥Ÿ ¿–±‚
+		size_t bRead = cnt;
+
+		memcpy(destbuf + aRead, mBRegionPointer, bRead);
+		mBRegionSize -= bRead;
+		mBRegionPointer += bRead;
+		cnt -= bRead;
+	}
+
+	assert(cnt == 0);
+
+	/// A πˆ∆€∞° ∫Òæ˙¥Ÿ∏È Bπˆ∆€∏¶ ∏« æ’¿∏∑Œ ¥Á±‚∞Ì A πˆ∆€∑Œ ¡ˆ¡§ 
+	if (mARegionSize == 0)
+	{
+		if (mBRegionSize > 0)
+		{
+			if (mBRegionPointer != mBuffer)
+				memmove(mBuffer, mBRegionPointer, mBRegionSize);
+
+			mARegionPointer = mBuffer;
+			mARegionSize = mBRegionSize;
+			mBRegionPointer = nullptr;
+			mBRegionSize = 0;
+		}
+		else
+		{
+			/// Bø° æ∆π´∞Õµµ æ¯¥¬ ∞ÊøÏ ±◊≥… A∑Œ Ω∫¿ßƒ°
+			mBRegionPointer = nullptr;
+			mBRegionSize = 0;
+			mARegionPointer = mBuffer;
+			mARegionSize = 0;
+		}
+	}
+
+	return true;
+}
+
+
+
+
+bool CircularBuffer::Write(const char* data, size_t bytes)
+{
+	assert(mBuffer != nullptr);
+
+	/// ReadøÕ π›¥Î∑Œ B∞° ¿÷¥Ÿ∏È Bøµø™ø° ∏’¿˙ æ¥¥Ÿ
+	if (mBRegionPointer != nullptr)
+	{
+		if (GetBFreeSpace() < bytes)
+			return false;
+
+		memcpy(mBRegionPointer + mBRegionSize, data, bytes);
+		mBRegionSize += bytes;
+
+		return true;
+	}
+
+	/// Aøµø™∫∏¥Ÿ ¥Ÿ∏• øµø™¿« øÎ∑Æ¿Ã ¥ı ≈¨ ∞ÊøÏ ±◊ øµø™¿ª B∑Œ º≥¡§«œ∞Ì ±‚∑œ
+	if (GetAFreeSpace() < GetSpaceBeforeA())
+	{
+		AllocateB();
+
+		if (GetBFreeSpace() < bytes)
+			return false;
+
+		memcpy(mBRegionPointer + mBRegionSize, data, bytes);
+		mBRegionSize += bytes;
+
+		return true;
+	}
+	/// Aøµø™¿Ã ¥ı ≈©∏È ¥Áø¨»˜ Aø° æ≤±‚
+	else
+	{
+		if (GetAFreeSpace() < bytes)
+			return false;
+
+		memcpy(mARegionPointer + mARegionSize, data, bytes);
+		mARegionSize += bytes;
+
+		return true;
+	}
+}
 
 
 
@@ -9,7 +154,7 @@ void CircularBuffer::Remove(size_t len)
 {
 	size_t cnt = len ;
 	
-	/// ReadÏôÄ ÎßàÏ∞¨Í∞ÄÏßÄÎ°ú AÍ∞Ä ÏûàÎã§Î©¥ AÏòÅÏó≠ÏóêÏÑú Î®ºÏ†Ä ÏÇ≠Ï†ú
+	/// ReadøÕ ∏∂¬˘∞°¡ˆ∑Œ A∞° ¿÷¥Ÿ∏È Aøµø™ø°º≠ ∏’¿˙ ªË¡¶
 
 	if ( mARegionSize > 0 )
 	{
@@ -19,7 +164,7 @@ void CircularBuffer::Remove(size_t len)
 		cnt -= aRemove ;
 	}
 
-	// Ï†úÍ±∞Ìï† Ïö©ÎüâÏù¥ Îçî ÎÇ®ÏùÄÍ≤ΩÏö∞ BÏóêÏÑú Ï†úÍ±∞ 
+	// ¡¶∞≈«“ øÎ∑Æ¿Ã ¥ı ≥≤¿∫∞ÊøÏ Bø°º≠ ¡¶∞≈ 
 	if ( cnt > 0 && mBRegionSize > 0 )
 	{
 		size_t bRemove = (cnt > mBRegionSize) ? mBRegionSize : cnt ;
@@ -28,12 +173,12 @@ void CircularBuffer::Remove(size_t len)
 		cnt -= bRemove ;
 	}
 
-	/// AÏòÅÏó≠Ïù¥ ÎπÑÏõåÏßÄÎ©¥ BÎ•º AÎ°ú Ïä§ÏúÑÏπò 
+	/// Aøµø™¿Ã ∫Òøˆ¡ˆ∏È B∏¶ A∑Œ Ω∫¿ßƒ° 
 	if ( mARegionSize == 0 )
 	{
 		if ( mBRegionSize > 0 )
 		{
-			/// ÏïûÏúºÎ°ú ÎãπÍ≤® Î∂ôÏù¥Í∏∞
+			/// æ’¿∏∑Œ ¥Á∞‹ ∫Ÿ¿Ã±‚
 			if ( mBRegionPointer != mBuffer )
 				memmove(mBuffer, mBRegionPointer, mBRegionSize) ;
 	

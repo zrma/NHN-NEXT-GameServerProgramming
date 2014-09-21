@@ -92,11 +92,14 @@
     <ClInclude Include="FastSpinlock.h" />
     <ClInclude Include="IocpManager.h" />
     <ClInclude Include="IoThread.h" />
+    <ClInclude Include="Log.h" />
     <ClInclude Include="MemoryPool.h" />
     <ClInclude Include="mypacket.pb.h" />
     <ClInclude Include="ObjectPool.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="ProtoHeader.h" />
     <ClInclude Include="SessionManager.h" />
+    <ClInclude Include="StackWalker.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="ThreadLocal.h" />
@@ -111,9 +114,13 @@
     <ClCompile Include="FastSpinlock.cpp" />
     <ClCompile Include="IocpManager.cpp" />
     <ClCompile Include="IoThread.cpp" />
+    <ClCompile Include="Log.cpp" />
     <ClCompile Include="MemoryPool.cpp" />
     <ClCompile Include="mypacket.pb.cc" />
+    <ClCompile Include="PacketHandler.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="SessionManager.cpp" />
+    <ClCompile Include="StackWalker.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

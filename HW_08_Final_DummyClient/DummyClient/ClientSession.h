@@ -8,6 +8,7 @@
 
 class ClientSession ;
 class SessionManager;
+class Player;
 
 enum IOType
 {
@@ -105,6 +106,7 @@ public:
 	void	SendCompletion( DWORD transferred );
 
 	void	EchoBack();
+	void	OnRead( size_t len );
 
 	void	DisconnectRequest( DisconnectReason dr );
 	void	DisconnectCompletion( DisconnectReason dr );
@@ -118,6 +120,9 @@ public:
 	long long	GetSendBytes() { return mSendBytes; }
 	long long	GetRecyBytes() { return mRecvBytes; }
 	long		GetConnectCount() { return mUseCount; }
+
+public:
+	std::shared_ptr<Player> mPlayer;
 
 private:
 	SOCKET			mSocket;
@@ -156,7 +161,7 @@ private:
 		stream.WriteRaw( &messageHeader, sizeof( MessageHeader ) );
 		message.SerializeToCodedStream( &stream );
 	}
-
+	
 	friend class SessionManager;
 };
 

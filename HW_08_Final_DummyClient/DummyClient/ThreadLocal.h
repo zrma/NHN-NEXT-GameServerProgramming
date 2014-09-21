@@ -9,5 +9,15 @@ enum THREAD_TYPE
 	THREAD_DB_WORKER
 };
 
+class ThreadCallHistory;
+class ThreadCallElapsedRecord;
+
 extern __declspec(thread) int LThreadType;
 extern __declspec(thread) int LIoThreadId;
+
+extern __declspec( thread ) ThreadCallHistory* LThreadCallHistory;
+extern __declspec( thread ) ThreadCallElapsedRecord* LThreadCallElapsedRecord;
+extern __declspec( thread ) void* LRecentThisPointer;
+
+extern ThreadCallHistory* GThreadCallHistory[MAX_IO_THREAD];
+extern ThreadCallElapsedRecord* GThreadCallElapsedRecord[MAX_IO_THREAD];

@@ -6,6 +6,7 @@
 #include "SessionManager.h"
 #include "FastSpinlock.h"
 #include "DummyClient.h"
+#include "Player.h"
 
 __declspec( thread ) std::deque<ClientSession*>* LSendRequestSessionList = nullptr;
 __declspec( thread ) std::deque<ClientSession*>* LSendRequestFailedSessionList = nullptr;
@@ -20,6 +21,7 @@ OverlappedIOContext::OverlappedIOContext(ClientSession* owner, IOType ioType)
 
 ClientSession::ClientSession() : mRecvBuffer(BUFFER_SIZE), mSendBuffer(BUFFER_SIZE)
 , mConnected(0), mRefCount(0), mSendBufferLock(LO_LUGGAGE_CLASS), mSendPendingCount(0)
+, mPlayer( new Player( this ) )
 {
 	memset(&mClientAddr, 0, sizeof(SOCKADDR_IN));
 	mSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
