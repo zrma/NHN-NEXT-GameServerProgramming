@@ -52,4 +52,5 @@ protected:
 };
 
 
-extern __declspec(thread) std::deque<Session*>* LSendRequestSessionList;
+extern __declspec( thread ) std::deque<Session*>* LSendRequestSessionList;
+extern __declspec( thread ) std::deque<Session*>* LSendRequestFailedSessionList;

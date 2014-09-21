@@ -148,16 +148,28 @@ void IOThread::DoIocpJob()
 
 void IOThread::DoSendJob()
 {
-	while (!LSendRequestSessionList->empty())
+	while ( !LSendRequestSessionList->empty() )
 	{
 		auto& session = LSendRequestSessionList->front();
-	
-		if (session->FlushSend())
+		LSendRequestSessionList->pop_front();
+
+		if ( !( session->FlushSend() ) )
 		{
-			/// true 리턴 되면 빼버린다.
-			LSendRequestSessionList->pop_front();
+			// false 되면 가비지 수집한다
+			LSendRequestFailedSessionList->push_back( session );
 		}
 	}
-	
+
+	//////////////////////////////////////////////////////////////////////////
+	// Swap!
+
+	// 비어 있는 녀석이다
+	std::deque<Session*>* tempDeq = LSendRequestSessionList;
+
+	// 남아 있는 녀석을 다음번에 이어서 쓰고
+	LSendRequestSessionList = LSendRequestFailedSessionList;
+
+	// 가비지 수집할 녀석을 비어 있는 녀석으로 교체
+	LSendRequestFailedSessionList = tempDeq;
 }
 
