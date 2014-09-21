@@ -90,7 +90,7 @@ bool ClientSession::PostConnect()
 	
 	if ( SERVER_PORT <= 4000 || SERVER_PORT > 10000 )
 	{
-		SERVER_PORT = 9001;
+		SERVER_PORT = 9000;
 	}
 
 	if ( HOST_NAME.length() == 0 )

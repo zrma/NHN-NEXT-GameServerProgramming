@@ -11,7 +11,7 @@
 
 std::string HOST_NAME = "127.0.0.1";
 int MAX_CONNECTION = 100;
-int SERVER_PORT = 9001;
+int SERVER_PORT = 9000;
 int THREAD_COUNT = 4;
 int BUFFER_SIZE = 4096;
 bool NO_DELAY = true;
@@ -97,7 +97,7 @@ int optionCheck( int argc, _TCHAR* argv[] )
 			
 			if ( SERVER_PORT <= 4000 || SERVER_PORT > 10000 )
 			{
-				SERVER_PORT = 9001;
+				SERVER_PORT = 9000;
 			}
 
 			++optionCount;
