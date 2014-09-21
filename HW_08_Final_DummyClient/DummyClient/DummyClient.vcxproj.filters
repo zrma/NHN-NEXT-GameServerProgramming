@@ -88,7 +88,7 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>Thread</Filter>
+      <Filter>Contents</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -138,7 +138,7 @@
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>Main</Filter>
+      <Filter>Contents</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

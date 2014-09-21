@@ -107,6 +107,11 @@ public:
 
 	void	EchoBack();
 	void	OnRead( size_t len );
+	
+	bool ParsePacket( char* packet, int size )
+	{
+		return mRecvBuffer.Read( packet, size );
+	}
 
 	void	DisconnectRequest( DisconnectReason dr );
 	void	DisconnectCompletion( DisconnectReason dr );
@@ -142,6 +147,7 @@ private:
 	long long		mRecvBytes = 0;
 	long			mUseCount = 0;
 
+	int				mLife = 0;
 
 	//////////////////////////////////////////////////////////////////////////
 	// for protobuff

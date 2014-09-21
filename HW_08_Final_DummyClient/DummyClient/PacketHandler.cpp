@@ -2,15 +2,21 @@
 #include "Log.h"
 #include "ClientSession.h"
 #include "Player.h"
+#include "ProtoHeader.h"
 
 #define PKT_NONE	0
 #define PKT_MAX		1024
 
-typedef void(*HandlerFunc)(ClientSession* session);
+#define PKT_SC_LOGIN	MyPacket::MessageType::PKT_SC_LOGIN
+#define PKT_SC_CHAT		MyPacket::MessageType::PKT_SC_CHAT
+#define PKT_SC_MOVE		MyPacket::MessageType::PKT_SC_MOVE
+
+
+typedef void(*HandlerFunc)(ClientSession* session, int size);
 
 static HandlerFunc HandlerTable[PKT_MAX];
 
-static void DefaultHandler(ClientSession* session)
+static void DefaultHandler(ClientSession* session, int size)
 {
 	LoggerUtil::EventLog("invalid packet handler", session->mPlayer->GetPlayerId());
 	session->DisconnectRequest(DR_ACTIVE);
@@ -34,11 +40,9 @@ struct RegisterHandler
 };
 
 #define REGISTER_HANDLER(PKT_TYPE)	\
-	static void Handler_##PKT_TYPE(ClientSession* session); \
+	static void Handler_##PKT_TYPE(ClientSession* session, int size); \
 	static RegisterHandler _register_##PKT_TYPE(PKT_TYPE, Handler_##PKT_TYPE); \
-	static void Handler_##PKT_TYPE(ClientSession* session)
-
-//@}
+	static void Handler_##PKT_TYPE(ClientSession* session, int size)
 
 
 void ClientSession::OnRead(size_t len)
@@ -53,27 +57,90 @@ void ClientSession::OnRead(size_t len)
 			return;
 
 		/// 패킷 완성이 되는가? 
-		if (mRecvBuffer.GetStoredSize() < header.size)
-			return;
 
+		// 구 교수님 코드와는 다르다!
+		// Easy Server에서는 헤더에 담긴 사이즈 = 패킷 전체 사이즈 였지만
+		// 여기서는 프로토버프의 몸통 사이즈(페이로드)만 담겨 있음
+		if ( mRecvBuffer.GetStoredSize() < header.size - MessageHeaderSize )
+			return;
+		
 
 		if (header.type >= PKT_MAX || header.type <= PKT_NONE)
 		{
-			// LoggerUtil::EventLog("packet type error", mPlayer->GetPlayerId());
-
 			// 서버에서 보낸 패킷이 이상하다?!
-
+			LoggerUtil::EventLog("packet type error", mPlayer->GetPlayerId());
+			
 			DisconnectRequest(DR_ACTIVE);
 			return;
 		}
 
 		/// packet dispatch...
-		HandlerTable[header.type](this);
+		HandlerTable[header.type](this, header.size);
 	}
 }
 
+REGISTER_HANDLER( PKT_SC_LOGIN )
+{
+
+}
+
+REGISTER_HANDLER( PKT_SC_MOVE )
+{
+	//////////////////////////////////////////////////////////////////////////
+	// 서버로부터 이동 허가가 떨어진 것이다.
+	char* packetTemp = new char[MessageHeaderSize + size];
+
+	if ( false == session->ParsePacket( packetTemp, MessageHeaderSize + size ) )
+	{
+		LoggerUtil::EventLog( "packet parsing error", PKT_SC_MOVE );
+		return;
+	}
+
+	// 디크립트
+
+
+	// 디시리얼라이즈
+	google::protobuf::io::ArrayInputStream is( packetTemp, MessageHeaderSize + size );
+	is.Skip( MessageHeaderSize );
+
+	MyPacket::MoveResult inPacket;
+	inPacket.ParseFromZeroCopyStream( &is );
+
+	delete packetTemp;
+
+	MyPacket::Position pos = inPacket.playerpos();
+	session->mPlayer->ResponseUpdatePosition( pos.x(), pos.y(), pos.z() );
+}
+
+REGISTER_HANDLER( PKT_SC_CHAT )
+{
+	//////////////////////////////////////////////////////////////////////////
+	// 누군가 내게 채팅을 했다
+	char* packetTemp = new char[MessageHeaderSize + size];
+		
+	if ( false == session->ParsePacket( packetTemp, MessageHeaderSize + size ) )
+	{
+		LoggerUtil::EventLog( "packet parsing error", PKT_SC_CHAT );
+		return;
+	}
+	
+	// 디크립트
+
+
+	// 디시리얼라이즈
+	google::protobuf::io::ArrayInputStream is( packetTemp, MessageHeaderSize + size );
+	is.Skip( MessageHeaderSize );
+
+	MyPacket::ChatResult inPacket;
+	inPacket.ParseFromZeroCopyStream( &is );
+
+	delete packetTemp;
+
+	session->mPlayer->ResponseChat( inPacket.playername().c_str() , inPacket.playermessage().c_str() );
+}
+
 /////////////////////////////////////////////////////////
-// REGISTER_HANDLER(PKT_CS_LOGIN)
+// REGISTER_HANDLER(PKT_SC_LOGIN)
 // {
 // 	LoginRequest inPacket;
 // 	if (false == session->ParsePacket(inPacket))

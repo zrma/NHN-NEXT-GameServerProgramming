@@ -20,12 +20,9 @@ public:
 	void RequestUpdatePosition( float x, float y, float z );
 	void ResponseUpdatePosition( float x, float y, float z );
 
-	void RequestChat( const wchar_t* comment );
-	void ResponseChat( const wchar_t* comment );
-
-	void RequestUpdateValidation( bool isValid );
-	void ResponseUpdateValidation( bool isValid );
-
+	void RequestChat( const char* comment );
+	void ResponseChat( const char* name, const char* comment );
+	
 private:
 	void PlayerReset();
 	
@@ -36,7 +33,9 @@ private:
 	float	mPosY;
 	float	mPosZ;
 	bool	mIsValid;
-	wchar_t	mPlayerName[MAX_NAME_LEN];
+	char	mPlayerName[MAX_NAME_LEN];
+
+	int		mHP;
 
 	ClientSession* const mSession;
 	friend class ClientSession;

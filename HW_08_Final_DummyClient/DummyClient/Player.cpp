@@ -16,6 +16,7 @@ void Player::PlayerReset()
 	mPlayerId = -1;
 	mIsValid = false;
 	mPosX = mPosY = mPosZ = 0;
+	mHP = 0;
 }
 
 void Player::RequestLogin( int pid )
@@ -35,26 +36,18 @@ void Player::RequestUpdatePosition( float x, float y, float z )
 
 void Player::ResponseUpdatePosition( float x, float y, float z )
 {
-
+	//////////////////////////////////////////////////////////////////////////
+	// 이동이 끝났으면 채팅을 시작하지
 }
 
-void Player::RequestChat( const wchar_t* comment )
+void Player::RequestChat( const char* comment )
 {
 
 }
 
-void Player::ResponseChat( const wchar_t* comment )
+void Player::ResponseChat( const char* name, const char* comment )
 {
-
+	//////////////////////////////////////////////////////////////////////////
+	// 채팅을 받았으면 카운트 해서 100회 초과 되면 접속 종료
+	// 아니면 이동
 }
-
-void Player::RequestUpdateValidation( bool isValid )
-{
-
-}
-
-void Player::ResponseUpdateValidation( bool isValid )
-{
-
-}
-
