@@ -148,25 +148,16 @@
   <ItemGroup>
     <ClInclude Include="CircularBuffer.h" />
     <ClInclude Include="ClientSession.h" />
-    <ClInclude Include="ContentsConfig.h" />
-    <ClInclude Include="DBContext.h" />
-    <ClInclude Include="DBThread.h" />
-    <ClInclude Include="DBHelper.h" />
-    <ClInclude Include="DBManager.h" />
     <ClInclude Include="EduServer_IOCP.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FastSpinlock.h" />
-    <ClInclude Include="mypacket.pb.h" />
-    <ClInclude Include="Player.h" />
     <ClInclude Include="IocpManager.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="ClientSessionManager.h" />
     <ClInclude Include="OverlappedIOContext.h" />
-    <ClInclude Include="PlayerDBContext.h" />
     <ClInclude Include="ServerSession.h" />
     <ClInclude Include="Session.h" />
-    <ClInclude Include="SQLStatement.h" />
     <ClInclude Include="StackWalker.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -176,20 +167,13 @@
   <ItemGroup>
     <ClCompile Include="CircularBuffer.cpp" />
     <ClCompile Include="ClientSession.cpp" />
-    <ClCompile Include="DBContext.cpp" />
-    <ClCompile Include="DBThread.cpp" />
-    <ClCompile Include="DBHelper.cpp" />
-    <ClCompile Include="DBManager.cpp" />
     <ClCompile Include="EduServer_IOCP.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="FastSpinlock.cpp" />
     <ClCompile Include="IocpManager.cpp" />
     <ClCompile Include="ClientSessionManager.cpp" />
     <ClCompile Include="Log.cpp" />
-    <ClCompile Include="mypacket.pb.cc" />
     <ClCompile Include="OverlappedIOContext.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PlayerDBContext.cpp" />
     <ClCompile Include="ServerSession.cpp" />
     <ClCompile Include="Session.cpp" />
     <ClCompile Include="StackWalker.cpp">
@@ -204,9 +188,6 @@
     </ClCompile>
     <ClCompile Include="ThreadLocal.cpp" />
     <ClCompile Include="IOThread.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\SQL\GameDB.sql" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "Session.h"
-#include "Player.h"
 
 class ClientSessionManager;
 
@@ -19,9 +18,6 @@ public:
 	
 	virtual void OnDisconnect(DisconnectReason dr);
 	virtual void OnRelease();
-
-public:
-	Player			mPlayer;
 
 private:
 	

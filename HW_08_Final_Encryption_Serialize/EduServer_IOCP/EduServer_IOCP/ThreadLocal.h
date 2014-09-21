@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #define MAX_IO_THREAD	4
-#define MAX_DB_THREAD	4
-#define MAX_WORKER_THREAD	(MAX_IO_THREAD+MAX_DB_THREAD)
+
+#define MAX_WORKER_THREAD	(MAX_IO_THREAD)
 
 enum THREAD_TYPE
 {

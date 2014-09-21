@@ -113,7 +113,7 @@ bool IocpManager::StartIoThreads()
 	{
 		DWORD dwThreadId;
 		/// 스레드ID는 DB 스레드 이후에 IO 스레드로..
-		HANDLE hThread = (HANDLE)_beginthreadex(NULL, 0, IoWorkerThread, (LPVOID)(i+MAX_DB_THREAD), CREATE_SUSPENDED, (unsigned int*)&dwThreadId);
+		HANDLE hThread = (HANDLE)_beginthreadex(NULL, 0, IoWorkerThread, (LPVOID)(i), CREATE_SUSPENDED, (unsigned int*)&dwThreadId);
 		if (hThread == NULL)
 			return false;
 
@@ -170,9 +170,10 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 	GThreadCallElapsedRecord[LWorkerThreadId] = LThreadCallElapsedRecord = new ThreadCallElapsedRecord(LWorkerThreadId);
 	
 	/// 반드시 DB 쓰레드를 먼저 띄운 후에 진입해야 한다.
-	CRASH_ASSERT(LWorkerThreadId >= MAX_DB_THREAD);
+//	CRASH_ASSERT(LWorkerThreadId >= MAX_DB_THREAD);
 
-	return GIocpManager->mIoWorkerThread[LWorkerThreadId-MAX_DB_THREAD]->Run();
+	//return GIocpManager->mIoWorkerThread[LWorkerThreadId-MAX_DB_THREAD]->Run();
+	return GIocpManager->mIoWorkerThread[LWorkerThreadId]->Run();
 }
 
 

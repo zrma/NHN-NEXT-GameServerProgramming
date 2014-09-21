@@ -6,11 +6,11 @@
 #include "ClientSession.h"
 #include "IocpManager.h"
 #include "ClientSessionManager.h"
-#include "Player.h"
+//#include "Player.h"
 
 #define CLIENT_BUFSIZE	65536
 
-ClientSession::ClientSession() : Session(CLIENT_BUFSIZE, CLIENT_BUFSIZE), mPlayer(this)
+ClientSession::ClientSession() : Session(CLIENT_BUFSIZE, CLIENT_BUFSIZE)
 {
 	memset(&mClientAddr, 0, sizeof(SOCKADDR_IN));
 }
@@ -46,8 +46,6 @@ void ClientSession::SessionReset()
 	closesocket(mSocket);
 
 	mSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
-
-	mPlayer.PlayerReset();
 }
 
 bool ClientSession::PostAccept()
@@ -147,7 +145,7 @@ void ClientSession::AcceptCompletion()
 		printf_s("[DEBUG] PreRecv error: %d\n", GetLastError());
 	}
 
-
+	/*
 	//TEST: 요놈의 위치는 원래 C_LOGIN 핸들링 할 때 해야하는거지만 지금은 접속 완료 시점에서 테스트 ㄱㄱ
 
 	//todo: 플레이어 id는 여러분의 플레이어 테이블 상황에 맞게 적절히 고쳐서 로딩하도록 
@@ -155,6 +153,8 @@ void ClientSession::AcceptCompletion()
 	mPlayer.ResponseCreatePlayerData( L"newPlayer 뿅" );
  	mPlayer.RequestLoad(id);
 	mPlayer.ResponseDeletePlayerData( id++ );
+	*/
+	//DB out
 }
 
 

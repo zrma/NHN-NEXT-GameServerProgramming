@@ -41,7 +41,7 @@ void IOThread::DoIocpJob()
 	ULONG_PTR completionKey = 0;
 
 	int ret = GetQueuedCompletionStatus(mCompletionPort, &dwTransferred, (PULONG_PTR)&completionKey, &overlapped, GQCS_TIMEOUT);
-
+	/*
 	if (CK_DB_RESULT == completionKey)
 	{
 		//todo: DB 처리 결과가 담겨오는 경우 처리
@@ -53,6 +53,8 @@ void IOThread::DoIocpJob()
 
 		return;
 	}
+	*/
+	//DB out
 
 	/// 아래로는 일반적인 I/O 처리
 
@@ -86,10 +88,12 @@ void IOThread::DoIocpJob()
 	bool completionOk = false;
 	switch (context->mIoType)
 	{
+		/*
 	case IO_CONNECT:
 		dynamic_cast<ServerSession*>(remote)->ConnectCompletion();
 		completionOk = true;
 		break;
+		*/
 
 	case IO_DISCONNECT:
 		remote->DisconnectCompletion(static_cast<OverlappedDisconnectContext*>(context)->mDisconnectReason);

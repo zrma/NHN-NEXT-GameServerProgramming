@@ -8,7 +8,6 @@
 #include "ClientSession.h"
 #include "ClientSessionManager.h"
 #include "IocpManager.h"
-#include "DBManager.h"
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -20,16 +19,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	/// Global Managers
 	GClientSessionManager = new ClientSessionManager;
 	GIocpManager = new IocpManager;
-	GDatabaseManager = new DBManager;
 	
 
 	if (false == GIocpManager->Initialize())
-		return -1;
-	
-	if (false == GDatabaseManager->Initialize())
-		return -1;
-
-	if (false == GDatabaseManager->StartDatabaseThreads())
 		return -1;
 
 	if (false == GIocpManager->StartIoThreads())
@@ -39,14 +31,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
  	GIocpManager->StartAccept(); ///< block here...
 
-
-	GDatabaseManager->Finalize();
 	GIocpManager->Finalize();
 
 	printf_s("End Server\n");
 
-
-	delete GDatabaseManager;
 	delete GIocpManager;
 	delete GClientSessionManager;
 
