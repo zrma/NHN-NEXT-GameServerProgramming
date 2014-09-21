@@ -71,6 +71,9 @@
     <ClInclude Include="IOThread.h">
       <Filter>SessionHandling</Filter>
     </ClInclude>
+    <ClInclude Include="mypacket.pb.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -117,6 +120,9 @@
     </ClCompile>
     <ClCompile Include="IOThread.cpp">
       <Filter>SessionHandling</Filter>
+    </ClCompile>
+    <ClCompile Include="mypacket.pb.cc">
+      <Filter>Packet</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
