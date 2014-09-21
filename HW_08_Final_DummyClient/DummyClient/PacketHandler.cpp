@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Log.h"
 #include "ClientSession.h"
 #include "Player.h"
@@ -47,27 +47,27 @@ struct RegisterHandler
 
 void ClientSession::OnRead(size_t len)
 {
-	/// ÆĞÅ¶ ÆÄ½ÌÇÏ°í Ã³¸®
+	/// íŒ¨í‚· íŒŒì‹±í•˜ê³  ì²˜ë¦¬
 	while (true)
 	{
-		/// ÆĞÅ¶ Çì´õ Å©±â ¸¸Å­ ÀĞ¾î¿Íº¸±â
+		/// íŒ¨í‚· í—¤ë” í¬ê¸° ë§Œí¼ ì½ì–´ì™€ë³´ê¸°
 		MessageHeader header;
 		
 		if (false == mRecvBuffer.Peek((char*)&header, MessageHeaderSize))
 			return;
 
-		/// ÆĞÅ¶ ¿Ï¼ºÀÌ µÇ´Â°¡? 
+		/// íŒ¨í‚· ì™„ì„±ì´ ë˜ëŠ”ê°€? 
 
-		// ±¸ ±³¼ö´Ô ÄÚµå¿Í´Â ´Ù¸£´Ù!
-		// Easy Server¿¡¼­´Â Çì´õ¿¡ ´ã±ä »çÀÌÁî = ÆĞÅ¶ ÀüÃ¼ »çÀÌÁî ¿´Áö¸¸
-		// ¿©±â¼­´Â ÇÁ·ÎÅä¹öÇÁÀÇ ¸öÅë »çÀÌÁî(ÆäÀÌ·Îµå)¸¸ ´ã°Ü ÀÖÀ½
+		// êµ¬ êµìˆ˜ë‹˜ ì½”ë“œì™€ëŠ” ë‹¤ë¥´ë‹¤!
+		// Easy Serverì—ì„œëŠ” í—¤ë”ì— ë‹´ê¸´ ì‚¬ì´ì¦ˆ = íŒ¨í‚· ì „ì²´ ì‚¬ì´ì¦ˆ ì˜€ì§€ë§Œ
+		// ì—¬ê¸°ì„œëŠ” í”„ë¡œí† ë²„í”„ì˜ ëª¸í†µ ì‚¬ì´ì¦ˆ(í˜ì´ë¡œë“œ)ë§Œ ë‹´ê²¨ ìˆìŒ
 		if ( mRecvBuffer.GetStoredSize() < header.size - MessageHeaderSize )
 			return;
 		
 
 		if (header.type >= PKT_MAX || header.type <= PKT_NONE)
 		{
-			// ¼­¹ö¿¡¼­ º¸³½ ÆĞÅ¶ÀÌ ÀÌ»óÇÏ´Ù?!
+			// ì„œë²„ì—ì„œ ë³´ë‚¸ íŒ¨í‚·ì´ ì´ìƒí•˜ë‹¤?!
 			LoggerUtil::EventLog("packet type error", mPlayer->GetPlayerId());
 			
 			DisconnectRequest(DR_ACTIVE);
@@ -87,7 +87,7 @@ REGISTER_HANDLER( PKT_SC_LOGIN )
 REGISTER_HANDLER( PKT_SC_MOVE )
 {
 	//////////////////////////////////////////////////////////////////////////
-	// ¼­¹ö·ÎºÎÅÍ ÀÌµ¿ Çã°¡°¡ ¶³¾îÁø °ÍÀÌ´Ù.
+	// ì„œë²„ë¡œë¶€í„° ì´ë™ í—ˆê°€ê°€ ë–¨ì–´ì§„ ê²ƒì´ë‹¤.
 	char* packetTemp = new char[MessageHeaderSize + size];
 
 	if ( false == session->ParsePacket( packetTemp, MessageHeaderSize + size ) )
@@ -96,10 +96,10 @@ REGISTER_HANDLER( PKT_SC_MOVE )
 		return;
 	}
 
-	// µğÅ©¸³Æ®
+	// ë””í¬ë¦½íŠ¸
 
 
-	// µğ½Ã¸®¾ó¶óÀÌÁî
+	// ë””ì‹œë¦¬ì–¼ë¼ì´ì¦ˆ
 	google::protobuf::io::ArrayInputStream is( packetTemp, MessageHeaderSize + size );
 	is.Skip( MessageHeaderSize );
 
@@ -115,7 +115,7 @@ REGISTER_HANDLER( PKT_SC_MOVE )
 REGISTER_HANDLER( PKT_SC_CHAT )
 {
 	//////////////////////////////////////////////////////////////////////////
-	// ´©±º°¡ ³»°Ô Ã¤ÆÃÀ» Çß´Ù
+	// ëˆ„êµ°ê°€ ë‚´ê²Œ ì±„íŒ…ì„ í–ˆë‹¤
 	char* packetTemp = new char[MessageHeaderSize + size];
 		
 	if ( false == session->ParsePacket( packetTemp, MessageHeaderSize + size ) )
@@ -124,10 +124,10 @@ REGISTER_HANDLER( PKT_SC_CHAT )
 		return;
 	}
 	
-	// µğÅ©¸³Æ®
+	// ë””í¬ë¦½íŠ¸
 
 
-	// µğ½Ã¸®¾ó¶óÀÌÁî
+	// ë””ì‹œë¦¬ì–¼ë¼ì´ì¦ˆ
 	google::protobuf::io::ArrayInputStream is( packetTemp, MessageHeaderSize + size );
 	is.Skip( MessageHeaderSize );
 
@@ -149,7 +149,7 @@ REGISTER_HANDLER( PKT_SC_CHAT )
 // 		return;
 // 	}
 // 	
-// 	/// Å×½ºÆ®¸¦ À§ÇØ 10msÈÄ¿¡ ·ÎµùÇÏµµ·Ï ¤¡¤¡
+// 	/// í…ŒìŠ¤íŠ¸ë¥¼ ìœ„í•´ 10msí›„ì— ë¡œë”©í•˜ë„ë¡ ã„±ã„±
 // 	DoSyncAfter(10, session->mPlayer, &Player::RequestLoad, inPacket.mPlayerId);
 // 
 // }
@@ -169,7 +169,7 @@ REGISTER_HANDLER( PKT_SC_CHAT )
 // 		return;
 // 	}
 // 
-// 	/// Áö±İÀº ¼º´É Å×½ºÆ®¸¦ À§ÇØ DB¿¡ ¾÷µ¥ÀÌÆ®ÇÏ°í Åëº¸ÇÏµµ·Ï ÇÏÀÚ.
+// 	/// ì§€ê¸ˆì€ ì„±ëŠ¥ í…ŒìŠ¤íŠ¸ë¥¼ ìœ„í•´ DBì— ì—…ë°ì´íŠ¸í•˜ê³  í†µë³´í•˜ë„ë¡ í•˜ì.
 // 	session->mPlayer->DoSync(&Player::RequestUpdatePosition, inPacket.mPosX, inPacket.mPosY, inPacket.mPosZ);
 // }
 
@@ -188,7 +188,7 @@ REGISTER_HANDLER( PKT_SC_CHAT )
 // 		return;
 // 	}
 // 
-// 	/// chattingÀÇ °æ¿ì ¿©±â¼­ ¹Ù·Î ¹æ¼Û
+// 	/// chattingì˜ ê²½ìš° ì—¬ê¸°ì„œ ë°”ë¡œ ë°©ì†¡
 // 	ChatBroadcastResult outPacket;
 // 		
 // 	outPacket.mPlayerId = inPacket.mPlayerId;

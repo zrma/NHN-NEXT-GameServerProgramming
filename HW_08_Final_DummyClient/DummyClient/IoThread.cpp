@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Exception.h"
 #include "ThreadLocal.h"
 #include "IOThread.h"
@@ -102,7 +102,7 @@ void IOThread::DoIocpJob()
 		case IO_RECV:
 			session->RecvCompletion( dwTransferred );
 
-			// ÀÏ´Ü Å×½ºÆ®¿ë ¿¡ÄÚ!
+			// ì¼ë‹¨ í…ŒìŠ¤íŠ¸ìš© ì—ì½”!
 			session->EchoBack();
 
 			completionOk = session->PreRecv();
@@ -135,7 +135,7 @@ void IOThread::DoSendJob()
 
 		if ( !(session->FlushSend()) )
 		{
-			// false µÇ¸é °¡ºñÁö ¼öÁıÇÑ´Ù
+			// false ë˜ë©´ ê°€ë¹„ì§€ ìˆ˜ì§‘í•œë‹¤
 			LSendRequestFailedSessionList->push_back( session );
 		}
 	}
@@ -143,12 +143,12 @@ void IOThread::DoSendJob()
 	//////////////////////////////////////////////////////////////////////////
 	// Swap!
 	
-	// ºñ¾î ÀÖ´Â ³à¼®ÀÌ´Ù
+	// ë¹„ì–´ ìˆëŠ” ë…€ì„ì´ë‹¤
 	std::deque<ClientSession*>* tempDeq = LSendRequestSessionList;
 
-	// ³²¾Æ ÀÖ´Â ³à¼®À» ´ÙÀ½¹ø¿¡ ÀÌ¾î¼­ ¾²°í
+	// ë‚¨ì•„ ìˆëŠ” ë…€ì„ì„ ë‹¤ìŒë²ˆì— ì´ì–´ì„œ ì“°ê³ 
 	LSendRequestSessionList = LSendRequestFailedSessionList;
 	
-	// °¡ºñÁö ¼öÁıÇÒ ³à¼®À» ºñ¾î ÀÖ´Â ³à¼®À¸·Î ±³Ã¼
+	// ê°€ë¹„ì§€ ìˆ˜ì§‘í•  ë…€ì„ì„ ë¹„ì–´ ìˆëŠ” ë…€ì„ìœ¼ë¡œ êµì²´
 	LSendRequestFailedSessionList = tempDeq;
 }

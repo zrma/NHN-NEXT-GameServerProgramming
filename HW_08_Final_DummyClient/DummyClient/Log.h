@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <iostream>
 #include "Exception.h"
@@ -79,8 +79,8 @@ public:
 	ScopeElapsedCheck(const char* funcsig) : mFuncSig(funcsig)
 	{
 		/* FYI
-		 * 10~16 ms ÇØ»óµµ·Î Ã¼Å©ÇÏ·Á¸é GetTickCount »ç¿ë
-		 * 1 us ÇØ»óµµ·Î Ã¼Å©ÇÏ·Á¸é  QueryPerformanceCounter »ç¿ë
+		 * 10~16 ms í•´ìƒë„ë¡œ ì²´í¬í•˜ë ¤ë©´ GetTickCount ì‚¬ìš©
+		 * 1 us í•´ìƒë„ë¡œ ì²´í¬í•˜ë ¤ë©´  QueryPerformanceCounter ì‚¬ìš©
 		*/ 
 		mStartTick = GetTickCount64();
 	}

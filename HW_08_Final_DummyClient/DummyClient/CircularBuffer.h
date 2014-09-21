@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 
 class CircularBuffer
@@ -33,7 +33,7 @@ public:
 	bool Read(OUT char* destbuf, size_t bytes);
 	bool Write(const char* data, size_t bytes);
 
-	/// ¹öÆÛÀÇ Ã¹ºÎºĞ len¸¸Å­ ³¯¸®±â
+	/// ë²„í¼ì˜ ì²«ë¶€ë¶„ lenë§Œí¼ ë‚ ë¦¬ê¸°
 	void Remove(size_t len) ;
 
 	size_t GetFreeSpaceSize()
@@ -42,7 +42,7 @@ public:
 			return GetBFreeSpace() ;
 		else
 		{
-			/// A ¹öÆÛº¸´Ù ´õ ¸¹ÀÌ Á¸ÀçÇÏ¸é, B ¹öÆÛ·Î ½ºÀ§Ä¡
+			/// A ë²„í¼ë³´ë‹¤ ë” ë§ì´ ì¡´ì¬í•˜ë©´, B ë²„í¼ë¡œ ìŠ¤ìœ„ì¹˜
 			if ( GetAFreeSpace() < GetSpaceBeforeA() )
 			{
 				AllocateB() ;
@@ -66,7 +66,7 @@ public:
 			return mBRegionSize ;
 	}
 
-	/// ¾²±â°¡ °¡´ÉÇÑ À§Ä¡ (¹öÆÛÀÇ ³¡ºÎºĞ) ¹İÈ¯
+	/// ì“°ê¸°ê°€ ê°€ëŠ¥í•œ ìœ„ì¹˜ (ë²„í¼ì˜ ëë¶€ë¶„) ë°˜í™˜
 	char* GetBuffer() const
 	{
 		if( mBRegionPointer != nullptr )
@@ -78,7 +78,7 @@ public:
 	
 
 
-	/// Ä¿¹Ô(aka. IncrementWritten)
+	/// ì»¤ë°‹(aka. IncrementWritten)
 	void Commit(size_t len)
 	{
 		if ( mBRegionPointer != nullptr )
@@ -87,7 +87,7 @@ public:
 			mARegionSize += len ;
 	}
 
-	/// ¹öÆÛÀÇ Ã¹ºÎºĞ ¸®ÅÏ
+	/// ë²„í¼ì˜ ì²«ë¶€ë¶„ ë¦¬í„´
 	char* GetBufferStart() const
 	{
 		if ( mARegionSize > 0 )

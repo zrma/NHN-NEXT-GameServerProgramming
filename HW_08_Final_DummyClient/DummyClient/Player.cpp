@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Player.h"
 
 Player::Player( ClientSession* session ): mSession( session )
@@ -37,7 +37,7 @@ void Player::RequestUpdatePosition( float x, float y, float z )
 void Player::ResponseUpdatePosition( float x, float y, float z )
 {
 	//////////////////////////////////////////////////////////////////////////
-	// ÀÌµ¿ÀÌ ³¡³µÀ¸¸é Ã¤ÆÃÀ» ½ÃÀÛÇÏÁö
+	// ì´ë™ì´ ëë‚¬ìœ¼ë©´ ì±„íŒ…ì„ ì‹œì‘í•˜ì§€
 }
 
 void Player::RequestChat( const char* comment )
@@ -48,6 +48,6 @@ void Player::RequestChat( const char* comment )
 void Player::ResponseChat( const char* name, const char* comment )
 {
 	//////////////////////////////////////////////////////////////////////////
-	// Ã¤ÆÃÀ» ¹Ş¾ÒÀ¸¸é Ä«¿îÆ® ÇØ¼­ 100È¸ ÃÊ°ú µÇ¸é Á¢¼Ó Á¾·á
-	// ¾Æ´Ï¸é ÀÌµ¿
+	// ì±„íŒ…ì„ ë°›ì•˜ìœ¼ë©´ ì¹´ìš´íŠ¸ í•´ì„œ 100íšŒ ì´ˆê³¼ ë˜ë©´ ì ‘ì† ì¢…ë£Œ
+	// ì•„ë‹ˆë©´ ì´ë™
 }
