@@ -7,6 +7,7 @@
 #include "FastSpinlock.h"
 #include "DummyClient.h"
 #include "Player.h"
+#include "Log.h"
 
 __declspec( thread ) std::deque<ClientSession*>* LSendRequestSessionList = nullptr;
 __declspec( thread ) std::deque<ClientSession*>* LSendRequestFailedSessionList = nullptr;
@@ -71,6 +72,8 @@ void ClientSession::SessionReset()
 
 bool ClientSession::PostConnect()
 {
+	TRACE_THIS;
+
 	CRASH_ASSERT( LThreadType == THREAD_MAIN );
 
 	HANDLE handle = CreateIoCompletionPort( (HANDLE)mSocket, GIocpManager->GetComletionPort(), ( ULONG_PTR )this, 0 );
@@ -118,6 +121,7 @@ bool ClientSession::PostConnect()
 
 void ClientSession::ConnectCompletion()
 {
+	TRACE_THIS;
 	CRASH_ASSERT( LThreadType == THREAD_IO_WORKER );
 	if ( 1 == InterlockedExchange( &mConnected, 1 ) )
 	{
@@ -242,6 +246,8 @@ void ClientSession::ConnectCompletion()
 
 void ClientSession::DisconnectRequest(DisconnectReason dr)
 {
+	TRACE_THIS;
+
 	/// 이미 끊겼거나 끊기는 중이거나
 	if (0 == InterlockedExchange(&mConnected, 0))
 		return ;
@@ -269,10 +275,12 @@ void ClientSession::DisconnectCompletion(DisconnectReason dr)
 
 bool ClientSession::PreRecv()
 {
-	if (!IsConnected())
+	TRACE_THIS;
+
+	if ( !IsConnected() )
 		return false;
 
-	OverlappedPreRecvContext* recvContext = new OverlappedPreRecvContext(this);
+	OverlappedPreRecvContext* recvContext = new OverlappedPreRecvContext( this );
 
 	DWORD recvbytes = 0;
 	DWORD flags = 0;
@@ -280,12 +288,12 @@ bool ClientSession::PreRecv()
 	recvContext->mWsaBuf.buf = nullptr;
 
 	/// start async recv
-	if (SOCKET_ERROR == WSARecv(mSocket, &recvContext->mWsaBuf, 1, &recvbytes, &flags, (LPWSAOVERLAPPED)recvContext, NULL))
+	if ( SOCKET_ERROR == WSARecv( mSocket, &recvContext->mWsaBuf, 1, &recvbytes, &flags, (LPWSAOVERLAPPED)recvContext, NULL ) )
 	{
-		if (WSAGetLastError() != WSA_IO_PENDING)
+		if ( WSAGetLastError() != WSA_IO_PENDING )
 		{
-			DeleteIoContext(recvContext);
-			printf_s("ClientSession::PreRecv Error : %d\n", GetLastError());
+			DeleteIoContext( recvContext );
+			printf_s( "Session::PreRecv Error : %d\n", GetLastError() );
 			return false;
 		}
 	}
@@ -295,6 +303,8 @@ bool ClientSession::PreRecv()
 
 bool ClientSession::PostRecv()
 {
+	TRACE_THIS;
+
 	if (!IsConnected())
 		return false;
 
@@ -326,6 +336,8 @@ bool ClientSession::PostRecv()
 
 void ClientSession::RecvCompletion(DWORD transferred)
 {
+	TRACE_THIS;
+
 	FastSpinlockGuard criticalSection(mSendBufferLock);
 
 	mRecvBuffer.Commit(transferred);
@@ -337,6 +349,8 @@ void ClientSession::RecvCompletion(DWORD transferred)
 
 bool ClientSession::PostSend( const char* data, size_t len )
 {
+	TRACE_THIS;
+
 	if ( !IsConnected() )
 		return false;
 
@@ -359,6 +373,8 @@ bool ClientSession::PostSend( const char* data, size_t len )
 
 bool ClientSession::FlushSend()
 {
+	TRACE_THIS;
+
 	if ( !IsConnected() )
 	{
 		DisconnectRequest( DR_SENDFLUSH_ERROR );
@@ -411,6 +427,8 @@ bool ClientSession::FlushSend()
 
 void ClientSession::SendCompletion(DWORD transferred)
 {
+	TRACE_THIS;
+
 	FastSpinlockGuard criticalSection( mSendBufferLock );
 
 	mSendBuffer.Remove( transferred );
@@ -436,6 +454,8 @@ void ClientSession::ReleaseRef()
 
 void ClientSession::EchoBack()
 {
+	TRACE_THIS;
+
 	size_t len = mRecvBuffer.GetContiguiousBytes();
 
 	if ( len == 0 )
