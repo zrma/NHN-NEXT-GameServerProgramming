@@ -182,11 +182,12 @@ void ClientSession::ConnectCompletion()
 		
 	// proto
 	
-	MyPacket::LoginRequest loginRequest;
-	loginRequest.set_playerid( 1234 );
+	MyPacket::CryptRequest cryptRequest;
+	cryptRequest.set_playerid( 1234 );
 
-	WriteMessageToStream( MyPacket::MessageType::PKT_CS_LOGIN, loginRequest, *m_pCodedOutputStream );
+	WriteMessageToStream( MyPacket::MessageType::PKT_CS_LOGIN, cryptRequest, *m_pCodedOutputStream );
 	
+
 	++mUseCount;
 
 
