@@ -6,6 +6,7 @@
 #include "SessionManager.h"
 #include "DummyClient.h"
 #include "IoThread.h"
+#include "Log.h"
 
 
 IocpManager* GIocpManager = nullptr;
@@ -178,6 +179,9 @@ unsigned int WINAPI IocpManager::IoWorkerThread(LPVOID lpParam)
 	LIoThreadId = reinterpret_cast<int>(lpParam);
 	LSendRequestSessionList = new std::deque < ClientSession* > ;
 	LSendRequestFailedSessionList = new std::deque < ClientSession* > ;
+
+	GThreadCallHistory[LIoThreadId] = LThreadCallHistory = new ThreadCallHistory( LIoThreadId );
+	GThreadCallElapsedRecord[LIoThreadId] = LThreadCallElapsedRecord = new ThreadCallElapsedRecord( LIoThreadId );
 	
 	return GIocpManager->mIoWorkerThread[LIoThreadId]->Run();
 }
