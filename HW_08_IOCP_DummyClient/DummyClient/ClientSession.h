@@ -2,6 +2,7 @@
 #include "ObjectPool.h"
 #include "MemoryPool.h"
 #include "CircularBuffer.h"
+#include "ProtoHeader.h"
 
 #define BUFSIZE	65536
 
@@ -127,6 +128,15 @@ private:
 	long long		mSendBytes = 0;
 	long long		mRecvBytes = 0;
 	long			mUseCount = 0;
+
+
+	//////////////////////////////////////////////////////////////////////////
+	// for protobuff
+	google::protobuf::uint8 m_SessionBuffer[MAX_BUFFER_SIZE];
+	google::protobuf::io::ArrayOutputStream* m_pArrayOutputStream;
+	google::protobuf::io::CodedOutputStream* m_pCodedOutputStream;
+
+
 
 	friend class SessionManager;
 };

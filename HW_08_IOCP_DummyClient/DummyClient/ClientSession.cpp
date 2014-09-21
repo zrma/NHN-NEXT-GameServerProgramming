@@ -32,6 +32,13 @@ ClientSession::ClientSession() : mBuffer(BUFFER_SIZE), mConnected(0), mRefCount(
 	{
 		printf( "Bind failed: %d\n", WSAGetLastError() );
 	}
+
+
+	// proto
+
+	m_pArrayOutputStream = new google::protobuf::io::ArrayOutputStream( m_SessionBuffer, MAX_BUFFER_SIZE );
+	m_pCodedOutputStream = new google::protobuf::io::CodedOutputStream( m_pArrayOutputStream );
+
 }
 
 
@@ -186,6 +193,11 @@ void ClientSession::ConnectCompletion()
 		
 	CRASH_ASSERT( 0 != mBuffer.GetContiguiousBytes() );
 		
+
+
+	delete[] temp;
+
+
 	OverlappedSendContext* sendContext = new OverlappedSendContext( this );
 
 	DWORD sendbytes = 0;
@@ -193,7 +205,6 @@ void ClientSession::ConnectCompletion()
 	sendContext->mWsaBuf.len = (ULONG)mBuffer.GetContiguiousBytes();
 	sendContext->mWsaBuf.buf = mBuffer.GetBufferStart();
 
-	delete[] temp;
 
 	/// start async send
 	if ( SOCKET_ERROR == WSASend( mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL ) )
@@ -204,6 +215,18 @@ void ClientSession::ConnectCompletion()
 			printf_s( "ClientSession::PostSend Error : %d\n", GetLastError() );
 		}
 	}
+
+
+	// proto
+
+
+	MyPacket::LoginRequest loginRequest;
+	loginRequest.set_playerid( 1234 );
+
+	WriteMessageToStream( MyPacket::MessageType::PKT_CS_LOGIN, loginRequest, *m_pCodedOutputStream );
+
+
+
 
 	++mUseCount;
 }
