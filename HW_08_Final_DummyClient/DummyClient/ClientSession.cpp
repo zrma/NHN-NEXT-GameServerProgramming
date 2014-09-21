@@ -179,12 +179,7 @@ void ClientSession::ConnectCompletion()
 
 	//////////////////////////////////////////////////////////////////////////
 	// 여기부터 로그인 리퀘스트 패킷 조합 -> 시리얼라이즈 -> 암호화 해서 전송 요청 시작하면 됨
-	//
-	// 하단 코드는 날려버릴 예정
-
-	char* testText = "TempTextArrayForTest";
-	PostSend( testText, strlen( testText ) );
-
+		
 	// proto
 	
 	MyPacket::LoginRequest loginRequest;
@@ -194,10 +189,31 @@ void ClientSession::ConnectCompletion()
 	
 	++mUseCount;
 
+
 	if ( false == PreRecv() )
 	{
 		printf_s( "[DEBUG] PreRecv error: %d\n", GetLastError() );
 	}
+
+
+	if ( BUFFER_SIZE <= 0 || BUFFER_SIZE > BUFSIZE )
+	{
+		BUFFER_SIZE = 4096;
+	}
+
+	char* temp = new char[BUFFER_SIZE];
+
+	ZeroMemory( temp, sizeof( char ) * BUFFER_SIZE );
+	for ( int i = 0; i < BUFFER_SIZE - 1; ++i )
+	{
+		temp[i] = 'a' + ( mSocket % 26 );
+	}
+
+	temp[BUFFER_SIZE - 1] = '\0';
+		
+	PostSend( temp, BUFFER_SIZE );
+
+	delete[] temp;
 }
 
 void ClientSession::DisconnectRequest(DisconnectReason dr)
@@ -376,7 +392,7 @@ bool ClientSession::FlushSend()
 	}
 
 	++mSendPendingCount;
-
+	
 	return mSendPendingCount == 1;
 }
 
