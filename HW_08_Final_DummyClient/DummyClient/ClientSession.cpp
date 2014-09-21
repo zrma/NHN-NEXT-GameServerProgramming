@@ -184,63 +184,58 @@ void ClientSession::ConnectCompletion()
 	//
 	// 하단 코드는 날려버릴 예정
 
-	if ( BUFFER_SIZE <= 0 || BUFFER_SIZE > BUFSIZE )
-	{
-		BUFFER_SIZE = 4096;
-	}
-
-	char* temp = new char[BUFFER_SIZE];
+// 	if ( BUFFER_SIZE <= 0 || BUFFER_SIZE > BUFSIZE )
+// 	{
+// 		BUFFER_SIZE = 4096;
+// 	}
+// 
+// 	char* temp = new char[BUFFER_SIZE];
+// 	
+// 	ZeroMemory( temp, sizeof( char ) * BUFFER_SIZE );
+// 	for ( int i = 0; i < BUFFER_SIZE - 1; ++i )
+// 	{
+// 		temp[i] = 'a' + ( mSocket % 26 );
+// 	}
+// 
+// 	temp[BUFFER_SIZE - 1] = '\0';
+// 
+// 	char* bufferStart = mSendBuffer.GetBuffer();
+// 	memcpy( bufferStart, temp, BUFFER_SIZE );
+// 
+// 	mSendBuffer.Commit( BUFFER_SIZE );
+// 		
+// 	CRASH_ASSERT( 0 != mSendBuffer.GetContiguiousBytes() );
+// 		
+// 
+// 
+// 	delete[] temp;
+// 
+// 
+// 	OverlappedSendContext* sendContext = new OverlappedSendContext( this );
+// 
+// 	DWORD sendbytes = 0;
+// 	DWORD flags = 0;
+// 	sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
+// 	sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
+// 
+// 
+// 	/// start async send
+// 	if ( SOCKET_ERROR == WSASend( mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL ) )
+// 	{
+// 		if ( WSAGetLastError() != WSA_IO_PENDING )
+// 		{
+// 			DeleteIoContext( sendContext );
+// 			printf_s( "ClientSession::PostSend Error : %d\n", GetLastError() );
+// 		}
+// 	}
 	
-	ZeroMemory( temp, sizeof( char ) * BUFFER_SIZE );
-	for ( int i = 0; i < BUFFER_SIZE - 1; ++i )
-	{
-		temp[i] = 'a' + ( mSocket % 26 );
-	}
-
-	temp[BUFFER_SIZE - 1] = '\0';
-
-	char* bufferStart = mSendBuffer.GetBuffer();
-	memcpy( bufferStart, temp, BUFFER_SIZE );
-
-	mSendBuffer.Commit( BUFFER_SIZE );
-		
-	CRASH_ASSERT( 0 != mSendBuffer.GetContiguiousBytes() );
-		
-
-
-	delete[] temp;
-
-
-	OverlappedSendContext* sendContext = new OverlappedSendContext( this );
-
-	DWORD sendbytes = 0;
-	DWORD flags = 0;
-	sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
-	sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
-
-
-	/// start async send
-	if ( SOCKET_ERROR == WSASend( mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL ) )
-	{
-		if ( WSAGetLastError() != WSA_IO_PENDING )
-		{
-			DeleteIoContext( sendContext );
-			printf_s( "ClientSession::PostSend Error : %d\n", GetLastError() );
-		}
-	}
-
-
 	// proto
-
-
+	
 	MyPacket::LoginRequest loginRequest;
 	loginRequest.set_playerid( 1234 );
 
 	WriteMessageToStream( MyPacket::MessageType::PKT_CS_LOGIN, loginRequest, *m_pCodedOutputStream );
-
-
-
-
+	
 	++mUseCount;
 }
 
@@ -343,8 +338,8 @@ void ClientSession::RecvCompletion(DWORD transferred)
 	mRecvBuffer.Commit(transferred);
 	mRecvBytes += transferred;
 
-	mRecvBuffer.GetBuffer();
-	// OnRead(transferred);
+	// mRecvBuffer.GetBuffer();
+	OnRead(transferred);
 }
 
 bool ClientSession::PostSend( const char* data, size_t len )
@@ -380,8 +375,7 @@ bool ClientSession::FlushSend()
 		DisconnectRequest( DR_SENDFLUSH_ERROR );
 		return true;
 	}
-
-
+	
 	FastSpinlockGuard criticalSection( mSendBufferLock );
 
 	/// 보낼 데이터가 없는 경우

@@ -32,19 +32,17 @@ DWORD IOThread::Run()
 void IOThread::DoIocpJob()
 {
 	DWORD dwTransferred = 0;
-	LPOVERLAPPED overlapped = nullptr;
+	OverlappedIOContext* context = nullptr;
 
 	ULONG_PTR completionKey = 0;
 
-	int ret = GetQueuedCompletionStatus( mCompletionPort, &dwTransferred, (PULONG_PTR)&completionKey, &overlapped, GQCS_TIMEOUT );
+	int ret = GetQueuedCompletionStatus( mCompletionPort, &dwTransferred, (PULONG_PTR)&completionKey, (LPOVERLAPPED*)&context, GQCS_TIMEOUT );
 	
 	if ( completionKey == THREAD_QUIT_KEY )
 	{
 		mIsContinue = false;
 		return;
 	}
-
-	OverlappedIOContext* context = reinterpret_cast<OverlappedIOContext*>( overlapped );
 
 	ClientSession* session = context ? context->mSessionObject : nullptr;
 
@@ -100,6 +98,10 @@ void IOThread::DoIocpJob()
 
 		case IO_RECV:
 			session->RecvCompletion( dwTransferred );
+
+			// 일단 테스트용 에코!
+			session->EchoBack();
+
 			completionOk = session->PreRecv();
 
 			break;

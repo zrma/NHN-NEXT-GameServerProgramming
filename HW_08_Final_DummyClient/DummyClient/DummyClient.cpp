@@ -17,13 +17,13 @@ int BUFFER_SIZE = 4096;
 bool NO_DELAY = true;
 int TIME = 10;
 
-int optionCheck( int argc, _TCHAR* argv[] );
+int OptionCheck( int argc, _TCHAR* argv[] );
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 	LThreadType = THREAD_MAIN;
 
-	if ( optionCheck( argc, argv ) < 2 )
+	if ( OptionCheck( argc, argv ) < 2 )
 	{
 		printf_s( "Performance test client  \n" );
 		printf_s( "Allowed options :        \n" );
@@ -74,7 +74,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	return 0;
 }
 
-int optionCheck( int argc, _TCHAR* argv[] )
+int OptionCheck( int argc, _TCHAR* argv[] )
 {
 	int optionCount = 0;
 

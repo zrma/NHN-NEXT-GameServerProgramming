@@ -161,7 +161,7 @@ void ClientSession::ConnectCompletion()
 		DisconnectRequest( DR_ONCONNECT_ERROR );
 		return;
 	}
-
+	
 	FastSpinlockGuard criticalSection( mBufferLock );
 
 	if ( BUFFER_SIZE <= 0 || BUFFER_SIZE > BUFSIZE )
