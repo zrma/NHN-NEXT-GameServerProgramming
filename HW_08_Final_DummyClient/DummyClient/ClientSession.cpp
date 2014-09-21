@@ -35,8 +35,7 @@ ClientSession::ClientSession() : mRecvBuffer(BUFFER_SIZE), mSendBuffer(BUFFER_SI
 	{
 		printf( "Bind failed: %d\n", WSAGetLastError() );
 	}
-
-
+	
 	// proto
 
 	m_pArrayOutputStream = new google::protobuf::io::ArrayOutputStream( m_SessionBuffer, MAX_BUFFER_SIZE );

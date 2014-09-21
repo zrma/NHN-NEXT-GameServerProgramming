@@ -144,7 +144,18 @@ private:
 	google::protobuf::io::ArrayOutputStream* m_pArrayOutputStream;
 	google::protobuf::io::CodedOutputStream* m_pCodedOutputStream;
 
+	void WriteMessageToStream(
+		MyPacket::MessageType msgType,
+		const google::protobuf::MessageLite& message,
+		google::protobuf::io::CodedOutputStream& stream )
 
+	{
+		MessageHeader messageHeader;
+		messageHeader.size = message.ByteSize();
+		messageHeader.type = msgType;
+		stream.WriteRaw( &messageHeader, sizeof( MessageHeader ) );
+		message.SerializeToCodedStream( &stream );
+	}
 
 	friend class SessionManager;
 };
