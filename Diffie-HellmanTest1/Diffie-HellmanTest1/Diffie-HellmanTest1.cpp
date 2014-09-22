@@ -8,20 +8,19 @@
 
 int _tmain( int argc, _TCHAR* argv[] )
 {
-	KeyChanger* keyChanger = new KeyChanger();
-
-
+	KeyChanger keyChanger1, keyChanger2;
+	
 	KeyPrivateSets bobPrivateKeySets;
 	KeyPrivateSets alicePrivateKeySets;
 	KeySendingSets bobSendingKeySets;
 	KeySendingSets aliceSendingKeySets;
 
 	printf_s( "" );
-	keyChanger->GenerateKey( &bobPrivateKeySets, &bobSendingKeySets );
-	keyChanger->GenerateKey( &alicePrivateKeySets, &aliceSendingKeySets );
+	keyChanger1.GenerateKey( &bobPrivateKeySets, &bobSendingKeySets );
+	keyChanger2.GenerateKey( &alicePrivateKeySets, &aliceSendingKeySets );
 	printf_s( "" );
-	keyChanger->GetSessionKey( &bobPrivateKeySets, &aliceSendingKeySets );
-	keyChanger->GetSessionKey( &alicePrivateKeySets, &bobSendingKeySets );
+	keyChanger1.GetSessionKey( &bobPrivateKeySets, &aliceSendingKeySets );
+	keyChanger2.GetSessionKey( &alicePrivateKeySets, &bobSendingKeySets );
 	printf_s( "" );
 
 
@@ -29,14 +28,28 @@ int _tmain( int argc, _TCHAR* argv[] )
 
 	BYTE oriData[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
 	BYTE temp[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-	printf_s( "" );
-	keyChanger->EncryptData( bobPrivateKeySets.hSessionKey, oriData, sizeof( oriData ), temp );
-	printf_s( "" );
-	keyChanger->DecryptData( alicePrivateKeySets.hSessionKey, temp, sizeof( oriData ) );
-	printf_s( "" );
+	printf_s( "Original : %s (%d) \n", oriData, sizeof( oriData ) );
+	keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData, sizeof( oriData ), temp );
+	printf_s( "Encrypte : %s (%d) \n", temp, sizeof( temp ) );
+	keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, temp, sizeof( oriData ) );
+	printf_s( "Decrypte : %s (%d) \n", temp, sizeof(temp) );
 
+	bool flag = false;
 
+	for ( int i = 0; i < sizeof( temp ); ++i )
+	{
+		if ( oriData[i] != temp[i] )
+		{
+			flag = true;
+			break;
+		}
+	}
 
+	if ( flag )
+		printf_s( "Diff! \n" );
+	else
+		printf_s( "Same! \n" );
+	
 	getchar();
 
 	return 0;
