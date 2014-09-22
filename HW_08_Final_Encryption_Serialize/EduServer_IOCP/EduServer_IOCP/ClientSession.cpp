@@ -6,7 +6,6 @@
 #include "ClientSession.h"
 #include "IocpManager.h"
 #include "ClientSessionManager.h"
-#include "Player.h"
 
 #define CLIENT_BUFSIZE	65536
 

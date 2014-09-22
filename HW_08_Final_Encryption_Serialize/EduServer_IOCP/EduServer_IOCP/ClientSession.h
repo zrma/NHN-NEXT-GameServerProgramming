@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Session.h"
-//#include "Player.h"
+#include "Player.h"
 
 class ClientSessionManager;
 class Player;
