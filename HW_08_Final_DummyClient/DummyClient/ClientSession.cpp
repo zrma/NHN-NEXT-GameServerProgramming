@@ -177,6 +177,11 @@ void ClientSession::ConnectCompletion()
 		return;
 	}
 
+	if ( false == PreRecv() )
+	{
+		printf_s( "[DEBUG] PreRecv error: %d\n", GetLastError() );
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	// 여기부터 로그인 리퀘스트 패킷 조합 -> 시리얼라이즈 -> 암호화 해서 전송 요청 시작하면 됨
 		
@@ -199,15 +204,19 @@ void ClientSession::ConnectCompletion()
 
 	WriteMessageToStream( MyPacket::MessageType::PKT_CS_CRYPT, cryptRequest, *m_pCodedOutputStream );
 	
+	int size = 0;
+	void* bufferPtr = nullptr;
+	m_pCodedOutputStream->GetDirectBufferPointer( &bufferPtr, &size );
+
+	if ( false == PostSend( (char*)bufferPtr, size ) )
+	{
+		printf_s( "[DEBUG] PostSend(Send-Key) error: %d\n", GetLastError() );
+	}
 
 	++mUseCount;
 
 
-	if ( false == PreRecv() )
-	{
-		printf_s( "[DEBUG] PreRecv error: %d\n", GetLastError() );
-	}
-
+	/*
 
 	if ( BUFFER_SIZE <= 0 || BUFFER_SIZE > BUFSIZE )
 	{
@@ -227,6 +236,8 @@ void ClientSession::ConnectCompletion()
 	PostSend( temp, BUFFER_SIZE );
 
 	delete[] temp;
+	
+	*/
 }
 
 void ClientSession::DisconnectRequest(DisconnectReason dr)
