@@ -189,10 +189,11 @@ void ClientSession::ConnectCompletion()
 	
 	// 이렇게 쓰는게 맞나?!
 	google::protobuf::uint32 dataLen = mCliSendKeySet.dwDataLen;
-	google::protobuf::uint64 keyBlob = *(mCliSendKeySet.pbKeyBlob);
+	google::protobuf::string keyBlob;
+	keyBlob.append( (char*)mCliSendKeySet.pbKeyBlob );
 
-	sendKey.set_datalen(dataLen);
-	sendKey.set_keyblob(keyBlob);
+	sendKey.set_datalen( dataLen );
+	sendKey.set_keyblob( keyBlob );
 
 	cryptRequest.set_allocated_sendkey( &sendKey );
 

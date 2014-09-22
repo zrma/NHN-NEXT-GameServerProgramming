@@ -113,19 +113,24 @@ class SendingKeySet : public ::google::protobuf::MessageLite {
 
   // accessors -------------------------------------------------------
 
-  // required fixed32 DataLen = 1;
+  // required uint32 DataLen = 1;
   inline bool has_datalen() const;
   inline void clear_datalen();
   static const int kDataLenFieldNumber = 1;
   inline ::google::protobuf::uint32 datalen() const;
   inline void set_datalen(::google::protobuf::uint32 value);
 
-  // required fixed64 KeyBlob = 2;
+  // required bytes KeyBlob = 2;
   inline bool has_keyblob() const;
   inline void clear_keyblob();
   static const int kKeyBlobFieldNumber = 2;
-  inline ::google::protobuf::uint64 keyblob() const;
-  inline void set_keyblob(::google::protobuf::uint64 value);
+  inline const ::std::string& keyblob() const;
+  inline void set_keyblob(const ::std::string& value);
+  inline void set_keyblob(const char* value);
+  inline void set_keyblob(const void* value, size_t size);
+  inline ::std::string* mutable_keyblob();
+  inline ::std::string* release_keyblob();
+  inline void set_allocated_keyblob(::std::string* keyblob);
 
   // @@protoc_insertion_point(class_scope:MyPacket.SendingKeySet)
  private:
@@ -134,7 +139,7 @@ class SendingKeySet : public ::google::protobuf::MessageLite {
   inline void set_has_keyblob();
   inline void clear_has_keyblob();
 
-  ::google::protobuf::uint64 keyblob_;
+  ::std::string* keyblob_;
   ::google::protobuf::uint32 datalen_;
 
   mutable int _cached_size_;
@@ -1015,7 +1020,7 @@ class MoveResult : public ::google::protobuf::MessageLite {
 
 // SendingKeySet
 
-// required fixed32 DataLen = 1;
+// required uint32 DataLen = 1;
 inline bool SendingKeySet::has_datalen() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -1037,7 +1042,7 @@ inline void SendingKeySet::set_datalen(::google::protobuf::uint32 value) {
   datalen_ = value;
 }
 
-// required fixed64 KeyBlob = 2;
+// required bytes KeyBlob = 2;
 inline bool SendingKeySet::has_keyblob() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
@@ -1048,15 +1053,63 @@ inline void SendingKeySet::clear_has_keyblob() {
   _has_bits_[0] &= ~0x00000002u;
 }
 inline void SendingKeySet::clear_keyblob() {
-  keyblob_ = GOOGLE_ULONGLONG(0);
+  if (keyblob_ != &::google::protobuf::internal::kEmptyString) {
+    keyblob_->clear();
+  }
   clear_has_keyblob();
 }
-inline ::google::protobuf::uint64 SendingKeySet::keyblob() const {
+inline const ::std::string& SendingKeySet::keyblob() const {
+  return *keyblob_;
+}
+inline void SendingKeySet::set_keyblob(const ::std::string& value) {
+  set_has_keyblob();
+  if (keyblob_ == &::google::protobuf::internal::kEmptyString) {
+    keyblob_ = new ::std::string;
+  }
+  keyblob_->assign(value);
+}
+inline void SendingKeySet::set_keyblob(const char* value) {
+  set_has_keyblob();
+  if (keyblob_ == &::google::protobuf::internal::kEmptyString) {
+    keyblob_ = new ::std::string;
+  }
+  keyblob_->assign(value);
+}
+inline void SendingKeySet::set_keyblob(const void* value, size_t size) {
+  set_has_keyblob();
+  if (keyblob_ == &::google::protobuf::internal::kEmptyString) {
+    keyblob_ = new ::std::string;
+  }
+  keyblob_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* SendingKeySet::mutable_keyblob() {
+  set_has_keyblob();
+  if (keyblob_ == &::google::protobuf::internal::kEmptyString) {
+    keyblob_ = new ::std::string;
+  }
   return keyblob_;
 }
-inline void SendingKeySet::set_keyblob(::google::protobuf::uint64 value) {
-  set_has_keyblob();
-  keyblob_ = value;
+inline ::std::string* SendingKeySet::release_keyblob() {
+  clear_has_keyblob();
+  if (keyblob_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = keyblob_;
+    keyblob_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void SendingKeySet::set_allocated_keyblob(::std::string* keyblob) {
+  if (keyblob_ != &::google::protobuf::internal::kEmptyString) {
+    delete keyblob_;
+  }
+  if (keyblob) {
+    set_has_keyblob();
+    keyblob_ = keyblob;
+  } else {
+    clear_has_keyblob();
+    keyblob_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
 }
 
 // -------------------------------------------------------------------

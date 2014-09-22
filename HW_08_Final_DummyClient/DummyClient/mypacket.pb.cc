@@ -2,7 +2,6 @@
 // source: MyPacket.proto
 
 #include "stdafx.h"
-
 #define INTERNAL_SUPPRESS_PROTOBUF_FIELD_DEPRECATION
 #include "MyPacket.pb.h"
 
@@ -119,7 +118,7 @@ SendingKeySet::SendingKeySet(const SendingKeySet& from)
 void SendingKeySet::SharedCtor() {
   _cached_size_ = 0;
   datalen_ = 0u;
-  keyblob_ = GOOGLE_ULONGLONG(0);
+  keyblob_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -128,6 +127,9 @@ SendingKeySet::~SendingKeySet() {
 }
 
 void SendingKeySet::SharedDtor() {
+  if (keyblob_ != &::google::protobuf::internal::kEmptyString) {
+    delete keyblob_;
+  }
   #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
   if (this != &default_instance()) {
   #else
@@ -159,7 +161,11 @@ SendingKeySet* SendingKeySet::New() const {
 void SendingKeySet::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     datalen_ = 0u;
-    keyblob_ = GOOGLE_ULONGLONG(0);
+    if (has_keyblob()) {
+      if (keyblob_ != &::google::protobuf::internal::kEmptyString) {
+        keyblob_->clear();
+      }
+    }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -170,30 +176,28 @@ bool SendingKeySet::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required fixed32 DataLen = 1;
+      // required uint32 DataLen = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
                  input, &datalen_)));
           set_has_datalen();
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(17)) goto parse_KeyBlob;
+        if (input->ExpectTag(18)) goto parse_KeyBlob;
         break;
       }
 
-      // required fixed64 KeyBlob = 2;
+      // required bytes KeyBlob = 2;
       case 2: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_KeyBlob:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED64>(
-                 input, &keyblob_)));
-          set_has_keyblob();
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_keyblob()));
         } else {
           goto handle_uninterpreted;
         }
@@ -218,14 +222,15 @@ bool SendingKeySet::MergePartialFromCodedStream(
 
 void SendingKeySet::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required fixed32 DataLen = 1;
+  // required uint32 DataLen = 1;
   if (has_datalen()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->datalen(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->datalen(), output);
   }
 
-  // required fixed64 KeyBlob = 2;
+  // required bytes KeyBlob = 2;
   if (has_keyblob()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFixed64(2, this->keyblob(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteBytes(
+      2, this->keyblob(), output);
   }
 
 }
@@ -234,14 +239,18 @@ int SendingKeySet::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required fixed32 DataLen = 1;
+    // required uint32 DataLen = 1;
     if (has_datalen()) {
-      total_size += 1 + 4;
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->datalen());
     }
 
-    // required fixed64 KeyBlob = 2;
+    // required bytes KeyBlob = 2;
     if (has_keyblob()) {
-      total_size += 1 + 8;
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->keyblob());
     }
 
   }
