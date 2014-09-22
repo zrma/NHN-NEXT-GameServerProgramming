@@ -15,7 +15,7 @@ public:
 	int  GetPlayerId() { return mPlayerId; }
 
 	void RequestLogin( int pid );
-	void ResponseLogin( int pid, float x, float y, float z, wchar_t* name, bool valid );
+	void ResponseLogin( int pid, float x, float y, float z, const char* name, bool valid );
 
 	void RequestUpdatePosition( float x, float y, float z );
 	void ResponseUpdatePosition( float x, float y, float z );

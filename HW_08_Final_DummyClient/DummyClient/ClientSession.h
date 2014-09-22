@@ -109,10 +109,15 @@ public:
 	void	EchoBack();
 	void	OnRead( size_t len );
 	
-	bool ParsePacket( char* packet, int size )
+	bool	ParsePacket( char* packet, int size )
 	{
 		return mRecvBuffer.Read( packet, size );
 	}
+
+	bool	IsEncrypt() const { return mIsEncrypt; }
+	bool	SetEncrypt( bool flag = true ) { mIsEncrypt = flag; }
+
+	void	SetReceiveKeySet( MyPacket::SendingKeySet keySet );
 
 	void	DisconnectRequest( DisconnectReason dr );
 	void	DisconnectCompletion( DisconnectReason dr );
@@ -147,6 +152,8 @@ private:
 	long long		mSendBytes = 0;
 	long long		mRecvBytes = 0;
 	long			mUseCount = 0;
+
+	bool			mIsEncrypt = false;
 
 	// 키 생성 및 암/복호화 클래스
 	KeyChanger		mCrypt;

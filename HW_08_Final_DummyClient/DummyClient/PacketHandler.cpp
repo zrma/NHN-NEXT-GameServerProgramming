@@ -83,20 +83,74 @@ void ClientSession::OnRead(size_t len)
 REGISTER_HANDLER( PKT_SC_CRYPT )
 {
 	//////////////////////////////////////////////////////////////////////////
-	// 서버로부터 G / P / B 를 받았다!
-	
+	// 서버로부터 키를 받았다!
+	if ( session->IsEncrypt() )
+	{
+		// 이미 키 교환을 해서 암호화 하는 도중이므로 이상하다!
+		return;
+	}
 
+	char* packetTemp = new char[MessageHeaderSize + size];
+
+	if ( false == session->ParsePacket( packetTemp, MessageHeaderSize + size ) )
+	{
+		LoggerUtil::EventLog( "packet parsing error", PKT_SC_CRYPT );
+		return;
+	}
+
+	// 디시리얼라이즈
+	google::protobuf::io::ArrayInputStream is( packetTemp, MessageHeaderSize + size );
+	is.Skip( MessageHeaderSize );
+
+	MyPacket::CryptResult inPacket;
+	inPacket.ParseFromZeroCopyStream( &is );
+
+	delete packetTemp;
+
+	MyPacket::SendingKeySet keySet = inPacket.sendkey();
+	session->SetReceiveKeySet( keySet );
 }
 
 REGISTER_HANDLER( PKT_SC_LOGIN )
 {
+	if ( !session->IsEncrypt() )
+	{
+		LoggerUtil::EventLog( "uncrypted session error", PKT_SC_LOGIN );
+		return;
+	}
 
+	char* packetTemp = new char[MessageHeaderSize + size];
+
+	if ( false == session->ParsePacket( packetTemp, MessageHeaderSize + size ) )
+	{
+		LoggerUtil::EventLog( "packet parsing error", PKT_SC_LOGIN );
+		return;
+	}
+
+	// 디시리얼라이즈
+	google::protobuf::io::ArrayInputStream is( packetTemp, MessageHeaderSize + size );
+	is.Skip( MessageHeaderSize );
+
+	MyPacket::LoginResult inPacket;
+	inPacket.ParseFromZeroCopyStream( &is );
+
+	delete packetTemp;
+
+	MyPacket::Position pos = inPacket.playerpos();
+	session->mPlayer->ResponseLogin( inPacket.playerid(), pos.x(), pos.y(), pos.z(),
+									 inPacket.playername().c_str(), true );
 }
 
 REGISTER_HANDLER( PKT_SC_MOVE )
 {
 	//////////////////////////////////////////////////////////////////////////
 	// 서버로부터 이동 허가가 떨어진 것이다.
+	if ( !session->IsEncrypt() )
+	{
+		LoggerUtil::EventLog( "uncrypted session error", PKT_SC_MOVE );
+		return;
+	}
+
 	char* packetTemp = new char[MessageHeaderSize + size];
 
 	if ( false == session->ParsePacket( packetTemp, MessageHeaderSize + size ) )

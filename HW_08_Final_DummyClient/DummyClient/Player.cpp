@@ -24,7 +24,7 @@ void Player::RequestLogin( int pid )
 
 }
 
-void Player::ResponseLogin( int pid, float x, float y, float z, wchar_t* name, bool valid )
+void Player::ResponseLogin( int pid, float x, float y, float z, const char* name, bool valid )
 {
 
 }

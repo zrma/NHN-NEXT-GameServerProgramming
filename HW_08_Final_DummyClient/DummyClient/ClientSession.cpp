@@ -55,6 +55,12 @@ void ClientSession::SessionReset()
 	mSendBuffer.BufferReset();
 	mRecvBuffer.BufferReset();
 
+	mIsEncrypt = false;
+	
+	memset( &mPrivateKeySet, 0, sizeof( KeyPrivateSets ) );
+	memset( &mCliSendKeySet, 0, sizeof( KeySendingSets ) );
+	memset( &mReceiveKeySet, 0, sizeof( KeySendingSets ) );
+
 	LINGER lingerOption;
 	lingerOption.l_onoff = 1;
 	lingerOption.l_linger = 0;
@@ -183,61 +189,42 @@ void ClientSession::ConnectCompletion()
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	// 여기부터 로그인 리퀘스트 패킷 조합 -> 시리얼라이즈 -> 암호화 해서 전송 요청 시작하면 됨
+	// 여기부터 로그인 리퀘스트 패킷 조합
 		
 	// proto
-	
 	mCrypt.GenerateKey( &mPrivateKeySet, &mCliSendKeySet );
 	
 	MyPacket::CryptRequest cryptRequest;
-	MyPacket::SendingKeySet sendKey;
+	MyPacket::SendingKeySet* sendKey = new MyPacket::SendingKeySet;
 	
 	// 이렇게 쓰는게 맞나?!
 	google::protobuf::uint32 dataLen = mCliSendKeySet.dwDataLen;
 	google::protobuf::string keyBlob;
 	keyBlob.append( (char*)mCliSendKeySet.pbKeyBlob );
 
-	sendKey.set_datalen( dataLen );
-	sendKey.set_keyblob( keyBlob );
+	sendKey->set_datalen( dataLen );
+	sendKey->set_keyblob( keyBlob );
 
-	cryptRequest.set_allocated_sendkey( &sendKey );
-
+	cryptRequest.set_allocated_sendkey( sendKey );
+	
 	WriteMessageToStream( MyPacket::MessageType::PKT_CS_CRYPT, cryptRequest, *m_pCodedOutputStream );
 	
-	int size = 0;
-	void* bufferPtr = nullptr;
-	m_pCodedOutputStream->GetDirectBufferPointer( &bufferPtr, &size );
+	int size = m_pCodedOutputStream->ByteCount();
 
-	if ( false == PostSend( (char*)bufferPtr, size ) )
+	if ( false == PostSend( (char*)m_pCodedOutputStream, size ) )
 	{
 		printf_s( "[DEBUG] PostSend(Send-Key) error: %d\n", GetLastError() );
 	}
 
 	++mUseCount;
+}
 
+void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
+{
+	mReceiveKeySet.dwDataLen = keySet.datalen();
+	*mReceiveKeySet.pbKeyBlob = (BYTE)(keySet.keyblob().c_str());
 
-	/*
-
-	if ( BUFFER_SIZE <= 0 || BUFFER_SIZE > BUFSIZE )
-	{
-		BUFFER_SIZE = 4096;
-	}
-
-	char* temp = new char[BUFFER_SIZE];
-
-	ZeroMemory( temp, sizeof( char ) * BUFFER_SIZE );
-	for ( int i = 0; i < BUFFER_SIZE - 1; ++i )
-	{
-		temp[i] = 'a' + ( mSocket % 26 );
-	}
-
-	temp[BUFFER_SIZE - 1] = '\0';
-		
-	PostSend( temp, BUFFER_SIZE );
-
-	delete[] temp;
-	
-	*/
+	mIsEncrypt = true;
 }
 
 void ClientSession::DisconnectRequest(DisconnectReason dr)
