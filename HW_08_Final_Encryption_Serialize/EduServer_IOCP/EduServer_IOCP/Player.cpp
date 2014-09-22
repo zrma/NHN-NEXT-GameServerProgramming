@@ -23,7 +23,7 @@ void Player::PlayerReset()
 
 
 
-void Player::UpdatePosition(float x, float y, float z)
+void Player::SetPosition( float x, float y, float z )
 {
 	FastSpinlockGuard criticalSection(mPlayerLock);
 	mPosX = x + RandomFloat( -1.0f, 1.0f );

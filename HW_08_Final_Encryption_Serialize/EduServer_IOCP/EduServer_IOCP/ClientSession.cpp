@@ -6,11 +6,11 @@
 #include "ClientSession.h"
 #include "IocpManager.h"
 #include "ClientSessionManager.h"
-//#include "Player.h"
+#include "Player.h"
 
 #define CLIENT_BUFSIZE	65536
 
-ClientSession::ClientSession() : Session(CLIENT_BUFSIZE, CLIENT_BUFSIZE)
+ClientSession::ClientSession(): Session( CLIENT_BUFSIZE, CLIENT_BUFSIZE ), mPlayer( this )
 {
 	memset(&mClientAddr, 0, sizeof(SOCKADDR_IN));
 }
@@ -46,6 +46,8 @@ void ClientSession::SessionReset()
 	closesocket(mSocket);
 
 	mSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+
+	mPlayer.PlayerReset();
 }
 
 bool ClientSession::PostAccept()

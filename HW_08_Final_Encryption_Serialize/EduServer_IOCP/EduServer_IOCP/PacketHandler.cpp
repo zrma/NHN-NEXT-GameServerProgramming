@@ -58,6 +58,16 @@ void PacketHandler::InputPacketJunction( ClientSession* currSession )
 
 	switch ( messageHeder.type )
 	{
+		case MyPacket::MessageType::PKT_CS_CRYPT:
+		{
+			MyPacket::CryptRequest message;
+			if ( false == message.ParseFromZeroCopyStream( &payloadArrayStream ) )
+			{
+				break;
+			}
+
+			break;
+		}
 		case MyPacket::MessageType::PKT_CS_LOGIN:
 		{
 			MyPacket::LoginRequest message;
@@ -65,6 +75,7 @@ void PacketHandler::InputPacketJunction( ClientSession* currSession )
 			{
 				break;
 			}
+
 //			printf_s( "PKT_CS_LOGIN \n" );
 
 			

@@ -175,6 +175,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="ThreadLocal.h" />
     <ClInclude Include="IOThread.h" />
+    <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CircularBuffer.cpp" />
@@ -203,6 +204,7 @@
     </ClCompile>
     <ClCompile Include="ThreadLocal.cpp" />
     <ClCompile Include="IOThread.cpp" />
+    <ClCompile Include="World.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
