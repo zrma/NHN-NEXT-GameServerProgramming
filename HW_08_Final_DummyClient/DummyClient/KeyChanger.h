@@ -31,6 +31,4 @@ public:
 
 	DATA_BLOB P;
 	DATA_BLOB G;
-
 };
-

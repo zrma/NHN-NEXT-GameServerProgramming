@@ -7,6 +7,7 @@
 #define PKT_NONE	0
 #define PKT_MAX		1024
 
+#define PKT_SC_CRYPT	MyPacket::MessageType::PKT_SC_CRYPT
 #define PKT_SC_LOGIN	MyPacket::MessageType::PKT_SC_LOGIN
 #define PKT_SC_CHAT		MyPacket::MessageType::PKT_SC_CHAT
 #define PKT_SC_MOVE		MyPacket::MessageType::PKT_SC_MOVE
@@ -55,7 +56,7 @@ void ClientSession::OnRead(size_t len)
 		
 		if (false == mRecvBuffer.Peek((char*)&header, MessageHeaderSize))
 			return;
-
+		
 		/// 패킷 완성이 되는가? 
 
 		// 구 교수님 코드와는 다르다!
@@ -77,6 +78,14 @@ void ClientSession::OnRead(size_t len)
 		/// packet dispatch...
 		HandlerTable[header.type](this, header.size);
 	}
+}
+
+REGISTER_HANDLER( PKT_SC_CRYPT )
+{
+	//////////////////////////////////////////////////////////////////////////
+	// 서버로부터 G / P / B 를 받았다!
+	
+
 }
 
 REGISTER_HANDLER( PKT_SC_LOGIN )

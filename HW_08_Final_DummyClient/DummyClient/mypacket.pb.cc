@@ -17,6 +17,7 @@
 namespace MyPacket {
 
 void protobuf_ShutdownFile_MyPacket_2eproto() {
+  delete SendingKeySet::default_instance_;
   delete CryptRequest::default_instance_;
   delete CryptResult::default_instance_;
   delete LoginRequest::default_instance_;
@@ -40,6 +41,7 @@ void protobuf_AddDesc_MyPacket_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 #endif
+  SendingKeySet::default_instance_ = new SendingKeySet();
   CryptRequest::default_instance_ = new CryptRequest();
   CryptResult::default_instance_ = new CryptResult();
   LoginRequest::default_instance_ = new LoginRequest();
@@ -49,6 +51,7 @@ void protobuf_AddDesc_MyPacket_2eproto() {
   ChatResult::default_instance_ = new ChatResult();
   MoveRequest::default_instance_ = new MoveRequest();
   MoveResult::default_instance_ = new MoveResult();
+  SendingKeySet::default_instance_->InitAsDefaultInstance();
   CryptRequest::default_instance_->InitAsDefaultInstance();
   CryptResult::default_instance_->InitAsDefaultInstance();
   LoginRequest::default_instance_->InitAsDefaultInstance();
@@ -95,7 +98,206 @@ bool MessageType_IsValid(int value) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int CryptRequest::kPlayerIdFieldNumber;
+const int SendingKeySet::kDataLenFieldNumber;
+const int SendingKeySet::kKeyBlobFieldNumber;
+#endif  // !_MSC_VER
+
+SendingKeySet::SendingKeySet()
+  : ::google::protobuf::MessageLite() {
+  SharedCtor();
+}
+
+void SendingKeySet::InitAsDefaultInstance() {
+}
+
+SendingKeySet::SendingKeySet(const SendingKeySet& from)
+  : ::google::protobuf::MessageLite() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void SendingKeySet::SharedCtor() {
+  _cached_size_ = 0;
+  datalen_ = 0u;
+  keyblob_ = GOOGLE_ULONGLONG(0);
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+SendingKeySet::~SendingKeySet() {
+  SharedDtor();
+}
+
+void SendingKeySet::SharedDtor() {
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  if (this != &default_instance()) {
+  #else
+  if (this != default_instance_) {
+  #endif
+  }
+}
+
+void SendingKeySet::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const SendingKeySet& SendingKeySet::default_instance() {
+#ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  protobuf_AddDesc_MyPacket_2eproto();
+#else
+  if (default_instance_ == NULL) protobuf_AddDesc_MyPacket_2eproto();
+#endif
+  return *default_instance_;
+}
+
+SendingKeySet* SendingKeySet::default_instance_ = NULL;
+
+SendingKeySet* SendingKeySet::New() const {
+  return new SendingKeySet;
+}
+
+void SendingKeySet::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    datalen_ = 0u;
+    keyblob_ = GOOGLE_ULONGLONG(0);
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+bool SendingKeySet::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required fixed32 DataLen = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &datalen_)));
+          set_has_datalen();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(17)) goto parse_KeyBlob;
+        break;
+      }
+
+      // required fixed64 KeyBlob = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
+         parse_KeyBlob:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED64>(
+                 input, &keyblob_)));
+          set_has_keyblob();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void SendingKeySet::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required fixed32 DataLen = 1;
+  if (has_datalen()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->datalen(), output);
+  }
+
+  // required fixed64 KeyBlob = 2;
+  if (has_keyblob()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed64(2, this->keyblob(), output);
+  }
+
+}
+
+int SendingKeySet::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required fixed32 DataLen = 1;
+    if (has_datalen()) {
+      total_size += 1 + 4;
+    }
+
+    // required fixed64 KeyBlob = 2;
+    if (has_keyblob()) {
+      total_size += 1 + 8;
+    }
+
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void SendingKeySet::CheckTypeAndMergeFrom(
+    const ::google::protobuf::MessageLite& from) {
+  MergeFrom(*::google::protobuf::down_cast<const SendingKeySet*>(&from));
+}
+
+void SendingKeySet::MergeFrom(const SendingKeySet& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_datalen()) {
+      set_datalen(from.datalen());
+    }
+    if (from.has_keyblob()) {
+      set_keyblob(from.keyblob());
+    }
+  }
+}
+
+void SendingKeySet::CopyFrom(const SendingKeySet& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool SendingKeySet::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+
+  return true;
+}
+
+void SendingKeySet::Swap(SendingKeySet* other) {
+  if (other != this) {
+    std::swap(datalen_, other->datalen_);
+    std::swap(keyblob_, other->keyblob_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::std::string SendingKeySet::GetTypeName() const {
+  return "MyPacket.SendingKeySet";
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int CryptRequest::kSendKeyFieldNumber;
 #endif  // !_MSC_VER
 
 CryptRequest::CryptRequest()
@@ -104,6 +306,12 @@ CryptRequest::CryptRequest()
 }
 
 void CryptRequest::InitAsDefaultInstance() {
+#ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  sendkey_ = const_cast< ::MyPacket::SendingKeySet*>(
+      ::MyPacket::SendingKeySet::internal_default_instance());
+#else
+  sendkey_ = const_cast< ::MyPacket::SendingKeySet*>(&::MyPacket::SendingKeySet::default_instance());
+#endif
 }
 
 CryptRequest::CryptRequest(const CryptRequest& from)
@@ -114,7 +322,7 @@ CryptRequest::CryptRequest(const CryptRequest& from)
 
 void CryptRequest::SharedCtor() {
   _cached_size_ = 0;
-  playerid_ = 0;
+  sendkey_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -128,6 +336,7 @@ void CryptRequest::SharedDtor() {
   #else
   if (this != default_instance_) {
   #endif
+    delete sendkey_;
   }
 }
 
@@ -153,7 +362,9 @@ CryptRequest* CryptRequest::New() const {
 
 void CryptRequest::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    playerid_ = 0;
+    if (has_sendkey()) {
+      if (sendkey_ != NULL) sendkey_->::MyPacket::SendingKeySet::Clear();
+    }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -164,14 +375,12 @@ bool CryptRequest::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required int32 PlayerId = 1;
+      // required .MyPacket.SendingKeySet SendKey = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &playerid_)));
-          set_has_playerid();
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_sendkey()));
         } else {
           goto handle_uninterpreted;
         }
@@ -196,9 +405,10 @@ bool CryptRequest::MergePartialFromCodedStream(
 
 void CryptRequest::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required int32 PlayerId = 1;
-  if (has_playerid()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->playerid(), output);
+  // required .MyPacket.SendingKeySet SendKey = 1;
+  if (has_sendkey()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessage(
+      1, this->sendkey(), output);
   }
 
 }
@@ -207,11 +417,11 @@ int CryptRequest::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required int32 PlayerId = 1;
-    if (has_playerid()) {
+    // required .MyPacket.SendingKeySet SendKey = 1;
+    if (has_sendkey()) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->playerid());
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->sendkey());
     }
 
   }
@@ -229,8 +439,8 @@ void CryptRequest::CheckTypeAndMergeFrom(
 void CryptRequest::MergeFrom(const CryptRequest& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from.has_playerid()) {
-      set_playerid(from.playerid());
+    if (from.has_sendkey()) {
+      mutable_sendkey()->::MyPacket::SendingKeySet::MergeFrom(from.sendkey());
     }
   }
 }
@@ -244,12 +454,15 @@ void CryptRequest::CopyFrom(const CryptRequest& from) {
 bool CryptRequest::IsInitialized() const {
   if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
 
+  if (has_sendkey()) {
+    if (!this->sendkey().IsInitialized()) return false;
+  }
   return true;
 }
 
 void CryptRequest::Swap(CryptRequest* other) {
   if (other != this) {
-    std::swap(playerid_, other->playerid_);
+    std::swap(sendkey_, other->sendkey_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     std::swap(_cached_size_, other->_cached_size_);
   }
@@ -263,9 +476,7 @@ void CryptRequest::Swap(CryptRequest* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int CryptResult::kGFieldNumber;
-const int CryptResult::kPFieldNumber;
-const int CryptResult::kAFieldNumber;
+const int CryptResult::kSendKeyFieldNumber;
 #endif  // !_MSC_VER
 
 CryptResult::CryptResult()
@@ -274,6 +485,12 @@ CryptResult::CryptResult()
 }
 
 void CryptResult::InitAsDefaultInstance() {
+#ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  sendkey_ = const_cast< ::MyPacket::SendingKeySet*>(
+      ::MyPacket::SendingKeySet::internal_default_instance());
+#else
+  sendkey_ = const_cast< ::MyPacket::SendingKeySet*>(&::MyPacket::SendingKeySet::default_instance());
+#endif
 }
 
 CryptResult::CryptResult(const CryptResult& from)
@@ -284,9 +501,7 @@ CryptResult::CryptResult(const CryptResult& from)
 
 void CryptResult::SharedCtor() {
   _cached_size_ = 0;
-  g_ = 0;
-  p_ = 0;
-  a_ = 0;
+  sendkey_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -300,6 +515,7 @@ void CryptResult::SharedDtor() {
   #else
   if (this != default_instance_) {
   #endif
+    delete sendkey_;
   }
 }
 
@@ -325,9 +541,9 @@ CryptResult* CryptResult::New() const {
 
 void CryptResult::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    g_ = 0;
-    p_ = 0;
-    a_ = 0;
+    if (has_sendkey()) {
+      if (sendkey_ != NULL) sendkey_->::MyPacket::SendingKeySet::Clear();
+    }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -338,46 +554,12 @@ bool CryptResult::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required int32 G = 1;
+      // required .MyPacket.SendingKeySet SendKey = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &g_)));
-          set_has_g();
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(16)) goto parse_P;
-        break;
-      }
-
-      // required int32 P = 2;
-      case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-         parse_P:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &p_)));
-          set_has_p();
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(24)) goto parse_A;
-        break;
-      }
-
-      // required int32 A = 3;
-      case 3: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-         parse_A:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &a_)));
-          set_has_a();
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_sendkey()));
         } else {
           goto handle_uninterpreted;
         }
@@ -402,19 +584,10 @@ bool CryptResult::MergePartialFromCodedStream(
 
 void CryptResult::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required int32 G = 1;
-  if (has_g()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->g(), output);
-  }
-
-  // required int32 P = 2;
-  if (has_p()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->p(), output);
-  }
-
-  // required int32 A = 3;
-  if (has_a()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->a(), output);
+  // required .MyPacket.SendingKeySet SendKey = 1;
+  if (has_sendkey()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessage(
+      1, this->sendkey(), output);
   }
 
 }
@@ -423,25 +596,11 @@ int CryptResult::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required int32 G = 1;
-    if (has_g()) {
+    // required .MyPacket.SendingKeySet SendKey = 1;
+    if (has_sendkey()) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->g());
-    }
-
-    // required int32 P = 2;
-    if (has_p()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->p());
-    }
-
-    // required int32 A = 3;
-    if (has_a()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->a());
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->sendkey());
     }
 
   }
@@ -459,14 +618,8 @@ void CryptResult::CheckTypeAndMergeFrom(
 void CryptResult::MergeFrom(const CryptResult& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from.has_g()) {
-      set_g(from.g());
-    }
-    if (from.has_p()) {
-      set_p(from.p());
-    }
-    if (from.has_a()) {
-      set_a(from.a());
+    if (from.has_sendkey()) {
+      mutable_sendkey()->::MyPacket::SendingKeySet::MergeFrom(from.sendkey());
     }
   }
 }
@@ -478,16 +631,17 @@ void CryptResult::CopyFrom(const CryptResult& from) {
 }
 
 bool CryptResult::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
 
+  if (has_sendkey()) {
+    if (!this->sendkey().IsInitialized()) return false;
+  }
   return true;
 }
 
 void CryptResult::Swap(CryptResult* other) {
   if (other != this) {
-    std::swap(g_, other->g_);
-    std::swap(p_, other->p_);
-    std::swap(a_, other->a_);
+    std::swap(sendkey_, other->sendkey_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     std::swap(_cached_size_, other->_cached_size_);
   }
@@ -501,7 +655,7 @@ void CryptResult::Swap(CryptResult* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int LoginRequest::kBFieldNumber;
+const int LoginRequest::kPlayerIdFieldNumber;
 #endif  // !_MSC_VER
 
 LoginRequest::LoginRequest()
@@ -520,7 +674,7 @@ LoginRequest::LoginRequest(const LoginRequest& from)
 
 void LoginRequest::SharedCtor() {
   _cached_size_ = 0;
-  b_ = 0;
+  playerid_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -559,7 +713,7 @@ LoginRequest* LoginRequest::New() const {
 
 void LoginRequest::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    b_ = 0;
+    playerid_ = 0;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -570,14 +724,14 @@ bool LoginRequest::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required int32 B = 1;
+      // required int32 PlayerId = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &b_)));
-          set_has_b();
+                 input, &playerid_)));
+          set_has_playerid();
         } else {
           goto handle_uninterpreted;
         }
@@ -602,9 +756,9 @@ bool LoginRequest::MergePartialFromCodedStream(
 
 void LoginRequest::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required int32 B = 1;
-  if (has_b()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->b(), output);
+  // required int32 PlayerId = 1;
+  if (has_playerid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->playerid(), output);
   }
 
 }
@@ -613,11 +767,11 @@ int LoginRequest::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required int32 B = 1;
-    if (has_b()) {
+    // required int32 PlayerId = 1;
+    if (has_playerid()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->b());
+          this->playerid());
     }
 
   }
@@ -635,8 +789,8 @@ void LoginRequest::CheckTypeAndMergeFrom(
 void LoginRequest::MergeFrom(const LoginRequest& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from.has_b()) {
-      set_b(from.b());
+    if (from.has_playerid()) {
+      set_playerid(from.playerid());
     }
   }
 }
@@ -655,7 +809,7 @@ bool LoginRequest::IsInitialized() const {
 
 void LoginRequest::Swap(LoginRequest* other) {
   if (other != this) {
-    std::swap(b_, other->b_);
+    std::swap(playerid_, other->playerid_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     std::swap(_cached_size_, other->_cached_size_);
   }

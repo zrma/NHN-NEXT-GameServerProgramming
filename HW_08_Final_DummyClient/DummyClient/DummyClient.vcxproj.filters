@@ -90,6 +90,9 @@
     <ClInclude Include="Player.h">
       <Filter>Contents</Filter>
     </ClInclude>
+    <ClInclude Include="KeyChanger.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -139,6 +142,9 @@
     </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Contents</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyChanger.cpp">
+      <Filter>Packet</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

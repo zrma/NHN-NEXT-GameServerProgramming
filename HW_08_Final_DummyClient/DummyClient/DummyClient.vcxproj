@@ -100,6 +100,7 @@
     <ClInclude Include="FastSpinlock.h" />
     <ClInclude Include="IocpManager.h" />
     <ClInclude Include="IoThread.h" />
+    <ClInclude Include="KeyChanger.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="MemoryPool.h" />
     <ClInclude Include="mypacket.pb.h" />
@@ -122,6 +123,7 @@
     <ClCompile Include="FastSpinlock.cpp" />
     <ClCompile Include="IocpManager.cpp" />
     <ClCompile Include="IoThread.cpp" />
+    <ClCompile Include="KeyChanger.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="MemoryPool.cpp" />
     <ClCompile Include="mypacket.pb.cc" />

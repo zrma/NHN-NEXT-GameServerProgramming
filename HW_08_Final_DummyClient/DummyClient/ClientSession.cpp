@@ -182,10 +182,21 @@ void ClientSession::ConnectCompletion()
 		
 	// proto
 	
+	mCrypt.GenerateKey( &mPrivateKeySet, &mCliSendKeySet );
+	
 	MyPacket::CryptRequest cryptRequest;
-	cryptRequest.set_playerid( 1234 );
+	MyPacket::SendingKeySet sendKey;
+	
+	// 이렇게 쓰는게 맞나?!
+	google::protobuf::uint32 dataLen = mCliSendKeySet.dwDataLen;
+	google::protobuf::uint64 keyBlob = *(mCliSendKeySet.pbKeyBlob);
 
-	WriteMessageToStream( MyPacket::MessageType::PKT_CS_LOGIN, cryptRequest, *m_pCodedOutputStream );
+	sendKey.set_datalen(dataLen);
+	sendKey.set_keyblob(keyBlob);
+
+	cryptRequest.set_allocated_sendkey( &sendKey );
+
+	WriteMessageToStream( MyPacket::MessageType::PKT_CS_CRYPT, cryptRequest, *m_pCodedOutputStream );
 	
 
 	++mUseCount;
