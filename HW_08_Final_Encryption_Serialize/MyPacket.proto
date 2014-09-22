@@ -17,21 +17,25 @@ enum MessageType
 	PKT_SC_CRYPT = 8;
 }
 
+message SendingKeySet
+{
+    required fixed32 DataLen = 1;
+	required fixed64 KeyBlob = 2;
+}
+
 message CryptRequest
 {
-    required int32 PlayerId = 1;
+    required SendingKeySet SendKey = 1;
 }
 
 message CryptResult
 {
-    required int32 G = 1;
-	required int32 P = 2;
-	required int32 A = 3;
+    required SendingKeySet SendKey = 1;
 }
 
 message LoginRequest
 {
-    required int32 B = 1;
+    required int32 PlayerId = 1;
 }
 
  message Position 

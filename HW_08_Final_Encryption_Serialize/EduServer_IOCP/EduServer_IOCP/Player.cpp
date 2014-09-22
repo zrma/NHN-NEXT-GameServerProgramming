@@ -2,6 +2,7 @@
 #include "ClientSession.h"
 #include "Player.h"
 
+float RandomFloat( float a, float b );
 
 Player::Player(ClientSession* session) : mSession(session)
 {
@@ -16,113 +17,25 @@ void Player::PlayerReset()
 {
 	FastSpinlockGuard criticalSection(mPlayerLock);
 
-	memset(mPlayerName, 0, sizeof(mPlayerName));
-	memset(mComment, 0, sizeof(mComment));
 	mPlayerId = -1;
-	mIsValid = false;
 	mPosX = mPosY = mPosZ = 0;
 }
 
-void Player::RequestLoad(int pid)
-{
-	/*
- 	LoadPlayerDataContext* context = new LoadPlayerDataContext(mSession, pid);
- 	GDatabaseManager->PostDatabsaseRequest(context);
-	*/
-}
 
-void Player::ResponseLoad(int pid, float x, float y, float z, bool valid, wchar_t* name, wchar_t* comment)
+
+void Player::UpdatePosition(float x, float y, float z)
 {
 	FastSpinlockGuard criticalSection(mPlayerLock);
-
-	mPlayerId = pid;
-	mPosX = x;
-	mPosY = y;
-	mPosZ = z;
-	mIsValid = valid;
-
-	wcscpy_s(mPlayerName, name);
-	wcscpy_s(mComment, comment);
-
-	wprintf_s(L"PID[%d], X[%f] Y[%f] Z[%f] NAME[%s] COMMENT[%s]\n", mPlayerId, mPosX, mPosY, mPosZ, mPlayerName, mComment);
+	mPosX = x + RandomFloat( -1.0f, 1.0f );
+	mPosY = y + RandomFloat( -1.0f, 1.0f );
+	mPosZ = z + RandomFloat( -1.0f, 1.0f );
 }
 
-void Player::RequestUpdatePosition(float x, float y, float z)
+//세 번째에 map 크기 인자를 넣어서 크기를 넘지 않도록 해야되지 않을까...
+float RandomFloat( float a, float b )
 {
-	/*
-	UpdatePlayerPositionContext* context = new UpdatePlayerPositionContext( mSession, mPlayerId );
-	context->SetNewPosition( x, y, z );
-
-	GDatabaseManager->PostDatabsaseRequest( context );
-	*/
+	float random = ( (float)rand() ) / (float)RAND_MAX;
+	float diff = b - a;
+	float r = random * diff;
+	return a + r;
 }
-
-void Player::ResponseUpdatePosition(float x, float y, float z)
-{
-	FastSpinlockGuard criticalSection(mPlayerLock);
-	mPosX = x;
-	mPosY = y;
-	mPosZ = z;
-}
-
-void Player::RequestUpdateComment(const wchar_t* comment)
-{
-	/*
-	UpdatePlayerCommentContext* context = new UpdatePlayerCommentContext(mSession, mPlayerId);
-	context->SetNewComment(comment);
-	GDatabaseManager->PostDatabsaseRequest(context);
-	*/
-}
-
-void Player::ResponseUpdateComment(const wchar_t* comment)
-{
-	FastSpinlockGuard criticalSection(mPlayerLock);
-	wcscpy_s(mComment, comment);
-}
-
-void Player::RequestUpdateValidation(bool isValid)
-{
-	/*
-	UpdatePlayerValidContext* context = new UpdatePlayerValidContext(mSession, mPlayerId);
-	context->mIsValid = isValid;
-	GDatabaseManager->PostDatabsaseRequest(context);
-	*/
-}
-
-void Player::ResponseUpdateValidation(bool isValid)
-{
-	FastSpinlockGuard criticalSection(mPlayerLock);
-	mIsValid = isValid;
-}
-
-
-void Player::TestCreatePlayerData(const wchar_t* newName)
-{
-	/*
-	CreatePlayerDataContext* context = new CreatePlayerDataContext( mSession, newName );
-
-	GDatabaseManager->PostDatabsaseRequest( context );
-	*/
-
-}
-
-void Player::ResponseCreatePlayerData( const wchar_t* generatedName )
-{
-	wprintf_s( L"NAME[%s] Player Created\n", generatedName );
-}
-
-void Player::TestDeletePlayerData(int playerId)
-{
-	/*
-	DeletePlayerDataContext* context = new DeletePlayerDataContext( mSession, playerId );
-	GDatabaseManager->PostDatabsaseRequest( context );
-	*/
-}
-
-void Player::ResponseDeletePlayerData( int playerId )
-{
-	wprintf_s( L"ID[%d] Player Delete\n", playerId );
-}
-
-
-
