@@ -66,6 +66,8 @@ void PacketHandler::InputPacketJunction( ClientSession* currSession )
 				break;
 			}
 //			printf_s( "PKT_CS_LOGIN \n" );
+
+			
 			/*
 			int id = message.playerid();
 			printf_s( "Login Success! Player Id: %d \n", id );

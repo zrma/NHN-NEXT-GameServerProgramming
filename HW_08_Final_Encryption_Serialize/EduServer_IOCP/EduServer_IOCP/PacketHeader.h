@@ -14,6 +14,8 @@ struct MessageHeader
 };
 
 const int MessageHeaderSize = sizeof( MessageHeader );
+
+//프로토버프 설정용인데 이거 없어도 빌드가 되네
 /*
 #ifndef _ITERATOR_DEBUG_LEVEL
 #define _ITERATOR_DEBUG_LEVEL 0

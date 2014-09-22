@@ -121,10 +121,10 @@ void IOThread::DoIocpJob()
 
 	case IO_RECV:
 		remote->RecvCompletion(dwTransferred);
-	
+		/*
 		/// for test
 		remote->EchoBack();
-		
+		*/
 		completionOk = remote->PreRecv();
 
 		break;
