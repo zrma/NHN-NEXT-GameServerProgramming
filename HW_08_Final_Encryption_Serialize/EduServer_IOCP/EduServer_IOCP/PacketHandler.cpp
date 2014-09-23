@@ -108,7 +108,7 @@ REGISTER_HANDLER( PKT_CS_CRYPT )
 	}
 
 	//실제 작업 진행
-	
+	printf_s( "암호화 진행! \n" );
 }
 
 REGISTER_HANDLER( PKT_CS_LOGIN )

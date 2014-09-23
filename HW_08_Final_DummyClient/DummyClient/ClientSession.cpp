@@ -207,6 +207,8 @@ void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 	memcpy( mKeyBlob, keySet.keyblob().c_str(), sizeof( BYTE ) * 8 );
 	mReceiveKeySet.pbKeyBlob = mKeyBlob;
 
+	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
+
 	mIsEncrypt = true;
 }
 
