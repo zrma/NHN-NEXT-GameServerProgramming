@@ -248,3 +248,34 @@ void Session::EchoBack()
 
 }
 
+bool Session::SendRequest( short packetType, const google::protobuf::MessageLite& payload )
+{
+	TRACE_THIS;
+
+	if ( !IsConnected() )
+		return false;
+
+	FastSpinlockGuard criticalSection( mSendBufferLock );
+
+	int totalSize = payload.ByteSize() + HEADER_SIZE;
+	if ( mSendBuffer.GetFreeSpaceSize() < (size_t)( totalSize ) )
+		return false;
+
+	google::protobuf::io::ArrayOutputStream arrayOutputStream( mSendBuffer.GetBuffer(), totalSize );
+	google::protobuf::io::CodedOutputStream codedOutputStream( &arrayOutputStream );
+
+	PacketHeader packetheader;
+	packetheader.mSize = payload.ByteSize();
+	packetheader.mType = packetType;
+
+	codedOutputStream.WriteRaw( &packetheader, HEADER_SIZE );
+	payload.SerializeToCodedStream( &codedOutputStream );
+
+	/// flush later...
+	LSendRequestSessionList->push_back( this );
+
+	mSendBuffer.Commit( totalSize );
+
+	return true;
+}
+

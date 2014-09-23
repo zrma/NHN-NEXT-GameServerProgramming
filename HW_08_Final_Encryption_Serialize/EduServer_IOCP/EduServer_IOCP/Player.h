@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "ContentsConfig.h"
+#include "mypacket.pb.h"
 
 
 class ClientSession;
@@ -14,7 +15,7 @@ public:
 	int GetPlayerID() { return mPlayerId; }
 	
 	void RequestLogin( int pid );
-	void ResponseLogin( int pid, float x, float y, float z, const char* name);
+	void ResponseLogin( MyPacket::LoginResult& result);
 
 	void RequestUpdatePosition( float x, float y, float z );
 	void ResponseUpdatePosition( float x, float y, float z );

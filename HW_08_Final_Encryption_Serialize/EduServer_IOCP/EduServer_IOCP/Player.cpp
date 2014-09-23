@@ -21,6 +21,26 @@ void Player::PlayerReset()
 	mPosX = mPosY = mPosZ = 0;
 }
 
+void Player::RequestLogin( int pid )
+{
+	if ( mPlayerId != -1 )
+	{
+		//중복 로그인
+		CRASH_ASSERT( false );
+
+		printf_s( "this session already logged in \n" );
+	}
+
+	mPlayerId = pid;
+}
+
+void Player::ResponseLogin( MyPacket::LoginResult& result )
+{
+	int nameTag = 0;
+
+}
+
+
 
 
 

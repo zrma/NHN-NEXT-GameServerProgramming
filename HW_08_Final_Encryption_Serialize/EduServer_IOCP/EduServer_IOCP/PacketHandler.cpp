@@ -108,7 +108,7 @@ REGISTER_HANDLER( PKT_CS_CRYPT )
 	}
 
 	//실제 작업 진행
-
+	
 }
 
 REGISTER_HANDLER( PKT_CS_LOGIN )
@@ -120,7 +120,9 @@ REGISTER_HANDLER( PKT_CS_LOGIN )
 		return;
 	}
 
-	
+	session->mPlayer.RequestLogin( loginRequest.playerid() );
+
+	LoginResult loginResult;
 
 }
 
