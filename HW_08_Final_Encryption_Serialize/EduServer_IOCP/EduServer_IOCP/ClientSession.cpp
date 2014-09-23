@@ -157,8 +157,6 @@ void ClientSession::AcceptCompletion()
 	mPlayer.ResponseDeletePlayerData( id++ );
 	*/
 	//DB out
-
-	KeyInit();
 }
 
 

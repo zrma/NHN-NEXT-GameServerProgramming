@@ -103,7 +103,7 @@ void IOThread::DoIocpJob()
 			session->RecvCompletion( dwTransferred );
 
 			// 일단 테스트용 에코!
-			session->EchoBack();
+			// session->EchoBack();
 
 			completionOk = session->PreRecv();
 
