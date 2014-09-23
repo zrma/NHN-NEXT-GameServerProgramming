@@ -209,6 +209,9 @@ void Session::RecvCompletion(DWORD transferred)
 	TRACE_THIS;
 
 	mRecvBuffer.Commit(transferred);
+
+	//받고서 바로 패킷 처리 작업 진행
+	OnReceive( transferred );
 }
 
 

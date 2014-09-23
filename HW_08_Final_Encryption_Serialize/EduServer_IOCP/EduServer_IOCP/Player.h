@@ -1,9 +1,10 @@
 ﻿#pragma once
 #include "ContentsConfig.h"
 
+
 class ClientSession;
 
-class Player
+class Player 
 {
 public:
 	Player(ClientSession* session);

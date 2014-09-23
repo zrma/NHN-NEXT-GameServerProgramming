@@ -165,7 +165,6 @@
     <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="ClientSessionManager.h" />
     <ClInclude Include="OverlappedIOContext.h" />
-    <ClInclude Include="PacketHandler.h" />
     <ClInclude Include="PacketHeader.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="ServerSession.h" />

@@ -26,6 +26,7 @@ public:
 	void AddRef();
 	void ReleaseRef();
 
+	virtual void OnReceive( size_t len ) {}
 	virtual void OnDisconnect(DisconnectReason dr) {}
 	virtual void OnRelease() {}
 

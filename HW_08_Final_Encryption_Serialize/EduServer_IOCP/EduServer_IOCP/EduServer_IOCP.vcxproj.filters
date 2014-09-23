@@ -15,11 +15,11 @@
     <Filter Include="Packet">
       <UniqueIdentifier>{c05d12b5-e5b2-4776-97e7-f838d1101d15}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PacketHandler">
-      <UniqueIdentifier>{15c95cc7-deb6-4d13-a7c7-a6c41151810d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Contents">
       <UniqueIdentifier>{115668e0-47e4-4aaa-9e82-ae4fe5bab85e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PacketHandler">
+      <UniqueIdentifier>{15c95cc7-deb6-4d13-a7c7-a6c41151810d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -83,9 +83,6 @@
     <ClInclude Include="PacketHeader.h">
       <Filter>Packet</Filter>
     </ClInclude>
-    <ClInclude Include="PacketHandler.h">
-      <Filter>PacketHandler</Filter>
-    </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>Contents</Filter>
     </ClInclude>
@@ -142,14 +139,14 @@
     <ClCompile Include="mypacket.pb.cc">
       <Filter>Packet</Filter>
     </ClCompile>
-    <ClCompile Include="PacketHandler.cpp">
-      <Filter>PacketHandler</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Contents</Filter>
     </ClCompile>
     <ClCompile Include="World.cpp">
       <Filter>Contents</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHandler.cpp">
+      <Filter>PacketHandler</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
