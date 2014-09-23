@@ -351,6 +351,19 @@ bool ClientSession::SendRequest( short packetType, const google::protobuf::Messa
 	packetheader.mSize = payload.ByteSize();
 	packetheader.mType = packetType;
 
+	//////////////////////////////////////////////////////////////////////////
+	// 암호화
+	if ( IsEncrypt() )
+	{
+		void* payloadPos = nullptr;
+		int payloadSize = 0;
+
+		codedOutputStream.GetDirectBufferPointer( &payloadPos, &payloadSize );
+		mCrypt.EncryptData( mPrivateKeySet.hSessionKey, (BYTE*)&payloadPos, MessageHeaderSize, (BYTE*)&payloadPos );
+
+		mCrypt.EncryptData( mPrivateKeySet.hSessionKey, (BYTE*)&packetheader, MessageHeaderSize, (BYTE*)&packetheader );
+	}
+		
 	codedOutputStream.WriteRaw( &packetheader, MessageHeaderSize );
 	payload.SerializeToCodedStream( &codedOutputStream );
 	

@@ -79,7 +79,7 @@ void ClientSession::OnRead(size_t len)
 		/// payload 읽기
 		google::protobuf::io::ArrayInputStream payloadArrayStream( payloadPos, packetheader.mSize );
 		google::protobuf::io::CodedInputStream payloadInputStream( &payloadArrayStream );
-				
+
 		/// packet dispatch...
 		HandlerTable[packetheader.mType]( this, packetheader, payloadInputStream );
 
