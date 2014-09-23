@@ -178,3 +178,27 @@ void ClientSession::OnRelease()
 	GClientSessionManager->ReturnClientSession(this);
 }
 
+void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
+{
+	mReceiveKeySet.dwDataLen = keySet.datalen();
+	memcpy( mKeyBlob, keySet.keyblob().c_str(), sizeof( BYTE ) * 8 );
+	mReceiveKeySet.pbKeyBlob = mKeyBlob;
+
+	mIsEncrypt = true;
+}
+
+void ClientSession::KeyInit()
+{
+	mCrypt.GenerateKey( &mPrivateKeySet, &mServerSendKeySet );
+}
+
+DWORD ClientSession::GetKeyDataLen()
+{
+	return mServerSendKeySet.dwDataLen;
+}
+
+char* ClientSession::GetKeyBlob()
+{
+	return (char*)mServerSendKeySet.pbKeyBlob;
+}
+

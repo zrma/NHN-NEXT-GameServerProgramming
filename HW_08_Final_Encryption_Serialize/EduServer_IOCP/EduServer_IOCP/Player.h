@@ -14,6 +14,9 @@ public:
 	bool IsLoaded() { return mPlayerId > 0; }
 	int GetPlayerID() { return mPlayerId; }
 	
+	void RequestCrypt( MyPacket::CryptRequest cryptRequest );
+	void ResponseCrypt();
+
 	void RequestLogin( MyPacket::LoginRequest loginRequest );
 	void ResponseLogin();
 

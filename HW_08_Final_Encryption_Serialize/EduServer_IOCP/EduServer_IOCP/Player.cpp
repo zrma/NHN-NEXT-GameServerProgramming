@@ -21,6 +21,28 @@ void Player::PlayerReset()
 	mPosX = mPosY = mPosZ = 0;
 }
 
+void Player::RequestCrypt( MyPacket::CryptRequest cryptRequest )
+{
+	mSession->KeyInit();
+
+	MyPacket::SendingKeySet keySet = cryptRequest.sendkey();
+	mSession->SetReceiveKeySet( keySet );
+
+	ResponseCrypt();
+}
+
+void Player::ResponseCrypt()
+{
+	MyPacket::CryptResult cryptResult;
+	MyPacket::SendingKeySet* sendKey = new MyPacket::SendingKeySet;
+
+	cryptResult.mutable_sendkey()->set_datalen(mSession->GetKeyDataLen());
+	cryptResult.mutable_sendkey()->set_keyblob( mSession->GetKeyBlob() );
+
+	//mSession->SendRequest( MyPacket::PKT_SC_CRYPT, cryptResult );
+}
+
+
 void Player::RequestLogin( MyPacket::LoginRequest loginRequest )
 {
 	if ( mPlayerId != -1 )
@@ -58,6 +80,7 @@ void Player::ResponseLogin()
 	loginResult.mutable_playerpos()->set_z( mPosZ );
 
 	mSession->SendRequest( MyPacket::PKT_SC_LOGIN, loginResult );
+	++nameTag;
 }
 
 void Player::RequestUpdatePosition( MyPacket::MoveRequest moveRequest )
@@ -103,6 +126,9 @@ void Player::ResponseChat()
 
 	mSession->SendRequest( MyPacket::PKT_SC_CHAT, chatResult );
 }
+
+
+
 
 
 
