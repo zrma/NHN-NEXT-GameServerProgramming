@@ -86,7 +86,7 @@ void Player::ResponseLogin()
 	loginResult.mutable_playerpos()->set_z( mPosZ );
 
 	//암호화
-	mSession->CryptAction( (BYTE*)&loginResult, sizeof( loginResult ), (BYTE*)&loginResult );
+	//mSession->CryptAction( (BYTE*)&loginResult, sizeof( loginResult ), (BYTE*)&loginResult );
 
 	mSession->SendRequest( MyPacket::PKT_SC_LOGIN, loginResult );
 	++nameTag;
@@ -118,7 +118,7 @@ void Player::ResponseUpdatePosition()
 	moveResult.mutable_playerpos()->set_y( mPosY );
 	moveResult.mutable_playerpos()->set_z( mPosZ );
 
-	mSession->CryptAction( (BYTE*)&moveResult, sizeof( moveResult ), (BYTE*)&moveResult );
+	//mSession->CryptAction( (BYTE*)&moveResult, sizeof( moveResult ), (BYTE*)&moveResult );
 
 	mSession->SendRequest( MyPacket::PKT_SC_MOVE, moveResult );
 }
@@ -147,7 +147,7 @@ void Player::ResponseChat()
 	//아직 영역 관련 코드가 없네
 	//그래서 테스트로 자신에게 리턴하는 것
 
-	mSession->CryptAction( (BYTE*)&chatResult, sizeof( chatResult ), (BYTE*)&chatResult );
+	//mSession->CryptAction( (BYTE*)&chatResult, sizeof( chatResult ), (BYTE*)&chatResult );
 
 	mSession->SendRequest( MyPacket::PKT_SC_CHAT, chatResult );
 }

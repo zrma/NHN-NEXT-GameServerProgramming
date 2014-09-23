@@ -163,6 +163,9 @@ bool Session::FlushSend()
 	sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
 	sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
 
+
+
+
 	/// start async send
 	if (SOCKET_ERROR == WSASend(mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL))
 	{
@@ -246,66 +249,5 @@ void Session::EchoBack()
 
 	mRecvBuffer.Remove(len);
 
-}
-
-bool Session::SendRequest( short packetType, const google::protobuf::MessageLite& payload )
-{
-	TRACE_THIS;
-
-	if ( !IsConnected() )
-		return false;
-
-	FastSpinlockGuard criticalSection( mSendBufferLock );
-
-	int totalSize = payload.ByteSize() + HEADER_SIZE;
-	if ( mSendBuffer.GetFreeSpaceSize() < (size_t)( totalSize ) )
-		return false;
-
-	google::protobuf::io::ArrayOutputStream arrayOutputStream( mSendBuffer.GetBuffer(), totalSize );
-	google::protobuf::io::CodedOutputStream codedOutputStream( &arrayOutputStream );
-
-	PacketHeader packetheader;
-	packetheader.mSize = payload.ByteSize();
-	packetheader.mType = packetType;
-
-	codedOutputStream.WriteRaw( &packetheader, HEADER_SIZE );
-	payload.SerializeToCodedStream( &codedOutputStream );
-
-	mSendBuffer.Commit( totalSize );
-
-	if (packetType == MyPacket::PKT_SC_CRYPT)
-	{
-		OverlappedSendContext* sendContext = new OverlappedSendContext( this );
-
-		DWORD sendbytes = 0;
-		DWORD flags = 0;
-		sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
-		sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
-
-		
-
-		/// start async send
-		if ( SOCKET_ERROR == WSASend( mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL ) )
-		{
-			if ( WSAGetLastError() != WSA_IO_PENDING )
-			{
-				DeleteIoContext( sendContext );
-				printf_s( "Session::FlushSend Error : %d\n", GetLastError() );
-
-				DisconnectRequest( DR_SENDFLUSH_ERROR );
-				return true;
-			}
-
-		}
-
-		mSendPendingCount++;
-	}
-	else
-	{
-		/// flush later...
-		LSendRequestSessionList->push_back( this );
-	}
-
-	return true;
 }
 

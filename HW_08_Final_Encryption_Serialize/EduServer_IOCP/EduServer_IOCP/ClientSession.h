@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "KeyChanger.h"
 #include "mypacket.pb.h"
+#include "PacketHeader.h"
 
 class ClientSessionManager;
 class Player;
@@ -19,6 +20,7 @@ public:
 	bool PostAccept();
 	void AcceptCompletion();
 	
+	virtual bool SendRequest( short packetType, const google::protobuf::MessageLite& payload );
 	virtual void OnReceive( size_t len );
 	virtual void OnDisconnect(DisconnectReason dr);
 	virtual void OnRelease();

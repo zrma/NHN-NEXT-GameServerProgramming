@@ -20,8 +20,6 @@ public:
 	bool PostSend(const char* data, size_t len);
 	bool FlushSend() ;
 
-	bool SendRequest( short packetType, const google::protobuf::MessageLite& payload );
-
 	void DisconnectCompletion(DisconnectReason dr) ;
 	void SendCompletion(DWORD transferred) ;
 	void RecvCompletion(DWORD transferred) ;
@@ -29,6 +27,7 @@ public:
 	void AddRef();
 	void ReleaseRef();
 
+	virtual bool SendRequest( short packetType, const google::protobuf::MessageLite& payload );
 	virtual void OnReceive( size_t len ) {}
 	virtual void OnDisconnect(DisconnectReason dr) {}
 	virtual void OnRelease() {}
