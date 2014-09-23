@@ -68,7 +68,7 @@ void ClientSession::OnRead(size_t len)
 		/// payload 읽기
 		google::protobuf::io::ArrayInputStream payloadArrayStream( payloadPos, packetheader.mSize );
 		google::protobuf::io::CodedInputStream payloadInputStream( &payloadArrayStream );
-
+		
 		/// packet dispatch...
 		HandlerTable[packetheader.mType]( this, packetheader, payloadInputStream );
 
@@ -99,6 +99,8 @@ REGISTER_HANDLER( PKT_SC_CRYPT )
 
 	MyPacket::SendingKeySet keySet = inPacket.sendkey();
 	session->SetReceiveKeySet( keySet );
+
+	printf_s( "서버의 키를 받음 \n" );
 
 	// 대략 100~9100번의 아이디로 로그인을 시도 해 보자
 	session->mPlayer->RequestLogin( rand() % 9000 + 100 );

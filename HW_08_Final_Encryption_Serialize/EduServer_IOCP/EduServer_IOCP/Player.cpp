@@ -51,8 +51,6 @@ void Player::ResponseCrypt()
 	cryptResult.mutable_sendkey()->set_keyblob6( key[6] );
 	cryptResult.mutable_sendkey()->set_keyblob7( key[7] );
 
-	printf_s( "쏘는 키는 %d 라호! \n", *mSession->GetKeyBlob() );
-	
 	// printf_s( "Crypting_1 \n" );
 
 	mSession->SendRequest( MyPacket::PKT_SC_CRYPT, cryptResult );

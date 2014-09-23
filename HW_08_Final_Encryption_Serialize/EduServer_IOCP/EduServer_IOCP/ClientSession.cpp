@@ -13,13 +13,6 @@
 ClientSession::ClientSession(): Session( CLIENT_BUFSIZE, CLIENT_BUFSIZE ), mPlayer( this )
 {
 	memset(&mClientAddr, 0, sizeof(SOCKADDR_IN));
-	/*
-	memset( &mCrypt, 0, sizeof( KeyChanger ) );
-	memset( &mPrivateKeySet, 0, sizeof( KeyPrivateSets ) );
-	memset( &mReceiveKeySet, 0, sizeof( KeySendingSets ) );
-	memset( &mServerSendKeySet, 0, sizeof( KeySendingSets ) );
-	//memset( mKeyBlob, 0, sizeof( BYTE ) * 8 );
-	*/
 }
 
 ClientSession::~ClientSession()
@@ -164,6 +157,8 @@ void ClientSession::AcceptCompletion()
 	mPlayer.ResponseDeletePlayerData( id++ );
 	*/
 	//DB out
+
+	KeyInit();
 }
 
 
@@ -240,7 +235,6 @@ bool ClientSession::SendRequest( short packetType, const google::protobuf::Messa
 	}
 	else
 	{
-
 		/// flush later...
 		LSendRequestSessionList->push_back( this );
 	}

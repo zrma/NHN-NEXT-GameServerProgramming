@@ -227,8 +227,6 @@ void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 
 	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
 
-	printf_s( "받은 키는 %d 라호! \n", *mReceiveKeySet.pbKeyBlob );
-	
 	mIsEncrypt = true;
 }
 
@@ -385,11 +383,39 @@ bool ClientSession::SendRequest( short packetType, const google::protobuf::Messa
 			
 	codedOutputStream.WriteRaw( &packetheader, MessageHeaderSize );
 	payload.SerializeToCodedStream( &codedOutputStream );
-	
-	/// flush later...
-	LSendRequestSessionList->push_back( this );
-
+		
 	mSendBuffer.Commit( totalSize );
+
+	if ( packetType == MyPacket::PKT_CS_CRYPT )
+	{
+		OverlappedSendContext* sendContext = new OverlappedSendContext( this );
+
+		DWORD sendbytes = 0;
+		DWORD flags = 0;
+		sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
+		sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
+
+		/// start async send
+		if ( SOCKET_ERROR == WSASend( mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL ) )
+		{
+			if ( WSAGetLastError() != WSA_IO_PENDING )
+			{
+				DeleteIoContext( sendContext );
+				printf_s( "Session::FlushSend Error : %d\n", GetLastError() );
+
+				DisconnectRequest( DR_SENDFLUSH_ERROR );
+				return true;
+			}
+
+		}
+
+		mSendPendingCount++;
+	}
+	else
+	{
+		/// flush later...
+		LSendRequestSessionList->push_back( this );
+	}
 
 	return true;
 }
@@ -427,9 +453,9 @@ bool ClientSession::FlushSend()
 	sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
 	sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
 
-	if ( IsEncrypt() )
-		if ( !mCrypt.EncryptData( mPrivateKeySet.hSessionKey, (BYTE*)sendContext->mWsaBuf.buf, sendContext->mWsaBuf.len, (BYTE*)sendContext->mWsaBuf.buf ) )
-			printf_s( "FlushSend - Encrypt failed error \n" );
+	// if ( IsEncrypt() )
+	if ( !mCrypt.EncryptData( mPrivateKeySet.hSessionKey, (BYTE*)sendContext->mWsaBuf.buf, sendContext->mWsaBuf.len, (BYTE*)sendContext->mWsaBuf.buf ) )
+		printf_s( "FlushSend - Encrypt failed error \n" );
 	
 	/// start async send
 	if ( SOCKET_ERROR == WSASend( mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL ) )

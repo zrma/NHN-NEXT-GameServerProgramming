@@ -25,7 +25,11 @@ void Player::RequestLogin( int pid )
 	MyPacket::LoginRequest loginRequest;
 	loginRequest.set_playerid( pid );
 
+	printf_s( "로그인 시도! \n" );
+
 	mSession->SendRequest( MyPacket::PKT_CS_LOGIN, loginRequest );
+
+	printf_s( "로그인 성공! \n" );
 }
 
 void Player::ResponseLogin( MyPacket::LoginResult& loginResult )
