@@ -28,17 +28,19 @@ void Player::RequestCrypt( MyPacket::CryptRequest cryptRequest )
 	MyPacket::SendingKeySet keySet = cryptRequest.sendkey();
 	mSession->SetReceiveKeySet( keySet );
 
+	printf_s( "Crypting" );
+
 	ResponseCrypt();
 }
 
 void Player::ResponseCrypt()
 {
 	MyPacket::CryptResult cryptResult;
-	MyPacket::SendingKeySet* sendKey = new MyPacket::SendingKeySet;
 
 	cryptResult.mutable_sendkey()->set_datalen(mSession->GetKeyDataLen());
 	cryptResult.mutable_sendkey()->set_keyblob( mSession->GetKeyBlob() );
 
+	printf_s( "Crypting_1" );
 	mSession->SendRequest( MyPacket::PKT_SC_CRYPT, cryptResult );
 }
 
@@ -60,6 +62,7 @@ void Player::RequestLogin( MyPacket::LoginRequest loginRequest )
 	}
 
 	mPlayerId = loginRequest.playerid();
+	printf_s( "Login!!" );
 
 	ResponseLogin();
 }

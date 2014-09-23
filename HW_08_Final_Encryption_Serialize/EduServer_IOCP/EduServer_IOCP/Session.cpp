@@ -15,6 +15,13 @@ Session::Session(size_t sendBufSize, size_t recvBufSize)
 : mSendBuffer(sendBufSize), mRecvBuffer(recvBufSize), mConnected(0), mRefCount(0), mSendPendingCount(0)
 {
 	mSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+
+	memset( &mCrypt, 0, sizeof( KeyChanger ) );
+	memset( &mPrivateKeySet, 0, sizeof( KeyPrivateSets ) );
+	memset( &mReceiveKeySet, 0, sizeof( KeySendingSets ) );
+	memset( &mServerSendKeySet, 0, sizeof( KeySendingSets ) );
+	memset( mKeyBlob, 0, sizeof( mKeyBlob ) );
+	
 }
 
 
@@ -163,8 +170,8 @@ bool Session::FlushSend()
 	sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
 	sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
 
-
-
+	//암호화
+	CryptAction( (BYTE*)sendContext->mWsaBuf.buf, sendContext->mWsaBuf.len, (BYTE*)sendContext->mWsaBuf.buf );
 
 	/// start async send
 	if (SOCKET_ERROR == WSASend(mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL))
@@ -213,6 +220,9 @@ void Session::RecvCompletion(DWORD transferred)
 
 	mRecvBuffer.Commit(transferred);
 
+	//암호 해제 구간
+	this->DecryptAction( (BYTE*)mRecvBuffer.GetBufferStart(), transferred );
+	
 	//받고서 바로 패킷 처리 작업 진행
 	OnReceive( transferred );
 }
@@ -251,3 +261,46 @@ void Session::EchoBack()
 
 }
 
+void Session::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
+{
+	mReceiveKeySet.dwDataLen = keySet.datalen();
+	memcpy( mKeyBlob, keySet.keyblob().c_str(), sizeof( BYTE ) * 8 );
+	mReceiveKeySet.pbKeyBlob = mKeyBlob;
+
+	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
+
+	mIsEncrypt = true;
+}
+
+void Session::KeyInit()
+{
+	mCrypt.GenerateKey( &mPrivateKeySet, &mServerSendKeySet );
+}
+
+DWORD Session::GetKeyDataLen()
+{
+	return mServerSendKeySet.dwDataLen;
+}
+
+char* Session::GetKeyBlob()
+{
+	return (char*)mServerSendKeySet.pbKeyBlob;
+}
+
+void Session::CryptAction( BYTE* original, int originalSize, BYTE* crypted )
+{
+	if ( IsEncrypt() )
+	{
+		if ( !mCrypt.EncryptData( mPrivateKeySet.hSessionKey, original, originalSize, crypted ) )
+		{
+			printf_s( "Encrypt failed error \n" );
+		}
+	}
+}
+
+void Session::DecryptAction( BYTE* crypted, int crypedSize )
+{
+	if ( IsEncrypt() )
+		if ( !mCrypt.DecryptData( mPrivateKeySet.hSessionKey, crypted, crypedSize ) )
+			printf_s( "decrypt failed error \n" );
+}

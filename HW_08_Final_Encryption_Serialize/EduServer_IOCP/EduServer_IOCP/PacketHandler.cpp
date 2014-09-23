@@ -52,8 +52,7 @@ void ClientSession::OnReceive( size_t len )
 {
 	TRACE_THIS;
 
-	//암호 해제 구간
-	this->DecryptAction( (BYTE*)mRecvBuffer.GetBufferStart(), len );
+	
 
 	google::protobuf::io::ArrayInputStream arrayInputStream( mRecvBuffer.GetBufferStart(), mRecvBuffer.GetContiguiousBytes() );
 	google::protobuf::io::CodedInputStream codedInputStream( &arrayInputStream );

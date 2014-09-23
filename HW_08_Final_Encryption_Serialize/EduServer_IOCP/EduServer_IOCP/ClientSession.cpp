@@ -13,6 +13,13 @@
 ClientSession::ClientSession(): Session( CLIENT_BUFSIZE, CLIENT_BUFSIZE ), mPlayer( this )
 {
 	memset(&mClientAddr, 0, sizeof(SOCKADDR_IN));
+	/*
+	memset( &mCrypt, 0, sizeof( KeyChanger ) );
+	memset( &mPrivateKeySet, 0, sizeof( KeyPrivateSets ) );
+	memset( &mReceiveKeySet, 0, sizeof( KeySendingSets ) );
+	memset( &mServerSendKeySet, 0, sizeof( KeySendingSets ) );
+	//memset( mKeyBlob, 0, sizeof( BYTE ) * 8 );
+	*/
 }
 
 ClientSession::~ClientSession()
@@ -179,50 +186,6 @@ void ClientSession::OnRelease()
 	GClientSessionManager->ReturnClientSession(this);
 }
 
-void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
-{
-	mReceiveKeySet.dwDataLen = keySet.datalen();
-	memcpy( mKeyBlob, keySet.keyblob().c_str(), sizeof( BYTE ) * 8 );
-	mReceiveKeySet.pbKeyBlob = mKeyBlob;
-
-	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
-
-	mIsEncrypt = true;
-}
-
-void ClientSession::KeyInit()
-{
-	mCrypt.GenerateKey( &mPrivateKeySet, &mServerSendKeySet );
-}
-
-DWORD ClientSession::GetKeyDataLen()
-{
-	return mServerSendKeySet.dwDataLen;
-}
-
-char* ClientSession::GetKeyBlob()
-{
-	return (char*)mServerSendKeySet.pbKeyBlob;
-}
-
-void ClientSession::CryptAction( BYTE* original, int originalSize, BYTE* crypted )
-{
-	if (IsEncrypt())
-	{
-		if (!mCrypt.EncryptData(mPrivateKeySet.hSessionKey, original, originalSize, crypted))
-		{
-			printf_s( "Encrypt failed error \n" );
-		}
-	}
-}
-
-void ClientSession::DecryptAction( BYTE* crypted, int crypedSize )
-{
-	if ( IsEncrypt() )
-		if ( !mCrypt.DecryptData( mPrivateKeySet.hSessionKey,crypted, crypedSize ) )
-			printf_s( "decrypt failed error \n" );
-}
-
 bool ClientSession::SendRequest( short packetType, const google::protobuf::MessageLite& payload )
 {
 	TRACE_THIS;
@@ -258,7 +221,7 @@ bool ClientSession::SendRequest( short packetType, const google::protobuf::Messa
 		sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
 
 
-
+		printf_s( "Crypting_2" );
 		/// start async send
 		if ( SOCKET_ERROR == WSASend( mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL ) )
 		{
@@ -273,11 +236,11 @@ bool ClientSession::SendRequest( short packetType, const google::protobuf::Messa
 
 		}
 
+		printf_s( "Crypting_3" );
 		mSendPendingCount++;
 	}
 	else
 	{
-		CryptAction( (BYTE*)mSendBuffer.GetBufferStart(), totalSize, (BYTE*)mSendBuffer.GetBufferStart() );
 
 		/// flush later...
 		LSendRequestSessionList->push_back( this );
