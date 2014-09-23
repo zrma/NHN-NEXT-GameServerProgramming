@@ -14,14 +14,14 @@ public:
 	bool IsLoaded() { return mPlayerId > 0; }
 	int GetPlayerID() { return mPlayerId; }
 	
-	void RequestLogin( int pid );
-	void ResponseLogin( MyPacket::LoginResult& result);
+	void RequestLogin( MyPacket::LoginRequest loginRequest );
+	void ResponseLogin();
 
-	void RequestUpdatePosition( float x, float y, float z );
-	void ResponseUpdatePosition( float x, float y, float z );
+	void RequestUpdatePosition( MyPacket::MoveRequest moveRequest );
+	void ResponseUpdatePosition();
 
-	void RequestChat( const char* comment );
-	void ResponseChat( const char* name, const char* comment );
+	void RequestChat( MyPacket::ChatRequest chatRequest );
+	void ResponseChat();
 
 
 

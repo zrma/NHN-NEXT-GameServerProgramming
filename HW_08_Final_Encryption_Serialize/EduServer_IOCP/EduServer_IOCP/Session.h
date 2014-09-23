@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "CircularBuffer.h"
 #include "OverlappedIOContext.h"
+#include "PacketHeader.h"
 
 
 class Session
@@ -18,6 +19,8 @@ public:
 
 	bool PostSend(const char* data, size_t len);
 	bool FlushSend() ;
+
+	bool SendRequest( short packetType, const google::protobuf::MessageLite& payload );
 
 	void DisconnectCompletion(DisconnectReason dr) ;
 	void SendCompletion(DWORD transferred) ;

@@ -120,10 +120,8 @@ REGISTER_HANDLER( PKT_CS_LOGIN )
 		return;
 	}
 
-	session->mPlayer.RequestLogin( loginRequest.playerid() );
 
-	LoginResult loginResult;
-
+	session->mPlayer.RequestLogin( loginRequest );
 }
 
 REGISTER_HANDLER( PKT_CS_MOVE )
@@ -134,6 +132,8 @@ REGISTER_HANDLER( PKT_CS_MOVE )
 		session->DisconnectRequest( DR_ACTIVE );
 		return;
 	}
+
+	
 }
 
 REGISTER_HANDLER( PKT_CS_CHAT )
