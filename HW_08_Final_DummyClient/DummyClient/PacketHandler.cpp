@@ -2,7 +2,6 @@
 #include "Log.h"
 #include "ClientSession.h"
 #include "Player.h"
-#include "ProtoHeader.h"
 
 #define PKT_NONE	0
 #define PKT_MAX		1024

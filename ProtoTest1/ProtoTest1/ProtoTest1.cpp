@@ -7,8 +7,13 @@
 #include "google\protobuf\io\coded_stream.h"
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 #include <google/protobuf/text_format.h>
+#include "KeyChanger.h"
 
 #define MAX_BUFFER_SIZE 2048
+
+KeyChanger GKeyChanger;
+KeyPrivateSets GBobPrivateKeySets;
+KeyPrivateSets GAlicePrivateKeySets;
 
 struct MessageHeader
 {
@@ -16,27 +21,45 @@ struct MessageHeader
 	MyPacket::MessageType type;
 };
 
+const int MessageHeaderSize = sizeof( MessageHeader );
 
 void WriteMessageToStream(
 	MyPacket::MessageType msgType,
 	const google::protobuf::MessageLite& message,
 	google::protobuf::io::CodedOutputStream& stream )
-
 {
 	MessageHeader messageHeader;
 	messageHeader.size = message.ByteSize();
 	messageHeader.type = msgType;
+
+	void* payloadPos = nullptr;
+	int payloadSize = 0;
+
+	stream.GetDirectBufferPointer( &payloadPos, &payloadSize );
+	// GKeyChanger.EncryptData( GAlicePrivateKeySets.hSessionKey, (BYTE*)&payloadPos, MessageHeaderSize, (BYTE*)&payloadPos );
+
+	// GKeyChanger.EncryptData( GAlicePrivateKeySets.hSessionKey, (BYTE*)&messageHeader, MessageHeaderSize, (BYTE*)&messageHeader );
+
 	stream.WriteRaw( &messageHeader, sizeof( MessageHeader ) );
 	message.SerializeToCodedStream( &stream );
 }
 
-const int MessageHeaderSize = sizeof( MessageHeader );
-
-
-
-
 int _tmain(int argc, _TCHAR* argv[])
 {
+	//////////////////////////////////////////////////////////////////////////
+	// 逛 = 技记1
+	// 郡府胶 = 技记2
+	KeySendingSets bobSendingKeySets;
+	KeySendingSets aliceSendingKeySets;
+
+	GKeyChanger.GenerateKey( &GBobPrivateKeySets, &bobSendingKeySets );
+	GKeyChanger.GenerateKey( &GAlicePrivateKeySets, &aliceSendingKeySets );
+
+	GKeyChanger.GetSessionKey( &GBobPrivateKeySets, &aliceSendingKeySets );
+	GKeyChanger.GetSessionKey( &GAlicePrivateKeySets, &bobSendingKeySets );
+
+	//////////////////////////////////////////////////////////////////////////
+
 	google::protobuf::uint8 m_SessionBuffer[MAX_BUFFER_SIZE];
 	google::protobuf::io::ArrayOutputStream* m_pArrayOutputStream = new google::protobuf::io::ArrayOutputStream( m_SessionBuffer, MAX_BUFFER_SIZE );
 	google::protobuf::io::CodedOutputStream* m_pCodedOutputStream = new google::protobuf::io::CodedOutputStream( m_pArrayOutputStream );
@@ -60,18 +83,17 @@ int _tmain(int argc, _TCHAR* argv[])
 	loginResult.mutable_playerpos()->set_z( 3.0f );
 
 	WriteMessageToStream( MyPacket::MessageType::PKT_SC_LOGIN, loginResult, *m_pCodedOutputStream );
-
-
+	
 
 	//////////////////////////////////////////////////////////////////////////
 
+	google::protobuf::io::ArrayInputStream arrayInputStream( m_SessionBuffer, sizeof( m_SessionBuffer ) );
+	google::protobuf::io::CodedInputStream codedInputStream( &arrayInputStream );
+
 	MessageHeader messageHeader;
-	memcpy( &messageHeader, m_SessionBuffer, MessageHeaderSize );
-	
+	codedInputStream.ReadRaw( &messageHeader, MessageHeaderSize );
 
-
-	google::protobuf::io::ArrayInputStream payloadArrayStream( m_SessionBuffer, messageHeader.size + MessageHeaderSize );
-	payloadArrayStream.Skip( MessageHeaderSize );
+	// GKeyChanger.DecryptData( GBobPrivateKeySets.hSessionKey, (BYTE*)( &messageHeader ), MessageHeaderSize );
 
 	switch ( messageHeader.type )
 	{
@@ -90,10 +112,20 @@ int _tmain(int argc, _TCHAR* argv[])
 		case MyPacket::MessageType::PKT_SC_LOGIN:
 		{
 			printf_s( "PKT_SC_LOGIN \n" );
+			
+			const void* payloadPos = nullptr;
+			int payloadSize = 0;
 
+			codedInputStream.GetDirectBufferPointer( &payloadPos, &payloadSize );
+
+			// GKeyChanger.DecryptData( GBobPrivateKeySets.hSessionKey, (BYTE*)( &payloadPos ), messageHeader.size );
+
+			// payload 佬扁
+			google::protobuf::io::ArrayInputStream payloadArrayStream( payloadPos, messageHeader.size );
+			google::protobuf::io::CodedInputStream payloadInputStream( &payloadArrayStream );
 
 			MyPacket::LoginResult message;
-			if ( false == message.ParseFromZeroCopyStream( &payloadArrayStream ) )
+			if ( false == message.ParseFromCodedStream( &payloadInputStream ) )
 			{
 				break;
 			}
@@ -108,9 +140,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			printf_s( "ID:%d Name:%s [%f][%f][%f] \n", id, name.c_str(), x, y, z );
 			break;
 		}
-
-
-
+			
 			
 		case MyPacket::MessageType::PKT_SC_CHAT:
 			printf_s( "PKT_SC_CHAT \n" );
