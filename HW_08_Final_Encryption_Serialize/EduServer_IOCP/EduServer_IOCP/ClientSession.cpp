@@ -184,6 +184,8 @@ void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 	memcpy( mKeyBlob, keySet.keyblob().c_str(), sizeof( BYTE ) * 8 );
 	mReceiveKeySet.pbKeyBlob = mKeyBlob;
 
+	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
+
 	mIsEncrypt = true;
 }
 
@@ -200,5 +202,23 @@ DWORD ClientSession::GetKeyDataLen()
 char* ClientSession::GetKeyBlob()
 {
 	return (char*)mServerSendKeySet.pbKeyBlob;
+}
+
+void ClientSession::CryptAction( BYTE* original, int originalSize, BYTE* crypted )
+{
+	if (IsEncrypt())
+	{
+		if (!mCrypt.EncryptData(mPrivateKeySet.hSessionKey, original, originalSize, crypted))
+		{
+			printf_s( "Encrypt failed error \n" );
+		}
+	}
+}
+
+void ClientSession::DecryptAction( BYTE* crypted, int crypedSize )
+{
+	if ( IsEncrypt() )
+		if ( !mCrypt.DecryptData( mPrivateKeySet.hSessionKey,crypted, crypedSize ) )
+			printf_s( "decrypt failed error \n" );
 }
 

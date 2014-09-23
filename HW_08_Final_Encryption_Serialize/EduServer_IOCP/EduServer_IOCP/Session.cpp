@@ -282,6 +282,8 @@ bool Session::SendRequest( short packetType, const google::protobuf::MessageLite
 		sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
 		sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
 
+		
+
 		/// start async send
 		if ( SOCKET_ERROR == WSASend( mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL ) )
 		{
