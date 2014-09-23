@@ -191,7 +191,6 @@ void ClientSession::ConnectCompletion()
 	mCrypt.GenerateKey( &mPrivateKeySet, &mCliSendKeySet );
 	
 	MyPacket::CryptRequest cryptRequest;
-	MyPacket::SendingKeySet* sendKey = new MyPacket::SendingKeySet;
 	
 	cryptRequest.mutable_sendkey()->set_datalen( mCliSendKeySet.dwDataLen );
 	cryptRequest.mutable_sendkey()->set_keyblob( (char*)mCliSendKeySet.pbKeyBlob );
