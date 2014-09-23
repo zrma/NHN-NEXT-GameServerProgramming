@@ -7,20 +7,13 @@
 #define PKT_NONE	0
 #define PKT_MAX		1024
 
-#define PKT_SC_CRYPT	MyPacket::MessageType::PKT_SC_CRYPT
-#define PKT_SC_LOGIN	MyPacket::MessageType::PKT_SC_LOGIN
-#define PKT_SC_CHAT		MyPacket::MessageType::PKT_SC_CHAT
-#define PKT_SC_MOVE		MyPacket::MessageType::PKT_SC_MOVE
-
-
-typedef void(*HandlerFunc)(ClientSession* session, int size);
+typedef void( *HandlerFunc )( ClientSession* session, MessageHeader& pktBase, google::protobuf::io::CodedInputStream& payloadStream );
 
 static HandlerFunc HandlerTable[PKT_MAX];
 
-static void DefaultHandler(ClientSession* session, int size)
+static void DefaultHandler( ClientSession* session, MessageHeader& pktBase, google::protobuf::io::CodedInputStream& payloadStream )
 {
-	LoggerUtil::EventLog("invalid packet handler", session->mPlayer->GetPlayerId());
-	session->DisconnectRequest(DR_ACTIVE);
+	printf_s( "Default Handler...PKT ID: %d\n", pktBase.type );
 }
 
 struct InitializeHandlers
@@ -41,44 +34,52 @@ struct RegisterHandler
 };
 
 #define REGISTER_HANDLER(PKT_TYPE)	\
-	static void Handler_##PKT_TYPE(ClientSession* session, int size); \
+	static void Handler_##PKT_TYPE(ClientSession* session, MessageHeader& pktBase, google::protobuf::io::CodedInputStream& payloadStream ); \
 	static RegisterHandler _register_##PKT_TYPE(PKT_TYPE, Handler_##PKT_TYPE); \
-	static void Handler_##PKT_TYPE(ClientSession* session, int size)
+	static void Handler_##PKT_TYPE(ClientSession* session, MessageHeader& pktBase, google::protobuf::io::CodedInputStream& payloadStream )
 
 
 void ClientSession::OnRead(size_t len)
 {
 	/// 패킷 파싱하고 처리
-	while (true)
+	google::protobuf::io::ArrayInputStream arrayInputStream( mRecvBuffer.GetBufferStart(), mRecvBuffer.GetContiguiousBytes() );
+	google::protobuf::io::CodedInputStream codedInputStream( &arrayInputStream );
+
+	MessageHeader packetheader;
+
+	while ( codedInputStream.ReadRaw( &packetheader, MessageHeaderSize ) )
 	{
-		/// 패킷 헤더 크기 만큼 읽어와보기
-		MessageHeader header;
-		
-		if (false == mRecvBuffer.Peek((char*)&header, MessageHeaderSize))
-			return;
-		
-		/// 패킷 완성이 되는가? 
+		const void* payloadPos = nullptr;
+		int payloadSize = 0;
 
-		// 구 교수님 코드와는 다르다!
-		// Easy Server에서는 헤더에 담긴 사이즈 = 패킷 전체 사이즈 였지만
-		// 여기서는 프로토버프의 몸통 사이즈(페이로드)만 담겨 있음
-		if ( mRecvBuffer.GetStoredSize() < header.size - MessageHeaderSize )
-			return;
+		codedInputStream.GetDirectBufferPointer( &payloadPos, &payloadSize );
 		
-
-		if (header.type >= PKT_MAX || header.type <= PKT_NONE)
+		if ( (uint32_t)(payloadSize) < packetheader.size ) ///< 패킷 본체 사이즈 체크
+			break;
+		
+		if ( packetheader.type >= PKT_MAX || packetheader.type <= PKT_NONE )
 		{
 			// 서버에서 보낸 패킷이 이상하다?!
-			LoggerUtil::EventLog("packet type error", mPlayer->GetPlayerId());
-			
-			DisconnectRequest(DR_ACTIVE);
-			return;
+			LoggerUtil::EventLog( "packet type error", mPlayer->GetPlayerId() );
+
+			DisconnectRequest( DR_ACTIVE );
+			break;;
 		}
 
+		/// payload 읽기
+		google::protobuf::io::ArrayInputStream payloadArrayStream( payloadPos, packetheader.size );
+		google::protobuf::io::CodedInputStream payloadInputStream( &payloadArrayStream );
+
 		/// packet dispatch...
-		HandlerTable[header.type](this, header.size);
+		HandlerTable[packetheader.type]( this, packetheader, payloadInputStream );
+
+		/// 읽은 만큼 전진 및 버퍼에서 제거
+		codedInputStream.Skip( packetheader.size ); ///< ReadRaw에서 헤더 크기만큼 미리 전진했기 때문
+		mRecvBuffer.Remove( MessageHeaderSize + packetheader.size );
 	}
 }
+
+using namespace MyPacket;
 
 REGISTER_HANDLER( PKT_SC_CRYPT )
 {
@@ -90,22 +91,12 @@ REGISTER_HANDLER( PKT_SC_CRYPT )
 		return;
 	}
 
-	char* packetTemp = new char[MessageHeaderSize + size];
-
-	if ( false == session->ParsePacket( packetTemp, MessageHeaderSize + size ) )
+	MyPacket::CryptResult inPacket;
+	if ( false == inPacket.ParseFromCodedStream( &payloadStream ) )
 	{
-		LoggerUtil::EventLog( "packet parsing error", PKT_SC_CRYPT );
+		session->DisconnectRequest( DR_ACTIVE );
 		return;
 	}
-
-	// 디시리얼라이즈
-	google::protobuf::io::ArrayInputStream is( packetTemp, MessageHeaderSize + size );
-	is.Skip( MessageHeaderSize );
-
-	MyPacket::CryptResult inPacket;
-	inPacket.ParseFromZeroCopyStream( &is );
-
-	delete packetTemp;
 
 	MyPacket::SendingKeySet keySet = inPacket.sendkey();
 	session->SetReceiveKeySet( keySet );
@@ -113,28 +104,20 @@ REGISTER_HANDLER( PKT_SC_CRYPT )
 
 REGISTER_HANDLER( PKT_SC_LOGIN )
 {
+	//////////////////////////////////////////////////////////////////////////
+	// 서버로부터 정상적으로 로그인 허락을 받은 것이다.
 	if ( !session->IsEncrypt() )
 	{
 		LoggerUtil::EventLog( "uncrypted session error", PKT_SC_LOGIN );
 		return;
 	}
 
-	char* packetTemp = new char[MessageHeaderSize + size];
-
-	if ( false == session->ParsePacket( packetTemp, MessageHeaderSize + size ) )
+	MyPacket::LoginResult inPacket;
+	if ( false == inPacket.ParseFromCodedStream( &payloadStream ) )
 	{
-		LoggerUtil::EventLog( "packet parsing error", PKT_SC_LOGIN );
+		session->DisconnectRequest( DR_ACTIVE );
 		return;
 	}
-
-	// 디시리얼라이즈
-	google::protobuf::io::ArrayInputStream is( packetTemp, MessageHeaderSize + size );
-	is.Skip( MessageHeaderSize );
-
-	MyPacket::LoginResult inPacket;
-	inPacket.ParseFromZeroCopyStream( &is );
-
-	delete packetTemp;
 
 	MyPacket::Position pos = inPacket.playerpos();
 	session->mPlayer->ResponseLogin( inPacket.playerid(), pos.x(), pos.y(), pos.z(),
@@ -151,25 +134,12 @@ REGISTER_HANDLER( PKT_SC_MOVE )
 		return;
 	}
 
-	char* packetTemp = new char[MessageHeaderSize + size];
-
-	if ( false == session->ParsePacket( packetTemp, MessageHeaderSize + size ) )
+	MyPacket::MoveResult inPacket;
+	if ( false == inPacket.ParseFromCodedStream( &payloadStream ) )
 	{
-		LoggerUtil::EventLog( "packet parsing error", PKT_SC_MOVE );
+		session->DisconnectRequest( DR_ACTIVE );
 		return;
 	}
-
-	// 디크립트
-
-
-	// 디시리얼라이즈
-	google::protobuf::io::ArrayInputStream is( packetTemp, MessageHeaderSize + size );
-	is.Skip( MessageHeaderSize );
-
-	MyPacket::MoveResult inPacket;
-	inPacket.ParseFromZeroCopyStream( &is );
-
-	delete packetTemp;
 
 	MyPacket::Position pos = inPacket.playerpos();
 	session->mPlayer->ResponseUpdatePosition( pos.x(), pos.y(), pos.z() );
@@ -179,84 +149,18 @@ REGISTER_HANDLER( PKT_SC_CHAT )
 {
 	//////////////////////////////////////////////////////////////////////////
 	// 누군가 내게 채팅을 했다
-	char* packetTemp = new char[MessageHeaderSize + size];
-		
-	if ( false == session->ParsePacket( packetTemp, MessageHeaderSize + size ) )
+	if ( !session->IsEncrypt() )
 	{
-		LoggerUtil::EventLog( "packet parsing error", PKT_SC_CHAT );
+		LoggerUtil::EventLog( "uncrypted session error", PKT_SC_MOVE );
 		return;
 	}
-	
-	// 디크립트
-
-
-	// 디시리얼라이즈
-	google::protobuf::io::ArrayInputStream is( packetTemp, MessageHeaderSize + size );
-	is.Skip( MessageHeaderSize );
 
 	MyPacket::ChatResult inPacket;
-	inPacket.ParseFromZeroCopyStream( &is );
-
-	delete packetTemp;
+	if ( false == inPacket.ParseFromCodedStream( &payloadStream ) )
+	{
+		session->DisconnectRequest( DR_ACTIVE );
+		return;
+	}
 
 	session->mPlayer->ResponseChat( inPacket.playername().c_str() , inPacket.playermessage().c_str() );
 }
-
-/////////////////////////////////////////////////////////
-// REGISTER_HANDLER(PKT_SC_LOGIN)
-// {
-// 	LoginRequest inPacket;
-// 	if (false == session->ParsePacket(inPacket))
-// 	{
-// 		LoggerUtil::EventLog("packet parsing error", inPacket.mType);
-// 		return;
-// 	}
-// 	
-// 	/// 테스트를 위해 10ms후에 로딩하도록 ㄱㄱ
-// 	DoSyncAfter(10, session->mPlayer, &Player::RequestLoad, inPacket.mPlayerId);
-// 
-// }
-
-// REGISTER_HANDLER(PKT_CS_MOVE)
-// {
-// 	MoveRequest inPacket;
-// 	if (false == session->ParsePacket(inPacket))
-// 	{
-// 		LoggerUtil::EventLog("packet parsing error", inPacket.mType);
-// 		return;
-// 	}
-// 
-// 	if (inPacket.mPlayerId != session->mPlayer->GetPlayerId())
-// 	{
-// 		LoggerUtil::EventLog("PKT_CS_MOVE: invalid player ID", session->mPlayer->GetPlayerId());
-// 		return;
-// 	}
-// 
-// 	/// 지금은 성능 테스트를 위해 DB에 업데이트하고 통보하도록 하자.
-// 	session->mPlayer->DoSync(&Player::RequestUpdatePosition, inPacket.mPosX, inPacket.mPosY, inPacket.mPosZ);
-// }
-
-// REGISTER_HANDLER(PKT_CS_CHAT)
-// {
-// 	ChatBroadcastRequest inPacket;
-// 	if (false == session->ParsePacket(inPacket))
-// 	{
-// 		LoggerUtil::EventLog("packet parsing error", inPacket.mType);
-// 		return;
-// 	}
-// 
-// 	if (inPacket.mPlayerId != session->mPlayer->GetPlayerId())
-// 	{
-// 		LoggerUtil::EventLog("PKT_CS_CHAT: invalid player ID", session->mPlayer->GetPlayerId());
-// 		return;
-// 	}
-// 
-// 	/// chatting의 경우 여기서 바로 방송
-// 	ChatBroadcastResult outPacket;
-// 		
-// 	outPacket.mPlayerId = inPacket.mPlayerId;
-// 	wcscpy_s(outPacket.mChat, inPacket.mChat);
-// 	GBroadcastManager->BroadcastPacket(&outPacket);
-// 	
-// }
-
