@@ -17,7 +17,7 @@ public:
 	void RequestLogin( int pid );
 	void ResponseLogin( int pid, float x, float y, float z, const char* name, bool valid );
 
-	void RequestUpdatePosition( float x, float y, float z );
+	void RequestUpdatePosition();
 	void ResponseUpdatePosition( float x, float y, float z );
 
 	void RequestChat( const char* comment );

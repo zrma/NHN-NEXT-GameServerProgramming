@@ -207,8 +207,6 @@ void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 	memcpy( mKeyBlob, keySet.keyblob().c_str(), sizeof( BYTE ) * 8 );
 	mReceiveKeySet.pbKeyBlob = mKeyBlob;
 
-	// *mReceiveKeySet.pbKeyBlob = (BYTE)(keySet.keyblob().c_str());
-	
 	mIsEncrypt = true;
 }
 

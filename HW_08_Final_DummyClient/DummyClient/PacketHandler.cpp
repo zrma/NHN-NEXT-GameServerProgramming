@@ -99,6 +99,9 @@ REGISTER_HANDLER( PKT_SC_CRYPT )
 
 	MyPacket::SendingKeySet keySet = inPacket.sendkey();
 	session->SetReceiveKeySet( keySet );
+
+	// 대략 100~9100번의 아이디로 로그인을 시도 해 보자
+	session->mPlayer->RequestLogin( rand() % 9000 + 100 );
 }
 
 REGISTER_HANDLER( PKT_SC_LOGIN )
