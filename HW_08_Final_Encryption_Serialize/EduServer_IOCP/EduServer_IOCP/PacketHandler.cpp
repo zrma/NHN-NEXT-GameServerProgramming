@@ -133,7 +133,7 @@ REGISTER_HANDLER( PKT_CS_MOVE )
 		return;
 	}
 
-	
+	session->mPlayer.RequestUpdatePosition( moveRequest );
 }
 
 REGISTER_HANDLER( PKT_CS_CHAT )
@@ -144,4 +144,6 @@ REGISTER_HANDLER( PKT_CS_CHAT )
 		session->DisconnectRequest( DR_ACTIVE );
 		return;
 	}
+
+	session->mPlayer.RequestChat( chatRequest );
 }
