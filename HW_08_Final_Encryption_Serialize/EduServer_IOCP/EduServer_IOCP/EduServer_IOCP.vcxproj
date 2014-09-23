@@ -160,6 +160,7 @@
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FastSpinlock.h" />
     <ClInclude Include="IocpManager.h" />
+    <ClInclude Include="KeyChanger.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="mypacket.pb.h" />
     <ClInclude Include="ObjectPool.h" />
@@ -184,6 +185,7 @@
     <ClCompile Include="FastSpinlock.cpp" />
     <ClCompile Include="IocpManager.cpp" />
     <ClCompile Include="ClientSessionManager.cpp" />
+    <ClCompile Include="KeyChanger.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="mypacket.pb.cc" />
     <ClCompile Include="OverlappedIOContext.cpp" />

@@ -21,6 +21,9 @@
     <Filter Include="PacketHandler">
       <UniqueIdentifier>{15c95cc7-deb6-4d13-a7c7-a6c41151810d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Cryption">
+      <UniqueIdentifier>{25c25869-ca62-4ab7-8eda-f8bc78e3b45c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -89,6 +92,9 @@
     <ClInclude Include="World.h">
       <Filter>Contents</Filter>
     </ClInclude>
+    <ClInclude Include="KeyChanger.h">
+      <Filter>Cryption</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -147,6 +153,9 @@
     </ClCompile>
     <ClCompile Include="PacketHandler.cpp">
       <Filter>PacketHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyChanger.cpp">
+      <Filter>Cryption</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
