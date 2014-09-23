@@ -121,9 +121,7 @@ REGISTER_HANDLER( PKT_SC_LOGIN )
 		return;
 	}
 
-	MyPacket::Position pos = inPacket.playerpos();
-	session->mPlayer->ResponseLogin( inPacket.playerid(), pos.x(), pos.y(), pos.z(),
-									 inPacket.playername().c_str(), true );
+	session->mPlayer->ResponseLogin( inPacket );
 }
 
 REGISTER_HANDLER( PKT_SC_MOVE )
@@ -143,8 +141,7 @@ REGISTER_HANDLER( PKT_SC_MOVE )
 		return;
 	}
 
-	MyPacket::Position pos = inPacket.playerpos();
-	session->mPlayer->ResponseUpdatePosition( pos.x(), pos.y(), pos.z() );
+	session->mPlayer->ResponseUpdatePosition( inPacket );
 }
 
 REGISTER_HANDLER( PKT_SC_CHAT )
@@ -164,5 +161,5 @@ REGISTER_HANDLER( PKT_SC_CHAT )
 		return;
 	}
 
-	session->mPlayer->ResponseChat( inPacket.playername().c_str() , inPacket.playermessage().c_str() );
+	session->mPlayer->ResponseChat( inPacket );
 }

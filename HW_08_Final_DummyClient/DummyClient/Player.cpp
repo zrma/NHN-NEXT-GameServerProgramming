@@ -28,15 +28,21 @@ void Player::RequestLogin( int pid )
 	mSession->SendRequest( MyPacket::PKT_CS_LOGIN, loginRequest );
 }
 
-void Player::ResponseLogin( int pid, float x, float y, float z, const char* name, bool valid )
-{
-	mPlayerId = pid;
-	mPosX = x, mPosY = y, mPosZ = z;
-	strcpy_s( mPlayerName, name );
-	mIsValid = valid;
+void Player::ResponseLogin( MyPacket::LoginResult& loginResult )
+{	
+	mPlayerId = loginResult.playerid();
+
+	MyPacket::Position pos = loginResult.playerpos();
+	mPosX = pos.x();
+	mPosY = pos.y();
+	mPosZ = pos.z();
+
+	strcpy_s( mPlayerName, loginResult.playername().c_str() );
+	mIsValid = true;
 
 	// 로그인 했으면 이동 시작
 	RequestUpdatePosition();
+
 }
 
 void Player::RequestUpdatePosition()
@@ -50,12 +56,15 @@ void Player::RequestUpdatePosition()
 	mSession->SendRequest( MyPacket::PKT_CS_MOVE, moveRequest );
 }
 
-void Player::ResponseUpdatePosition( float x, float y, float z )
+void Player::ResponseUpdatePosition( MyPacket::MoveResult& moveResult )
 {
-	mPosX = x, mPosY = y, mPosZ = z;
-
 	//////////////////////////////////////////////////////////////////////////
 	// 이동이 끝났으면 채팅을 시작하지
+
+	MyPacket::Position pos = moveResult.playerpos();
+	mPosX = pos.x();
+	mPosY = pos.y();
+	mPosZ = pos.z();
 
 	char chatMessage[80];
 	sprintf_s( chatMessage, "Test Chatting Message from %s (%d) ", mPlayerName, mPlayerId );
@@ -72,8 +81,11 @@ void Player::RequestChat( const char* comment )
 	mSession->SendRequest( MyPacket::PKT_CS_CHAT, chatRequest );
 }
 
-void Player::ResponseChat( const char* name, const char* comment )
+void Player::ResponseChat( MyPacket::ChatResult& chatResult )
 {
+	// chatResult.playername().c_str();
+	// chatResult.playermessage().c_str();
+
 	//////////////////////////////////////////////////////////////////////////
 	// 채팅을 받았으면 카운트 해서 100회 초과 되면 접속 종료
 	// 아니면 이동

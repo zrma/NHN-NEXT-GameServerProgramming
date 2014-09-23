@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "ProtoHeader.h"
+
 #define MAX_NAME_LEN	32
 #define MAX_COMMENT_LEN	256
 
@@ -11,21 +13,20 @@ public:
 	Player( ClientSession* session );
 	~Player();
 
-	bool IsValid() { return mPlayerId > 0; }
-	int  GetPlayerId() { return mPlayerId; }
+	bool	IsValid() { return mPlayerId > 0; }
+	int		GetPlayerId() { return mPlayerId; }
 
-	void RequestLogin( int pid );
-	void ResponseLogin( int pid, float x, float y, float z, const char* name, bool valid );
+	void	RequestLogin( int pid );
 
-	void RequestUpdatePosition();
-	void ResponseUpdatePosition( float x, float y, float z );
-
-	void RequestChat( const char* comment );
-	void ResponseChat( const char* name, const char* comment );
+	void	ResponseLogin( MyPacket::LoginResult& loginResult );
+	void	ResponseUpdatePosition( MyPacket::MoveResult& moveResult );
+	void	ResponseChat( MyPacket::ChatResult& chatResult );
 	
 private:
-	void PlayerReset();
-	
+	void	PlayerReset();
+	void	RequestUpdatePosition();
+	void	RequestChat( const char* comment );
+
 private:
 
 	int		mPlayerId;
