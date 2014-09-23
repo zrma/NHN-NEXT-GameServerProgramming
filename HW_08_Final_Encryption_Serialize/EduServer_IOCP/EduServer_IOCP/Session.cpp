@@ -271,10 +271,38 @@ bool Session::SendRequest( short packetType, const google::protobuf::MessageLite
 	codedOutputStream.WriteRaw( &packetheader, HEADER_SIZE );
 	payload.SerializeToCodedStream( &codedOutputStream );
 
-	/// flush later...
-	LSendRequestSessionList->push_back( this );
-
 	mSendBuffer.Commit( totalSize );
+
+	if (packetType == MyPacket::PKT_SC_CRYPT)
+	{
+		OverlappedSendContext* sendContext = new OverlappedSendContext( this );
+
+		DWORD sendbytes = 0;
+		DWORD flags = 0;
+		sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
+		sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
+
+		/// start async send
+		if ( SOCKET_ERROR == WSASend( mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL ) )
+		{
+			if ( WSAGetLastError() != WSA_IO_PENDING )
+			{
+				DeleteIoContext( sendContext );
+				printf_s( "Session::FlushSend Error : %d\n", GetLastError() );
+
+				DisconnectRequest( DR_SENDFLUSH_ERROR );
+				return true;
+			}
+
+		}
+
+		mSendPendingCount++;
+	}
+	else
+	{
+		/// flush later...
+		LSendRequestSessionList->push_back( this );
+	}
 
 	return true;
 }

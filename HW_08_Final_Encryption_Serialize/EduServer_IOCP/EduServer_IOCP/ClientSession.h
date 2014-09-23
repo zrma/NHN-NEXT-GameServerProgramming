@@ -27,6 +27,7 @@ public:
 	DWORD GetKeyDataLen();
 	char* GetKeyBlob();
 	void SetReceiveKeySet( MyPacket::SendingKeySet keySet );
+	bool	IsEncrypt() const { return mIsEncrypt; }
 	
 public:
 	Player			mPlayer;

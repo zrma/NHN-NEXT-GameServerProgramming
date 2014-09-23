@@ -39,12 +39,18 @@ void Player::ResponseCrypt()
 	cryptResult.mutable_sendkey()->set_datalen(mSession->GetKeyDataLen());
 	cryptResult.mutable_sendkey()->set_keyblob( mSession->GetKeyBlob() );
 
-	//mSession->SendRequest( MyPacket::PKT_SC_CRYPT, cryptResult );
+	mSession->SendRequest( MyPacket::PKT_SC_CRYPT, cryptResult );
 }
 
 
 void Player::RequestLogin( MyPacket::LoginRequest loginRequest )
 {
+	if ( !mSession->IsEncrypt() )
+	{
+		printf_s( "uncrypted session error" );
+		return;
+	}
+
 	if ( mPlayerId != -1 )
 	{
 		//이미 사용하고 있는 녀석에게 또 로그인이 시도
@@ -85,6 +91,12 @@ void Player::ResponseLogin()
 
 void Player::RequestUpdatePosition( MyPacket::MoveRequest moveRequest )
 {
+	if ( !mSession->IsEncrypt() )
+	{
+		printf_s( "uncrypted session error" );
+		return;
+	}
+
 	MyPacket::Position pos = moveRequest.playerpos();
 
 	mPosX = pos.x();
@@ -108,6 +120,12 @@ void Player::ResponseUpdatePosition()
 
 void Player::RequestChat( MyPacket::ChatRequest chatRequest )
 {
+	if ( !mSession->IsEncrypt() )
+	{
+		printf_s( "uncrypted session error" );
+		return;
+	}
+
 	mChat = chatRequest.playermessage();
 
 	ResponseChat();
