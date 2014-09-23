@@ -15,15 +15,7 @@ Session::Session(size_t sendBufSize, size_t recvBufSize)
 : mSendBuffer(sendBufSize), mRecvBuffer(recvBufSize), mConnected(0), mRefCount(0), mSendPendingCount(0)
 {
 	mSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
-
-	memset( &mCrypt, 0, sizeof( KeyChanger ) );
-	memset( &mPrivateKeySet, 0, sizeof( KeyPrivateSets ) );
-	memset( &mReceiveKeySet, 0, sizeof( KeySendingSets ) );
-	memset( &mServerSendKeySet, 0, sizeof( KeySendingSets ) );
-	memset( mKeyBlob, 0, sizeof( mKeyBlob ) );
-	
 }
-
 
 
 void Session::DisconnectRequest(DisconnectReason dr)
@@ -274,6 +266,12 @@ void Session::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 
 void Session::KeyInit()
 {
+	memset( &mPrivateKeySet, 0, sizeof( KeyPrivateSets ) );
+	memset( &mReceiveKeySet, 0, sizeof( KeySendingSets ) );
+	memset( &mServerSendKeySet, 0, sizeof( KeySendingSets ) );
+
+	memset( &mKeyBlob, 0, sizeof( BYTE ) * 8 );
+
 	mCrypt.GenerateKey( &mPrivateKeySet, &mServerSendKeySet );
 }
 
