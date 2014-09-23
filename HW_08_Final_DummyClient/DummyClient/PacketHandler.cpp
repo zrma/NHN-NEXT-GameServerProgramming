@@ -46,9 +46,12 @@ void ClientSession::OnRead(size_t len)
 	google::protobuf::io::CodedInputStream codedInputStream( &arrayInputStream );
 
 	MessageHeader packetheader;
-
+	
 	while ( codedInputStream.ReadRaw( &packetheader, MessageHeaderSize ) )
 	{
+		if ( IsEncrypt() )
+			mCrypt.DecryptData( mPrivateKeySet.hSessionKey, (BYTE*)(&packetheader), MessageHeaderSize );
+		
 		const void* payloadPos = nullptr;
 		int payloadSize = 0;
 
