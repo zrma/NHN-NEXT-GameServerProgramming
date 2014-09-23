@@ -28,7 +28,7 @@ void Player::RequestCrypt( MyPacket::CryptRequest cryptRequest )
 	MyPacket::SendingKeySet keySet = cryptRequest.sendkey();
 	mSession->SetReceiveKeySet( keySet );
 
-	printf_s( "Crypting" );
+	// printf_s( "Crypting \n" );
 
 	ResponseCrypt();
 }
@@ -38,9 +38,23 @@ void Player::ResponseCrypt()
 	MyPacket::CryptResult cryptResult;
 
 	cryptResult.mutable_sendkey()->set_datalen(mSession->GetKeyDataLen());
-	cryptResult.mutable_sendkey()->set_keyblob( mSession->GetKeyBlob() );
+	
+	uint64_t key[8] = { 0, };
+	memcpy( key, mSession->GetKeyBlob(), sizeof( char ) * 64 );
 
-	printf_s( "Crypting_1" );
+	cryptResult.mutable_sendkey()->set_keyblob0( key[0] );
+	cryptResult.mutable_sendkey()->set_keyblob1( key[1] );
+	cryptResult.mutable_sendkey()->set_keyblob2( key[2] );
+	cryptResult.mutable_sendkey()->set_keyblob3( key[3] );
+	cryptResult.mutable_sendkey()->set_keyblob4( key[4] );
+	cryptResult.mutable_sendkey()->set_keyblob5( key[5] );
+	cryptResult.mutable_sendkey()->set_keyblob6( key[6] );
+	cryptResult.mutable_sendkey()->set_keyblob7( key[7] );
+
+	printf_s( "쏘는 키는 %d 라호! \n", *mSession->GetKeyBlob() );
+	
+	// printf_s( "Crypting_1 \n" );
+
 	mSession->SendRequest( MyPacket::PKT_SC_CRYPT, cryptResult );
 }
 

@@ -220,8 +220,7 @@ bool ClientSession::SendRequest( short packetType, const google::protobuf::Messa
 		sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
 		sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
 
-
-		printf_s( "Crypting_2" );
+		// printf_s( "Crypting_2 \n" );
 		/// start async send
 		if ( SOCKET_ERROR == WSASend( mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL ) )
 		{
@@ -236,7 +235,7 @@ bool ClientSession::SendRequest( short packetType, const google::protobuf::Messa
 
 		}
 
-		printf_s( "Crypting_3" );
+		// printf_s( "Crypting_3 \n" );
 		mSendPendingCount++;
 	}
 	else

@@ -256,8 +256,16 @@ void Session::EchoBack()
 void Session::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 {
 	mReceiveKeySet.dwDataLen = keySet.datalen();
-	memcpy( mKeyBlob, keySet.keyblob().c_str(), sizeof( BYTE ) * 8 );
 	mReceiveKeySet.pbKeyBlob = mKeyBlob;
+
+	mKeyBlob[0] = (BYTE)keySet.keyblob0();
+	mKeyBlob[1] = (BYTE)keySet.keyblob1();
+	mKeyBlob[2] = (BYTE)keySet.keyblob2();
+	mKeyBlob[3] = (BYTE)keySet.keyblob3();
+	mKeyBlob[4] = (BYTE)keySet.keyblob4();
+	mKeyBlob[5] = (BYTE)keySet.keyblob5();
+	mKeyBlob[6] = (BYTE)keySet.keyblob6();
+	mKeyBlob[7] = (BYTE)keySet.keyblob7();
 
 	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
 
@@ -288,12 +296,8 @@ char* Session::GetKeyBlob()
 void Session::CryptAction( BYTE* original, int originalSize, BYTE* crypted )
 {
 	if ( IsEncrypt() )
-	{
 		if ( !mCrypt.EncryptData( mPrivateKeySet.hSessionKey, original, originalSize, crypted ) )
-		{
 			printf_s( "Encrypt failed error \n" );
-		}
-	}
 }
 
 void Session::DecryptAction( BYTE* crypted, int crypedSize )

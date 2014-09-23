@@ -52,8 +52,6 @@ void ClientSession::OnReceive( size_t len )
 {
 	TRACE_THIS;
 
-	
-
 	google::protobuf::io::ArrayInputStream arrayInputStream( mRecvBuffer.GetBufferStart(), mRecvBuffer.GetContiguiousBytes() );
 	google::protobuf::io::CodedInputStream codedInputStream( &arrayInputStream );
 
@@ -112,7 +110,6 @@ REGISTER_HANDLER( PKT_CS_CRYPT )
 	//실제 작업 진행
 
 	session->mPlayer.RequestCrypt( cryptResquest );
-	
 }
 
 REGISTER_HANDLER( PKT_CS_LOGIN )

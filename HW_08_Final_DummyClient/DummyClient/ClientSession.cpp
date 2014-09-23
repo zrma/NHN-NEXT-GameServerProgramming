@@ -193,7 +193,18 @@ void ClientSession::ConnectCompletion()
 	MyPacket::CryptRequest cryptRequest;
 	
 	cryptRequest.mutable_sendkey()->set_datalen( mCliSendKeySet.dwDataLen );
-	cryptRequest.mutable_sendkey()->set_keyblob( (char*)mCliSendKeySet.pbKeyBlob );
+
+	uint64_t key[8] = { 0, };
+	memcpy( key, mCliSendKeySet.pbKeyBlob, sizeof( char ) * 64 );
+
+	cryptRequest.mutable_sendkey()->set_keyblob0( key[0] );
+	cryptRequest.mutable_sendkey()->set_keyblob1( key[1] );
+	cryptRequest.mutable_sendkey()->set_keyblob2( key[2] );
+	cryptRequest.mutable_sendkey()->set_keyblob3( key[3] );
+	cryptRequest.mutable_sendkey()->set_keyblob4( key[4] );
+	cryptRequest.mutable_sendkey()->set_keyblob5( key[5] );
+	cryptRequest.mutable_sendkey()->set_keyblob6( key[6] );
+	cryptRequest.mutable_sendkey()->set_keyblob7( key[7] );
 
 	SendRequest( MyPacket::PKT_CS_CRYPT, cryptRequest );
 
@@ -203,11 +214,21 @@ void ClientSession::ConnectCompletion()
 void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 {
 	mReceiveKeySet.dwDataLen = keySet.datalen();
-	memcpy( mKeyBlob, keySet.keyblob().c_str(), sizeof( BYTE ) * 8 );
 	mReceiveKeySet.pbKeyBlob = mKeyBlob;
+
+	mKeyBlob[0] = (BYTE)keySet.keyblob0();
+	mKeyBlob[1] = (BYTE)keySet.keyblob1();
+	mKeyBlob[2] = (BYTE)keySet.keyblob2();
+	mKeyBlob[3] = (BYTE)keySet.keyblob3();
+	mKeyBlob[4] = (BYTE)keySet.keyblob4();
+	mKeyBlob[5] = (BYTE)keySet.keyblob5();
+	mKeyBlob[6] = (BYTE)keySet.keyblob6();
+	mKeyBlob[7] = (BYTE)keySet.keyblob7();
 
 	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
 
+	printf_s( "받은 키는 %d 라호! \n", *mReceiveKeySet.pbKeyBlob );
+	
 	mIsEncrypt = true;
 }
 
