@@ -13,7 +13,7 @@ static HandlerFunc HandlerTable[PKT_MAX];
 
 static void DefaultHandler( ClientSession* session, MessageHeader& pktBase, google::protobuf::io::CodedInputStream& payloadStream )
 {
-	printf_s( "Default Handler...PKT ID: %d\n", pktBase.type );
+	printf_s( "Default Handler...PKT ID: %d\n", pktBase.mType );
 }
 
 struct InitializeHandlers
@@ -54,10 +54,10 @@ void ClientSession::OnRead(size_t len)
 
 		codedInputStream.GetDirectBufferPointer( &payloadPos, &payloadSize );
 		
-		if ( (uint32_t)(payloadSize) < packetheader.size ) ///< 패킷 본체 사이즈 체크
+		if ( payloadSize < packetheader.mSize ) ///< 패킷 본체 사이즈 체크
 			break;
 		
-		if ( packetheader.type >= PKT_MAX || packetheader.type <= PKT_NONE )
+		if ( packetheader.mType >= PKT_MAX || packetheader.mType <= PKT_NONE )
 		{
 			// 서버에서 보낸 패킷이 이상하다?!
 			LoggerUtil::EventLog( "packet type error", mPlayer->GetPlayerId() );
@@ -67,15 +67,15 @@ void ClientSession::OnRead(size_t len)
 		}
 
 		/// payload 읽기
-		google::protobuf::io::ArrayInputStream payloadArrayStream( payloadPos, packetheader.size );
+		google::protobuf::io::ArrayInputStream payloadArrayStream( payloadPos, packetheader.mSize );
 		google::protobuf::io::CodedInputStream payloadInputStream( &payloadArrayStream );
 
 		/// packet dispatch...
-		HandlerTable[packetheader.type]( this, packetheader, payloadInputStream );
+		HandlerTable[packetheader.mType]( this, packetheader, payloadInputStream );
 
 		/// 읽은 만큼 전진 및 버퍼에서 제거
-		codedInputStream.Skip( packetheader.size ); ///< ReadRaw에서 헤더 크기만큼 미리 전진했기 때문
-		mRecvBuffer.Remove( MessageHeaderSize + packetheader.size );
+		codedInputStream.Skip( packetheader.mSize ); ///< ReadRaw에서 헤더 크기만큼 미리 전진했기 때문
+		mRecvBuffer.Remove( MessageHeaderSize + packetheader.mSize );
 	}
 }
 

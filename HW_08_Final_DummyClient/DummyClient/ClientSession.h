@@ -102,6 +102,8 @@ public:
 	void	RecvCompletion( DWORD transferred );
 
 	bool	PostSend( const char* data, size_t len );
+	bool	SendRequest( short packetType, const google::protobuf::MessageLite& payload );
+
 	bool	FlushSend();
 
 	void	SendCompletion( DWORD transferred );
@@ -109,11 +111,6 @@ public:
 	void	EchoBack();
 	void	OnRead( size_t len );
 	
-	bool	ParsePacket( char* packet, int size )
-	{
-		return mRecvBuffer.Read( packet, size );
-	}
-
 	bool	IsEncrypt() const { return mIsEncrypt; }
 	bool	SetEncrypt( bool flag = true ) { mIsEncrypt = flag; }
 
@@ -164,25 +161,6 @@ private:
 	// 상대가 나한테 보내준 공개키
 	KeySendingSets	mReceiveKeySet;
 
-	//////////////////////////////////////////////////////////////////////////
-	// for protobuff
-	google::protobuf::uint8 m_SessionBuffer[MAX_BUFFER_SIZE];
-	google::protobuf::io::ArrayOutputStream* m_pArrayOutputStream;
-	google::protobuf::io::CodedOutputStream* m_pCodedOutputStream;
-
-	void WriteMessageToStream(
-		MyPacket::MessageType msgType,
-		const google::protobuf::MessageLite& message,
-		google::protobuf::io::CodedOutputStream& stream )
-
-	{
-		MessageHeader messageHeader;
-		messageHeader.size = message.ByteSize();
-		messageHeader.type = msgType;
-		stream.WriteRaw( &messageHeader, sizeof( MessageHeader ) );
-		message.SerializeToCodedStream( &stream );
-	}
-	
 	friend class SessionManager;
 };
 

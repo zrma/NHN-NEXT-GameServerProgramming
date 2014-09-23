@@ -9,8 +9,9 @@
 
 struct MessageHeader
 {
-	google::protobuf::uint32 size;
-	MyPacket::MessageType type;
+	MessageHeader(): mSize( 0 ), mType( -1 ) {}
+	short mSize;
+	short mType;
 };
 
 const int MessageHeaderSize = sizeof( MessageHeader );

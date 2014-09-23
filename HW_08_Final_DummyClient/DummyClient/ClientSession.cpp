@@ -38,12 +38,6 @@ ClientSession::ClientSession() : mRecvBuffer(BUFFER_SIZE), mSendBuffer(BUFFER_SI
 	{
 		printf( "Bind failed: %d\n", WSAGetLastError() );
 	}
-	
-	// proto
-
-	m_pArrayOutputStream = new google::protobuf::io::ArrayOutputStream( m_SessionBuffer, MAX_BUFFER_SIZE );
-	m_pCodedOutputStream = new google::protobuf::io::CodedOutputStream( m_pArrayOutputStream );
-
 }
 
 void ClientSession::SessionReset()
@@ -190,31 +184,15 @@ void ClientSession::ConnectCompletion()
 
 	//////////////////////////////////////////////////////////////////////////
 	// 여기부터 로그인 리퀘스트 패킷 조합
-		
-	// proto
 	mCrypt.GenerateKey( &mPrivateKeySet, &mCliSendKeySet );
 	
 	MyPacket::CryptRequest cryptRequest;
 	MyPacket::SendingKeySet* sendKey = new MyPacket::SendingKeySet;
 	
-	// 이렇게 쓰는게 맞나?!
-	google::protobuf::uint32 dataLen = mCliSendKeySet.dwDataLen;
-	google::protobuf::string keyBlob;
-	keyBlob.append( (char*)mCliSendKeySet.pbKeyBlob );
+	cryptRequest.mutable_sendkey()->set_datalen( mCliSendKeySet.dwDataLen );
+	cryptRequest.mutable_sendkey()->set_keyblob( (char*)mCliSendKeySet.pbKeyBlob );
 
-	sendKey->set_datalen( dataLen );
-	sendKey->set_keyblob( keyBlob );
-
-	cryptRequest.set_allocated_sendkey( sendKey );
-	
-	WriteMessageToStream( MyPacket::MessageType::PKT_CS_CRYPT, cryptRequest, *m_pCodedOutputStream );
-	
-	int size = m_pCodedOutputStream->ByteCount();
-
-	if ( false == PostSend( (char*)m_pCodedOutputStream, size ) )
-	{
-		printf_s( "[DEBUG] PostSend(Send-Key) error: %d\n", GetLastError() );
-	}
+	SendRequest( MyPacket::PKT_CS_CRYPT, cryptRequest );
 
 	++mUseCount;
 }
@@ -326,8 +304,7 @@ void ClientSession::RecvCompletion(DWORD transferred)
 	mRecvBuffer.Commit(transferred);
 	mRecvBytes += transferred;
 
-	// mRecvBuffer.GetBuffer();
-	// OnRead(transferred);
+	OnRead( transferred );
 }
 
 bool ClientSession::PostSend( const char* data, size_t len )
@@ -350,6 +327,37 @@ bool ClientSession::PostSend( const char* data, size_t len )
 	memcpy( destData, data, len );
 
 	mSendBuffer.Commit( len );
+
+	return true;
+}
+
+bool ClientSession::SendRequest( short packetType, const google::protobuf::MessageLite& payload )
+{
+	TRACE_THIS;
+
+	if ( !IsConnected() )
+		return false;
+
+	FastSpinlockGuard criticalSection( mSendBufferLock );
+
+	int totalSize = payload.ByteSize() + MessageHeaderSize;
+	if ( mSendBuffer.GetFreeSpaceSize() < (size_t)(totalSize) )
+		return false;
+
+	google::protobuf::io::ArrayOutputStream arrayOutputStream( mSendBuffer.GetBuffer(), totalSize );
+	google::protobuf::io::CodedOutputStream codedOutputStream( &arrayOutputStream );
+
+	MessageHeader packetheader;
+	packetheader.mSize = payload.ByteSize();
+	packetheader.mType = packetType;
+
+	codedOutputStream.WriteRaw( &packetheader, MessageHeaderSize );
+	payload.SerializeToCodedStream( &codedOutputStream );
+	
+	/// flush later...
+	LSendRequestSessionList->push_back( this );
+
+	mSendBuffer.Commit( totalSize );
 
 	return true;
 }
