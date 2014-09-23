@@ -38,6 +38,8 @@ ClientSession::ClientSession() : mRecvBuffer(BUFFER_SIZE), mSendBuffer(BUFFER_SI
 	{
 		printf( "Bind failed: %d\n", WSAGetLastError() );
 	}
+
+	memset( &mKeyBlob, 0, sizeof( BYTE ) * 8 );
 }
 
 void ClientSession::SessionReset()
@@ -54,6 +56,8 @@ void ClientSession::SessionReset()
 	memset( &mPrivateKeySet, 0, sizeof( KeyPrivateSets ) );
 	memset( &mCliSendKeySet, 0, sizeof( KeySendingSets ) );
 	memset( &mReceiveKeySet, 0, sizeof( KeySendingSets ) );
+
+	memset( &mKeyBlob, 0, sizeof( BYTE ) * 8 );
 
 	LINGER lingerOption;
 	lingerOption.l_onoff = 1;
@@ -200,8 +204,11 @@ void ClientSession::ConnectCompletion()
 void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 {
 	mReceiveKeySet.dwDataLen = keySet.datalen();
-	*mReceiveKeySet.pbKeyBlob = (BYTE)(keySet.keyblob().c_str());
+	memcpy( mKeyBlob, keySet.keyblob().c_str(), sizeof( BYTE ) * 8 );
+	mReceiveKeySet.pbKeyBlob = mKeyBlob;
 
+	// *mReceiveKeySet.pbKeyBlob = (BYTE)(keySet.keyblob().c_str());
+	
 	mIsEncrypt = true;
 }
 
@@ -304,6 +311,11 @@ void ClientSession::RecvCompletion(DWORD transferred)
 	mRecvBuffer.Commit(transferred);
 	mRecvBytes += transferred;
 
+	// 암호화
+	if ( IsEncrypt() )
+		if ( !mCrypt.DecryptData( mPrivateKeySet.hSessionKey, (BYTE*)mRecvBuffer.GetBufferStart(), transferred ) )
+			printf_s( "RecvCompletion - decrypt failed error \n" );
+
 	OnRead( transferred );
 }
 
@@ -350,20 +362,7 @@ bool ClientSession::SendRequest( short packetType, const google::protobuf::Messa
 	MessageHeader packetheader;
 	packetheader.mSize = payload.ByteSize();
 	packetheader.mType = packetType;
-
-	//////////////////////////////////////////////////////////////////////////
-	// 암호화
-	if ( IsEncrypt() )
-	{
-		void* payloadPos = nullptr;
-		int payloadSize = 0;
-
-		codedOutputStream.GetDirectBufferPointer( &payloadPos, &payloadSize );
-		mCrypt.EncryptData( mPrivateKeySet.hSessionKey, (BYTE*)&payloadPos, MessageHeaderSize, (BYTE*)&payloadPos );
-
-		mCrypt.EncryptData( mPrivateKeySet.hSessionKey, (BYTE*)&packetheader, MessageHeaderSize, (BYTE*)&packetheader );
-	}
-		
+			
 	codedOutputStream.WriteRaw( &packetheader, MessageHeaderSize );
 	payload.SerializeToCodedStream( &codedOutputStream );
 	
@@ -401,7 +400,6 @@ bool ClientSession::FlushSend()
 	if ( mSendPendingCount > 0 )
 		return false;
 
-
 	OverlappedSendContext* sendContext = new OverlappedSendContext( this );
 
 	DWORD sendbytes = 0;
@@ -409,6 +407,10 @@ bool ClientSession::FlushSend()
 	sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
 	sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
 
+	if ( IsEncrypt() )
+		if ( !mCrypt.EncryptData( mPrivateKeySet.hSessionKey, (BYTE*)sendContext->mWsaBuf.buf, sendContext->mWsaBuf.len, (BYTE*)sendContext->mWsaBuf.buf ) )
+			printf_s( "FlushSend - Encrypt failed error \n" );
+	
 	/// start async send
 	if ( SOCKET_ERROR == WSASend( mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL ) )
 	{

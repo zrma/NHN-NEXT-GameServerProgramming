@@ -27,12 +27,12 @@ int _tmain( int argc, _TCHAR* argv[] )
 
 
 	BYTE oriData[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
-	BYTE temp[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
+	BYTE temp[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 	printf_s( "Original : %s (%d) \n", oriData, sizeof( oriData ) );
-	keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData, sizeof( oriData ), oriData );
-	printf_s( "Encrypte : %s (%d) \n", oriData, sizeof( oriData ) );
-	keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, oriData, sizeof( oriData ) );
-	printf_s( "Decrypte : %s (%d) \n", oriData, sizeof( oriData ) );
+	keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData, sizeof( oriData ), temp );
+	printf_s( "Encrypte : %s (%d) \n", temp, sizeof( temp ) );
+	keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, temp, sizeof( oriData ) );
+	printf_s( "Decrypte : %s (%d) \n", temp, sizeof(temp) );
 
 	bool flag = false;
 

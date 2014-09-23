@@ -31,15 +31,7 @@ void WriteMessageToStream(
 	MessageHeader messageHeader;
 	messageHeader.size = message.ByteSize();
 	messageHeader.type = msgType;
-
-	void* payloadPos = nullptr;
-	int payloadSize = 0;
-
-	stream.GetDirectBufferPointer( &payloadPos, &payloadSize );
-	// GKeyChanger.EncryptData( GAlicePrivateKeySets.hSessionKey, (BYTE*)&payloadPos, MessageHeaderSize, (BYTE*)&payloadPos );
-
-	// GKeyChanger.EncryptData( GAlicePrivateKeySets.hSessionKey, (BYTE*)&messageHeader, MessageHeaderSize, (BYTE*)&messageHeader );
-
+	
 	stream.WriteRaw( &messageHeader, sizeof( MessageHeader ) );
 	message.SerializeToCodedStream( &stream );
 }
@@ -84,16 +76,19 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	WriteMessageToStream( MyPacket::MessageType::PKT_SC_LOGIN, loginResult, *m_pCodedOutputStream );
 	
+	GKeyChanger.EncryptData( GBobPrivateKeySets.hSessionKey, m_SessionBuffer, sizeof( m_SessionBuffer ), m_SessionBuffer );
+	GKeyChanger.DecryptData( GAlicePrivateKeySets.hSessionKey, m_SessionBuffer, sizeof( m_SessionBuffer ) );
 
 	//////////////////////////////////////////////////////////////////////////
+
+	GKeyChanger.EncryptData( GAlicePrivateKeySets.hSessionKey, m_SessionBuffer, sizeof( m_SessionBuffer ), m_SessionBuffer );
+	GKeyChanger.DecryptData( GBobPrivateKeySets.hSessionKey, m_SessionBuffer, sizeof( m_SessionBuffer ) );
 
 	google::protobuf::io::ArrayInputStream arrayInputStream( m_SessionBuffer, sizeof( m_SessionBuffer ) );
 	google::protobuf::io::CodedInputStream codedInputStream( &arrayInputStream );
 
 	MessageHeader messageHeader;
 	codedInputStream.ReadRaw( &messageHeader, MessageHeaderSize );
-
-	// GKeyChanger.DecryptData( GBobPrivateKeySets.hSessionKey, (BYTE*)( &messageHeader ), MessageHeaderSize );
 
 	switch ( messageHeader.type )
 	{
@@ -117,8 +112,6 @@ int _tmain(int argc, _TCHAR* argv[])
 			int payloadSize = 0;
 
 			codedInputStream.GetDirectBufferPointer( &payloadPos, &payloadSize );
-
-			// GKeyChanger.DecryptData( GBobPrivateKeySets.hSessionKey, (BYTE*)( &payloadPos ), messageHeader.size );
 
 			// payload ÀÐ±â
 			google::protobuf::io::ArrayInputStream payloadArrayStream( payloadPos, messageHeader.size );

@@ -48,11 +48,6 @@ void ClientSession::OnRead(size_t len)
 	
 	while ( codedInputStream.ReadRaw( &packetheader, MessageHeaderSize ) )
 	{
-		//////////////////////////////////////////////////////////////////////////
-		// 헤더 복호화
-		if ( IsEncrypt() )
-			mCrypt.DecryptData( mPrivateKeySet.hSessionKey, (BYTE*)(&packetheader), MessageHeaderSize );
-		
 		const void* payloadPos = nullptr;
 		int payloadSize = 0;
 
@@ -69,12 +64,7 @@ void ClientSession::OnRead(size_t len)
 			DisconnectRequest( DR_ACTIVE );
 			break;;
 		}
-
-		//////////////////////////////////////////////////////////////////////////
-		// 페이로드 복호화
-		if ( IsEncrypt() )
-			mCrypt.DecryptData( mPrivateKeySet.hSessionKey, (BYTE*)( &payloadPos ), packetheader.mSize );
-
+		
 		/// payload 읽기
 		google::protobuf::io::ArrayInputStream payloadArrayStream( payloadPos, packetheader.mSize );
 		google::protobuf::io::CodedInputStream payloadInputStream( &payloadArrayStream );
