@@ -42,9 +42,9 @@ struct RegisterHandler
 };
 
 #define REGISTER_HANDLER(PKT_TYPE)	\
-	static void Handler_##PKT_TYPE(ClientSession* session, PacketHeader& pktBase, protobuf::io::CodedInputStream& payloadStream); \
+	static void Handler_##PKT_TYPE(ClientSession* session, PacketHeader& pktBase, google::protobuf::io::CodedInputStream& payloadStream); \
 	static RegisterHandler _register_##PKT_TYPE(PKT_TYPE, Handler_##PKT_TYPE); \
-	static void Handler_##PKT_TYPE(ClientSession* session, PacketHeader& pktBase, protobuf::io::CodedInputStream& payloadStream)
+	static void Handler_##PKT_TYPE(ClientSession* session, PacketHeader& pktBase, google::protobuf::io::CodedInputStream& payloadStream)
 
 
 
@@ -95,3 +95,51 @@ void ClientSession::OnReceive( size_t len )
 //////////////////////////////////////////////////////////////////////////
 //실제 핸들러 등록 부분
 
+using namespace MyPacket;
+
+REGISTER_HANDLER( PKT_CS_CRYPT )
+{
+	//패킷 검증 단계
+	CryptRequest cryptResquest;
+	if (false == cryptResquest.ParseFromCodedStream(&payloadStream))
+	{
+		session->DisconnectRequest( DR_ACTIVE );
+		return;
+	}
+
+	//실제 작업 진행
+
+}
+
+REGISTER_HANDLER( PKT_CS_LOGIN )
+{
+	LoginRequest loginRequest;
+	if ( false == loginRequest.ParseFromCodedStream( &payloadStream ) )
+	{
+		session->DisconnectRequest( DR_ACTIVE );
+		return;
+	}
+
+	
+
+}
+
+REGISTER_HANDLER( PKT_CS_MOVE )
+{
+	MoveRequest moveRequest;
+	if ( false == moveRequest.ParseFromCodedStream( &payloadStream ) )
+	{
+		session->DisconnectRequest( DR_ACTIVE );
+		return;
+	}
+}
+
+REGISTER_HANDLER( PKT_CS_CHAT )
+{
+	ChatRequest chatRequest;
+	if ( false == chatRequest.ParseFromCodedStream( &payloadStream ) )
+	{
+		session->DisconnectRequest( DR_ACTIVE );
+		return;
+	}
+}

@@ -11,11 +11,16 @@ public:
 	~Player();
 
 	bool IsLoaded() { return mPlayerId > 0; }
+	int GetPlayerID() { return mPlayerId; }
 	
-	void UpdateID( int id );
-	
-	void SetPosition(float x, float y, float z);
-	void UpdateChat( std::string reqStirng );
+	void RequestLogin( int pid );
+	void ResponseLogin( int pid, float x, float y, float z, const char* name);
+
+	void RequestUpdatePosition( float x, float y, float z );
+	void ResponseUpdatePosition( float x, float y, float z );
+
+	void RequestChat( const char* comment );
+	void ResponseChat( const char* name, const char* comment );
 
 
 
@@ -27,6 +32,7 @@ private:
 private:
 
 	FastSpinlock mPlayerLock;
+
 	int		mPlayerId;
 	float	mPosX;
 	float	mPosY;

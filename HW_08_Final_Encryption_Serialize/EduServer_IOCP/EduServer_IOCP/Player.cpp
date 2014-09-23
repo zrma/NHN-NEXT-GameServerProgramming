@@ -23,13 +23,10 @@ void Player::PlayerReset()
 
 
 
-void Player::SetPosition( float x, float y, float z )
-{
-	FastSpinlockGuard criticalSection(mPlayerLock);
-	mPosX = x + RandomFloat( -1.0f, 1.0f );
-	mPosY = y + RandomFloat( -1.0f, 1.0f );
-	mPosZ = z + RandomFloat( -1.0f, 1.0f );
-}
+
+
+
+
 
 //세 번째에 map 크기 인자를 넣어서 크기를 넘지 않도록 해야되지 않을까...
 float RandomFloat( float a, float b )
