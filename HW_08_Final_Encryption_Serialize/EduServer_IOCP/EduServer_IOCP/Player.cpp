@@ -37,21 +37,18 @@ void Player::ResponseCrypt()
 {
 	MyPacket::CryptResult cryptResult;
 
-	cryptResult.mutable_sendkey()->set_datalen(mSession->GetKeyDataLen());
+	DWORD len = mSession->GetKeyDataLen();
+	cryptResult.mutable_sendkey()->set_datalen( len );
 	
-	uint64_t key[8] = { 0, };
-	memcpy( key, mSession->GetKeyBlob(), sizeof( char ) * 64 );
+	char* key = new char[len];
+	memcpy( key, mSession->GetKeyBlob(), len );
 
-	cryptResult.mutable_sendkey()->set_keyblob0( key[0] );
-	cryptResult.mutable_sendkey()->set_keyblob1( key[1] );
-	cryptResult.mutable_sendkey()->set_keyblob2( key[2] );
-	cryptResult.mutable_sendkey()->set_keyblob3( key[3] );
-	cryptResult.mutable_sendkey()->set_keyblob4( key[4] );
-	cryptResult.mutable_sendkey()->set_keyblob5( key[5] );
-	cryptResult.mutable_sendkey()->set_keyblob6( key[6] );
-	cryptResult.mutable_sendkey()->set_keyblob7( key[7] );
+	// 널문자 때문에 제대로 안 들어가므로 +1씩 더해준다. 뜯을 때 -1 해주자
+	for ( size_t i = 0; i < len; ++i )
+		key[i]++;
 
-	// printf_s( "Crypting_1 \n" );
+	cryptResult.mutable_sendkey()->set_keyblob( key );
+	delete key;
 
 	mSession->SendRequest( MyPacket::PKT_SC_CRYPT, cryptResult );
 }

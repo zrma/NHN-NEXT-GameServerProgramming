@@ -213,7 +213,7 @@ void Session::RecvCompletion(DWORD transferred)
 	mRecvBuffer.Commit(transferred);
 
 	//암호 해제 구간
-	this->DecryptAction( (BYTE*)mRecvBuffer.GetBufferStart(), transferred );
+	DecryptAction( (BYTE*)mRecvBuffer.GetBufferStart(), transferred );
 	
 	//받고서 바로 패킷 처리 작업 진행
 	OnReceive( transferred );
@@ -258,14 +258,24 @@ void Session::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 	mReceiveKeySet.dwDataLen = keySet.datalen();
 	mReceiveKeySet.pbKeyBlob = mKeyBlob;
 
-	mKeyBlob[0] = (BYTE)keySet.keyblob0();
-	mKeyBlob[1] = (BYTE)keySet.keyblob1();
-	mKeyBlob[2] = (BYTE)keySet.keyblob2();
-	mKeyBlob[3] = (BYTE)keySet.keyblob3();
-	mKeyBlob[4] = (BYTE)keySet.keyblob4();
-	mKeyBlob[5] = (BYTE)keySet.keyblob5();
-	mKeyBlob[6] = (BYTE)keySet.keyblob6();
-	mKeyBlob[7] = (BYTE)keySet.keyblob7();
+	if ( mReceiveKeySet.dwDataLen == 0 )
+	{
+		printf_s( "Key Length error - 0" );
+		return;
+	}
+
+	if ( mKeyBlob )
+	{
+		delete mKeyBlob;
+		mKeyBlob = nullptr;
+	}
+
+	mKeyBlob = new BYTE[mReceiveKeySet.dwDataLen];
+	memcpy( mKeyBlob, keySet.keyblob().data(), mReceiveKeySet.dwDataLen );
+
+	// 널문자 때문에 +1 더해준 것 -1
+	for ( size_t i = 0; i < mReceiveKeySet.dwDataLen; ++i )
+		mKeyBlob[i]--;
 
 	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
 
