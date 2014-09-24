@@ -47,6 +47,21 @@ int _tmain(int argc, _TCHAR* argv[])
 	GKeyChanger.GenerateKey( &GBobPrivateKeySets, &bobSendingKeySets );
 	GKeyChanger.GenerateKey( &GAlicePrivateKeySets, &aliceSendingKeySets );
 
+
+	//////////////////////////////////////////////////////////////////////////
+	// »ðÁú Å×½ºÆ®
+	MyPacket::CryptRequest cryptRequest;
+	cryptRequest.mutable_sendkey()->set_datalen( bobSendingKeySets.dwDataLen );
+	
+	char* key = new char[bobSendingKeySets.dwDataLen];
+	memcpy( key, bobSendingKeySets.pbKeyBlob, bobSendingKeySets.dwDataLen );
+
+	cryptRequest.mutable_sendkey()->set_keyblob( key );
+	delete key;
+	
+	memcpy( bobSendingKeySets.pbKeyBlob, cryptRequest.sendkey().keyblob().data(),
+			cryptRequest.sendkey().keyblob().size() );
+	
 	GKeyChanger.GetSessionKey( &GBobPrivateKeySets, &aliceSendingKeySets );
 	GKeyChanger.GetSessionKey( &GAlicePrivateKeySets, &bobSendingKeySets );
 
@@ -79,6 +94,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	GKeyChanger.EncryptData( GBobPrivateKeySets.hSessionKey, m_SessionBuffer, sizeof( m_SessionBuffer ), m_SessionBuffer );
 	GKeyChanger.DecryptData( GAlicePrivateKeySets.hSessionKey, m_SessionBuffer, sizeof( m_SessionBuffer ) );
 
+	
 	//////////////////////////////////////////////////////////////////////////
 
 	GKeyChanger.EncryptData( GAlicePrivateKeySets.hSessionKey, m_SessionBuffer, sizeof( m_SessionBuffer ), m_SessionBuffer );
