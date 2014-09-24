@@ -20,14 +20,7 @@ enum MessageType
 message SendingKeySet
 {
     required uint32 DataLen = 1;
-	required uint64 KeyBlob0 = 2;
-	required uint64 KeyBlob1 = 3;
-	required uint64 KeyBlob2 = 4;
-	required uint64 KeyBlob3 = 5;
-	required uint64 KeyBlob4 = 6;
-	required uint64 KeyBlob5 = 7;
-	required uint64 KeyBlob6 = 8;
-	required uint64 KeyBlob7 = 9;
+	required bytes KeyBlob = 2;
 }
 
 message CryptRequest

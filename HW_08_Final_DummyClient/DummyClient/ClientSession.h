@@ -161,7 +161,7 @@ private:
 	// 상대가 나한테 보내준 공개키
 	KeySendingSets	mReceiveKeySet;
 
-	BYTE			mKeyBlob[8];
+	PBYTE			mKeyBlob = nullptr;
 
 	friend class SessionManager;
 };

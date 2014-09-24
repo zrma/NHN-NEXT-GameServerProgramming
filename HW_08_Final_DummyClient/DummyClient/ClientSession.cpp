@@ -191,20 +191,17 @@ void ClientSession::ConnectCompletion()
 	mCrypt.GenerateKey( &mPrivateKeySet, &mCliSendKeySet );
 	
 	MyPacket::CryptRequest cryptRequest;
-	
 	cryptRequest.mutable_sendkey()->set_datalen( mCliSendKeySet.dwDataLen );
+	
+	char* key = new char[mCliSendKeySet.dwDataLen];
+	memcpy( key, mCliSendKeySet.pbKeyBlob, mCliSendKeySet.dwDataLen );
 
-	uint64_t key[8] = { 0, };
-	memcpy( key, mCliSendKeySet.pbKeyBlob, sizeof( char ) * 64 );
+	// 널문자 때문에 제대로 안 들어가므로 +1씩 더해준다. 뜯을 때 -1 해주자
+	for ( size_t i = 0; i < mCliSendKeySet.dwDataLen; ++i )
+		key[i]++;
 
-	cryptRequest.mutable_sendkey()->set_keyblob0( key[0] );
-	cryptRequest.mutable_sendkey()->set_keyblob1( key[1] );
-	cryptRequest.mutable_sendkey()->set_keyblob2( key[2] );
-	cryptRequest.mutable_sendkey()->set_keyblob3( key[3] );
-	cryptRequest.mutable_sendkey()->set_keyblob4( key[4] );
-	cryptRequest.mutable_sendkey()->set_keyblob5( key[5] );
-	cryptRequest.mutable_sendkey()->set_keyblob6( key[6] );
-	cryptRequest.mutable_sendkey()->set_keyblob7( key[7] );
+	cryptRequest.mutable_sendkey()->set_keyblob( key );
+	delete key;
 
 	SendRequest( MyPacket::PKT_CS_CRYPT, cryptRequest );
 
@@ -215,16 +212,26 @@ void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 {
 	mReceiveKeySet.dwDataLen = keySet.datalen();
 	mReceiveKeySet.pbKeyBlob = mKeyBlob;
+	
+	if ( mReceiveKeySet.dwDataLen == 0 )
+	{
+		printf_s( "Key Length error - 0" );
+		return;
+	}
 
-	mKeyBlob[0] = (BYTE)keySet.keyblob0();
-	mKeyBlob[1] = (BYTE)keySet.keyblob1();
-	mKeyBlob[2] = (BYTE)keySet.keyblob2();
-	mKeyBlob[3] = (BYTE)keySet.keyblob3();
-	mKeyBlob[4] = (BYTE)keySet.keyblob4();
-	mKeyBlob[5] = (BYTE)keySet.keyblob5();
-	mKeyBlob[6] = (BYTE)keySet.keyblob6();
-	mKeyBlob[7] = (BYTE)keySet.keyblob7();
+	if ( mKeyBlob )
+	{
+		delete mKeyBlob;
+		mKeyBlob = nullptr;
+	}
 
+	mKeyBlob = new BYTE[mReceiveKeySet.dwDataLen];
+	memcpy( mKeyBlob, keySet.keyblob().data(), mReceiveKeySet.dwDataLen );
+
+	// 널문자 때문에 +1 더해준 것 -1
+	for ( size_t i = 0; i < mReceiveKeySet.dwDataLen; ++i )
+		mKeyBlob[i]--;
+	
 	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
 
 	mIsEncrypt = true;

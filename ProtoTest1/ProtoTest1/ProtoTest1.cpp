@@ -46,8 +46,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	GKeyChanger.GenerateKey( &GBobPrivateKeySets, &bobSendingKeySets );
 	GKeyChanger.GenerateKey( &GAlicePrivateKeySets, &aliceSendingKeySets );
-
-
+	
 	//////////////////////////////////////////////////////////////////////////
 	// 삽질 테스트
 	MyPacket::CryptRequest cryptRequest;
@@ -56,15 +55,28 @@ int _tmain(int argc, _TCHAR* argv[])
 	char* key = new char[bobSendingKeySets.dwDataLen];
 	memcpy( key, bobSendingKeySets.pbKeyBlob, bobSendingKeySets.dwDataLen );
 
+	// 널문자 때문에 제대로 안 들어가므로 +1씩 더해준다. 뜯을 때 -1 해주자
+	for ( size_t i = 0; i < bobSendingKeySets.dwDataLen; ++i )
+		key[i]++;
+	
 	cryptRequest.mutable_sendkey()->set_keyblob( key );
 	delete key;
-	
-	memcpy( bobSendingKeySets.pbKeyBlob, cryptRequest.sendkey().keyblob().data(),
-			cryptRequest.sendkey().keyblob().size() );
-	
-	GKeyChanger.GetSessionKey( &GBobPrivateKeySets, &aliceSendingKeySets );
-	GKeyChanger.GetSessionKey( &GAlicePrivateKeySets, &bobSendingKeySets );
 
+	KeySendingSets copyKeySets;
+	copyKeySets.pbKeyBlob = new BYTE[cryptRequest.sendkey().datalen()];
+
+	// 키 복사 중
+	copyKeySets.dwDataLen = cryptRequest.sendkey().datalen();
+	memcpy( copyKeySets.pbKeyBlob, cryptRequest.sendkey().keyblob().data(),
+			copyKeySets.dwDataLen );
+
+	// 널문자 때문에 +1 더해준 것 -1
+	for ( size_t i = 0; i < copyKeySets.dwDataLen; ++i )
+		copyKeySets.pbKeyBlob[i]--;
+		
+	GKeyChanger.GetSessionKey( &GBobPrivateKeySets, &aliceSendingKeySets );
+	GKeyChanger.GetSessionKey( &GAlicePrivateKeySets, &copyKeySets );
+		
 	//////////////////////////////////////////////////////////////////////////
 
 	google::protobuf::uint8 m_SessionBuffer[MAX_BUFFER_SIZE];
