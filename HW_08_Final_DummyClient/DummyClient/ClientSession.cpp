@@ -228,10 +228,14 @@ void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 	mKeyBlob = new BYTE[mReceiveKeySet.dwDataLen];
 	memcpy( mKeyBlob, keySet.keyblob().data(), mReceiveKeySet.dwDataLen );
 
+	printf_s( "키 받음! : " );
 	// 널문자 때문에 +1 더해준 것 -1
 	for ( size_t i = 0; i < mReceiveKeySet.dwDataLen; ++i )
-		mKeyBlob[i]--;
-	
+	{
+		printf_s( "%d", --mKeyBlob[i] );
+	}
+	printf_s( "\n" );
+
 	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
 
 	mIsEncrypt = true;
