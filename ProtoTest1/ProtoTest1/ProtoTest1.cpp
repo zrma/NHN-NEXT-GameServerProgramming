@@ -9,7 +9,7 @@
 #include <google/protobuf/text_format.h>
 #include "KeyChanger.h"
 
-#define MAX_BUFFER_SIZE 2048
+#define MAX_BUFFER_SIZE 4096
 
 KeyChanger GKeyChanger;
 KeyPrivateSets GBobPrivateKeySets;
@@ -17,8 +17,8 @@ KeyPrivateSets GAlicePrivateKeySets;
 
 struct MessageHeader
 {
-	google::protobuf::uint32 size;
-	MyPacket::MessageType type;
+	google::protobuf::uint32 mSize;
+	MyPacket::MessageType mType;
 };
 
 const int MessageHeaderSize = sizeof( MessageHeader );
@@ -29,8 +29,8 @@ void WriteMessageToStream(
 	google::protobuf::io::CodedOutputStream& stream )
 {
 	MessageHeader messageHeader;
-	messageHeader.size = message.ByteSize();
-	messageHeader.type = msgType;
+	messageHeader.mSize = message.ByteSize();
+	messageHeader.mType = msgType;
 	
 	stream.WriteRaw( &messageHeader, sizeof( MessageHeader ) );
 	message.SerializeToCodedStream( &stream );
@@ -49,6 +49,27 @@ int _tmain(int argc, _TCHAR* argv[])
 	
 	//////////////////////////////////////////////////////////////////////////
 	// 삽질 테스트
+	
+	bool flag = false;
+
+	// 밥 키가 유효할 때까지(255가 없을 때까지) 계속 뽑아준다.
+	// Why -> 널 문자 때문에 제대로 안 들어간다. 그래서 밑에서 꼼수로 +1 해줌
+	// 하지만 unsigned char 255인 녀석(signed char -1)은 오버플로우 되면서 0이 되므로... risk!
+	while ( !flag )
+	{
+		for ( DWORD i = 0; i < bobSendingKeySets.dwDataLen; ++i )
+		{
+			if ( bobSendingKeySets.pbKeyBlob[i] == (UCHAR)255 )
+			{
+				printf_s( "키 재생성! \n" );
+				GKeyChanger.GenerateKey( &GBobPrivateKeySets, &bobSendingKeySets );
+				break;
+			}
+
+			flag = true;
+		}
+	}
+
 	MyPacket::CryptRequest cryptRequest;
 	cryptRequest.mutable_sendkey()->set_datalen( bobSendingKeySets.dwDataLen );
 	
@@ -56,32 +77,75 @@ int _tmain(int argc, _TCHAR* argv[])
 	memcpy( key, bobSendingKeySets.pbKeyBlob, bobSendingKeySets.dwDataLen );
 
 	// 널문자 때문에 제대로 안 들어가므로 +1씩 더해준다. 뜯을 때 -1 해주자
+	printf_s( "Send \n" );
 	for ( size_t i = 0; i < bobSendingKeySets.dwDataLen; ++i )
-		key[i]++;
+		printf_s( "%d ", (UCHAR)key[i]++ );
+	printf_s( " \n" );
 	
 	cryptRequest.mutable_sendkey()->set_keyblob( key );
 	delete key;
 
+	google::protobuf::uint8 buferA[MAX_BUFFER_SIZE];
+	google::protobuf::io::ArrayOutputStream* aos = new google::protobuf::io::ArrayOutputStream( buferA, MAX_BUFFER_SIZE );
+	google::protobuf::io::CodedOutputStream* cos = new google::protobuf::io::CodedOutputStream( aos );
+
+	WriteMessageToStream( MyPacket::MessageType::PKT_SC_CRYPT, cryptRequest, *cos );
+	
+	google::protobuf::io::ArrayInputStream ais( buferA, sizeof( buferA ) );
+	google::protobuf::io::CodedInputStream cis( &ais );
+
+	MessageHeader header;
+	cis.ReadRaw( &header, MessageHeaderSize );
+
+	if ( header.mType != MyPacket::MessageType::PKT_SC_CRYPT )
+	{
+		printf_s( "Packet Type Error! \n" );
+	}
+
+	const void* payloadPos = nullptr;
+	int payloadSize = 0;
+
+	cis.GetDirectBufferPointer( &payloadPos, &payloadSize );
+
+	// payload 읽기
+	google::protobuf::io::ArrayInputStream payloadArrayStream( payloadPos, header.mSize );
+	google::protobuf::io::CodedInputStream payloadInputStream( &payloadArrayStream );
+
+	MyPacket::CryptRequest message;
+	if ( false == message.ParseFromCodedStream( &payloadInputStream ) )
+	{
+		printf_s( "Packet Parse Error! \n" );
+	}
+
 	KeySendingSets copyKeySets;
-	copyKeySets.pbKeyBlob = new BYTE[cryptRequest.sendkey().datalen()];
+	copyKeySets.pbKeyBlob = new BYTE[message.sendkey().datalen()];
 
 	// 키 복사 중
-	copyKeySets.dwDataLen = cryptRequest.sendkey().datalen();
-	memcpy( copyKeySets.pbKeyBlob, cryptRequest.sendkey().keyblob().data(),
+	copyKeySets.dwDataLen = message.sendkey().datalen();
+	memcpy( copyKeySets.pbKeyBlob, message.sendkey().keyblob().data(),
 			copyKeySets.dwDataLen );
 
 	// 널문자 때문에 +1 더해준 것 -1
+	printf_s( "Recv \n" );
 	for ( size_t i = 0; i < copyKeySets.dwDataLen; ++i )
-		copyKeySets.pbKeyBlob[i]--;
-		
+		printf_s( "%d ", --copyKeySets.pbKeyBlob[i] );
+	printf_s( " \n" );
+
+	if ( !strcmp( (char*)bobSendingKeySets.pbKeyBlob, (char*)copyKeySets.pbKeyBlob ) )
+		printf_s( "Save \n" );
+	else
+		printf_s( "Out! \n" );
+
 	GKeyChanger.GetSessionKey( &GBobPrivateKeySets, &aliceSendingKeySets );
 	GKeyChanger.GetSessionKey( &GAlicePrivateKeySets, &copyKeySets );
 		
+	getchar();
+
 	//////////////////////////////////////////////////////////////////////////
 
-	google::protobuf::uint8 m_SessionBuffer[MAX_BUFFER_SIZE];
-	google::protobuf::io::ArrayOutputStream* m_pArrayOutputStream = new google::protobuf::io::ArrayOutputStream( m_SessionBuffer, MAX_BUFFER_SIZE );
-	google::protobuf::io::CodedOutputStream* m_pCodedOutputStream = new google::protobuf::io::CodedOutputStream( m_pArrayOutputStream );
+	google::protobuf::uint8 buferB[MAX_BUFFER_SIZE];
+	google::protobuf::io::ArrayOutputStream* aos2 = new google::protobuf::io::ArrayOutputStream( buferB, MAX_BUFFER_SIZE );
+	google::protobuf::io::CodedOutputStream* cos2 = new google::protobuf::io::CodedOutputStream( aos2 );
 
 	MyPacket::LoginResult loginResult;
 
@@ -101,24 +165,24 @@ int _tmain(int argc, _TCHAR* argv[])
 	loginResult.mutable_playerpos()->set_y( 2.0f );
 	loginResult.mutable_playerpos()->set_z( 3.0f );
 
-	WriteMessageToStream( MyPacket::MessageType::PKT_SC_LOGIN, loginResult, *m_pCodedOutputStream );
+	WriteMessageToStream( MyPacket::MessageType::PKT_SC_LOGIN, loginResult, *cos2 );
 	
-	GKeyChanger.EncryptData( GBobPrivateKeySets.hSessionKey, m_SessionBuffer, sizeof( m_SessionBuffer ), m_SessionBuffer );
-	GKeyChanger.DecryptData( GAlicePrivateKeySets.hSessionKey, m_SessionBuffer, sizeof( m_SessionBuffer ) );
+	GKeyChanger.EncryptData( GBobPrivateKeySets.hSessionKey, buferB, sizeof( buferB ), buferB );
+	GKeyChanger.DecryptData( GAlicePrivateKeySets.hSessionKey, buferB, sizeof( buferB ) );
 
 	
 	//////////////////////////////////////////////////////////////////////////
 
-	GKeyChanger.EncryptData( GAlicePrivateKeySets.hSessionKey, m_SessionBuffer, sizeof( m_SessionBuffer ), m_SessionBuffer );
-	GKeyChanger.DecryptData( GBobPrivateKeySets.hSessionKey, m_SessionBuffer, sizeof( m_SessionBuffer ) );
+	GKeyChanger.EncryptData( GAlicePrivateKeySets.hSessionKey, buferB, sizeof( buferB ), buferB );
+	GKeyChanger.DecryptData( GBobPrivateKeySets.hSessionKey, buferB, sizeof( buferB ) );
 
-	google::protobuf::io::ArrayInputStream arrayInputStream( m_SessionBuffer, sizeof( m_SessionBuffer ) );
-	google::protobuf::io::CodedInputStream codedInputStream( &arrayInputStream );
+	google::protobuf::io::ArrayInputStream ais2( buferB, sizeof( buferB ) );
+	google::protobuf::io::CodedInputStream cis2( &ais2 );
 
 	MessageHeader messageHeader;
-	codedInputStream.ReadRaw( &messageHeader, MessageHeaderSize );
+	cis2.ReadRaw( &messageHeader, MessageHeaderSize );
 
-	switch ( messageHeader.type )
+	switch ( messageHeader.mType )
 	{
 		case MyPacket::MessageType::PKT_CS_LOGIN:
 			printf_s( "PKT_CS_LOGIN \n" );
@@ -139,10 +203,10 @@ int _tmain(int argc, _TCHAR* argv[])
 			const void* payloadPos = nullptr;
 			int payloadSize = 0;
 
-			codedInputStream.GetDirectBufferPointer( &payloadPos, &payloadSize );
+			cis2.GetDirectBufferPointer( &payloadPos, &payloadSize );
 
 			// payload 읽기
-			google::protobuf::io::ArrayInputStream payloadArrayStream( payloadPos, messageHeader.size );
+			google::protobuf::io::ArrayInputStream payloadArrayStream( payloadPos, messageHeader.mSize );
 			google::protobuf::io::CodedInputStream payloadInputStream( &payloadArrayStream );
 
 			MyPacket::LoginResult message;
