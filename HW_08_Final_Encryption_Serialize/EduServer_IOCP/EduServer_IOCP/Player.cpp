@@ -47,7 +47,7 @@ void Player::ResponseCrypt()
 	// 널문자 때문에 제대로 안 들어가므로 +1씩 더해준다. 뜯을 때 -1 해주자
 	for ( size_t i = 0; i < len; ++i )
 	{
-		printf_s( "%d", key[i]++ );
+		printf_s( "%d ", (UCHAR)key[i]++ );
 	}
 	printf_s( "\n" );
 

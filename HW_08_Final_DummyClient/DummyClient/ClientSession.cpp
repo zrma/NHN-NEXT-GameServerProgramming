@@ -190,6 +190,26 @@ void ClientSession::ConnectCompletion()
 	// 여기부터 로그인 리퀘스트 패킷 조합
 	mCrypt.GenerateKey( &mPrivateKeySet, &mCliSendKeySet );
 	
+	bool flag = false;
+
+	// 키가 유효할 때까지(255가 없을 때까지) 계속 뽑아준다.
+	// Why -> 널 문자 때문에 제대로 안 들어간다. 그래서 밑에서 꼼수로 +1 해줌
+	// 하지만 unsigned char 255인 녀석(signed char -1)은 오버플로우 되면서 0이 되므로... risk!
+	while ( !flag )
+	{
+		for ( DWORD i = 0; i < mCliSendKeySet.dwDataLen; ++i )
+		{
+			if ( mCliSendKeySet.pbKeyBlob[i] == (UCHAR)255 )
+			{
+				printf_s( "키 재생성! \n" );
+				mCrypt.GenerateKey( &mPrivateKeySet, &mCliSendKeySet );
+				break;
+			}
+
+			flag = true;
+		}
+	}
+
 	MyPacket::CryptRequest cryptRequest;
 	cryptRequest.mutable_sendkey()->set_datalen( mCliSendKeySet.dwDataLen );
 	
@@ -232,7 +252,7 @@ void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 	// 널문자 때문에 +1 더해준 것 -1
 	for ( size_t i = 0; i < mReceiveKeySet.dwDataLen; ++i )
 	{
-		printf_s( "%d", --mKeyBlob[i] );
+		printf_s( "%d ", ( UCHAR )--mKeyBlob[i] );
 	}
 	printf_s( "\n" );
 
@@ -334,8 +354,6 @@ bool ClientSession::PostRecv()
 void ClientSession::RecvCompletion(DWORD transferred)
 {
 	TRACE_THIS;
-
-	FastSpinlockGuard criticalSection(mSendBufferLock);
 
 	mRecvBuffer.Commit(transferred);
 	mRecvBytes += transferred;
