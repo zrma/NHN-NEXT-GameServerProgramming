@@ -231,8 +231,7 @@ void ClientSession::ConnectCompletion()
 void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 {
 	mReceiveKeySet.dwDataLen = keySet.datalen();
-	mReceiveKeySet.pbKeyBlob = mKeyBlob;
-	
+		
 	if ( mReceiveKeySet.dwDataLen == 0 )
 	{
 		printf_s( "Key Length error - 0" );
@@ -248,13 +247,11 @@ void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 	mKeyBlob = new BYTE[mReceiveKeySet.dwDataLen];
 	memcpy( mKeyBlob, keySet.keyblob().data(), mReceiveKeySet.dwDataLen );
 
-	printf_s( "키 받음! : " );
 	// 널문자 때문에 +1 더해준 것 -1
 	for ( size_t i = 0; i < mReceiveKeySet.dwDataLen; ++i )
-	{
-		printf_s( "%d ", ( UCHAR )--mKeyBlob[i] );
-	}
-	printf_s( "\n" );
+		( UCHAR )--mKeyBlob[i];
+	
+	mReceiveKeySet.pbKeyBlob = mKeyBlob;
 
 	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
 
@@ -360,7 +357,7 @@ void ClientSession::RecvCompletion(DWORD transferred)
 
 	// 암호화
 	if ( IsEncrypt() )
-		if ( !mCrypt.DecryptData( mPrivateKeySet.hSessionKey, (BYTE*)mRecvBuffer.GetBufferStart(), transferred ) )
+		if ( !mCrypt.DecryptData( mPrivateKeySet.hSessionKey, (PBYTE)mRecvBuffer.GetBufferStart(), transferred ) )
 			printf_s( "RecvCompletion - decrypt failed error \n" );
 
 	OnRead( transferred );
@@ -482,8 +479,7 @@ bool ClientSession::FlushSend()
 	sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
 	sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
 
-	// if ( IsEncrypt() )
-	if ( !mCrypt.EncryptData( mPrivateKeySet.hSessionKey, (BYTE*)sendContext->mWsaBuf.buf, sendContext->mWsaBuf.len, (BYTE*)sendContext->mWsaBuf.buf ) )
+	if ( !mCrypt.EncryptData( mPrivateKeySet.hSessionKey, (PBYTE)sendContext->mWsaBuf.buf, sendContext->mWsaBuf.len, (PBYTE)sendContext->mWsaBuf.buf ) )
 		printf_s( "FlushSend - Encrypt failed error \n" );
 	
 	/// start async send

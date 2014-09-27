@@ -9,7 +9,7 @@
 int _tmain( int argc, _TCHAR* argv[] )
 {
 	KeyChanger keyChanger1, keyChanger2;
-	
+
 	KeyPrivateSets bobPrivateKeySets;
 	KeyPrivateSets alicePrivateKeySets;
 	KeySendingSets bobSendingKeySets;
@@ -24,16 +24,21 @@ int _tmain( int argc, _TCHAR* argv[] )
 	printf_s( "" );
 
 	BYTE oriData[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
-	BYTE temp[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	BYTE temp[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x10 };
 	printf_s( "Original : %s (%d) \n", oriData, sizeof( oriData ) );
-	keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData, sizeof( oriData ), temp );
+
+	if ( !keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData, sizeof( oriData ), temp ) )
+		printf_s( "Encrypted failed error \n" );
+	
 	printf_s( "Encrypte : %s (%d) \n", temp, sizeof( temp ) );
-	keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, temp, sizeof( oriData ) );
+	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, temp, sizeof( oriData ) ) )
+		printf_s( "Decrypted failed error \n" );
+	
 	printf_s( "Decrypte : %s (%d) \n", temp, sizeof(temp) );
 
 	bool flag = false;
 
-	for ( int i = 0; i < sizeof( temp ); ++i )
+	for ( int i = 0; i < sizeof( oriData ); ++i )
 	{
 		if ( oriData[i] != temp[i] )
 		{

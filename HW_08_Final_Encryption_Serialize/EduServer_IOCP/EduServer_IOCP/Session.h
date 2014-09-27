@@ -45,8 +45,8 @@ public:
 	void KeyInit();
 	DWORD GetKeyDataLen();
 	char* GetKeyBlob();
-	void CryptAction( BYTE* original, int originalSize, BYTE* crypted );
-	void DecryptAction( BYTE* crypted, int crypedSize );
+	void CryptAction( PBYTE original, int originalSize, PBYTE crypted );
+	void DecryptAction( PBYTE crypted, int crypedSize );
 
 	void SetReceiveKeySet( MyPacket::SendingKeySet keySet );
 

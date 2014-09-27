@@ -163,7 +163,7 @@ bool Session::FlushSend()
 	sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
 
 	//암호화
-	CryptAction( (BYTE*)sendContext->mWsaBuf.buf, sendContext->mWsaBuf.len, (BYTE*)sendContext->mWsaBuf.buf );
+	CryptAction( (PBYTE)sendContext->mWsaBuf.buf, sendContext->mWsaBuf.len, (PBYTE)sendContext->mWsaBuf.buf );
 		
 	/// start async send
 	if (SOCKET_ERROR == WSASend(mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL))
@@ -213,7 +213,7 @@ void Session::RecvCompletion(DWORD transferred)
 	mRecvBuffer.Commit(transferred);
 
 	//암호 해제 구간
-	DecryptAction( (BYTE*)mRecvBuffer.GetBufferStart(), transferred );
+	DecryptAction( (PBYTE)mRecvBuffer.GetBufferStart(), transferred );
 	
 	//받고서 바로 패킷 처리 작업 진행
 	OnReceive( transferred );
@@ -256,8 +256,7 @@ void Session::EchoBack()
 void Session::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 {
 	mReceiveKeySet.dwDataLen = keySet.datalen();
-	mReceiveKeySet.pbKeyBlob = mKeyBlob;
-
+	
 	if ( mReceiveKeySet.dwDataLen == 0 )
 	{
 		printf_s( "Key Length error - 0" );
@@ -277,6 +276,7 @@ void Session::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 	for ( size_t i = 0; i < mReceiveKeySet.dwDataLen; ++i )
 		mKeyBlob[i]--;
 
+	mReceiveKeySet.pbKeyBlob = mKeyBlob;
 	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
 
 	mIsEncrypt = true;
@@ -323,14 +323,14 @@ char* Session::GetKeyBlob()
 	return (char*)mServerSendKeySet.pbKeyBlob;
 }
 
-void Session::CryptAction( BYTE* original, int originalSize, BYTE* crypted )
+void Session::CryptAction( PBYTE original, int originalSize, PBYTE crypted )
 {
 	if ( IsEncrypt() )
 		if ( !mCrypt.EncryptData( mPrivateKeySet.hSessionKey, original, originalSize, crypted ) )
 			printf_s( "Encrypt failed error \n" );
 }
 
-void Session::DecryptAction( BYTE* crypted, int crypedSize )
+void Session::DecryptAction( PBYTE crypted, int crypedSize )
 {
 	if ( IsEncrypt() )
 		if ( !mCrypt.DecryptData( mPrivateKeySet.hSessionKey, crypted, crypedSize ) )
