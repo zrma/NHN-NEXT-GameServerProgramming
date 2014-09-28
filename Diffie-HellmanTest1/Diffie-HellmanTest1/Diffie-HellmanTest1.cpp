@@ -40,9 +40,16 @@ int _tmain( int argc, _TCHAR* argv[] )
 		printf_s( "%3d ", oriData[i] );
 	printf_s( "  Size (%d) \n", sizeof( oriData ) );
 
-	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, oriData, sizeof( oriData ) ) )
+	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, oriData, 1 ) )
 		printf_s( "Decrypted failed error \n" );
+	else
+		printf_s( "Success! \n" );
 	
+	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, oriData + 1, 1 ) )
+		printf_s( "Decrypted failed error \n" );
+	else
+		printf_s( "Success! \n" );
+
 	printf_s( "Decrypted : " );
 	for ( int i = 0; i < sizeof( oriData ); ++i )
 		printf_s( "%3d ", oriData[i] );

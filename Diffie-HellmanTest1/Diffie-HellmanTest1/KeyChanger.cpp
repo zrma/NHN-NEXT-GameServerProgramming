@@ -279,7 +279,7 @@ bool KeyChanger::EncryptData( HCRYPTKEY sessionKey, BYTE* originalData, int orig
 	fReturn = CryptEncrypt(
 		sessionKey,
 		0,
-		TRUE,
+		FALSE,
 		0,
 		encryptedData,
 		&dwLength,
@@ -316,7 +316,7 @@ bool KeyChanger::DecryptData( HCRYPTKEY sessionKey, BYTE* encryptedData, int ori
 	fReturn = CryptDecrypt(
 		sessionKey,
 		0,
-		TRUE,
+		FALSE,
 		0,
 		encryptedData,
 		&dwLength );
