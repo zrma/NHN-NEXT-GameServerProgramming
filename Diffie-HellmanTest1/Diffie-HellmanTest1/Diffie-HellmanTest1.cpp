@@ -24,17 +24,29 @@ int _tmain( int argc, _TCHAR* argv[] )
 	printf_s( "" );
 
 	BYTE oriData[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
-	BYTE temp[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x10 };
-	printf_s( "Original : %s (%d) \n", oriData, sizeof( oriData ) );
+	BYTE *temp = new BYTE[sizeof(oriData)];
+	memcpy( temp, oriData, sizeof( oriData ) );
 
-	if ( !keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData, sizeof( oriData ), temp ) )
+	printf_s( "Original  : " );
+	for ( int i = 0; i < sizeof( oriData ); ++i )
+		printf_s( "%3d ", oriData[i] );
+	printf_s( "  Size (%d) \n", sizeof( oriData ) );
+
+	if ( !keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData, sizeof( oriData ), oriData ) )
 		printf_s( "Encrypted failed error \n" );
 	
-	printf_s( "Encrypte : %s (%d) \n", temp, sizeof( temp ) );
-	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, temp, sizeof( oriData ) ) )
+	printf_s( "Encrypted : " );
+	for ( int i = 0; i < sizeof( oriData ); ++i )
+		printf_s( "%3d ", oriData[i] );
+	printf_s( "  Size (%d) \n", sizeof( oriData ) );
+
+	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, oriData, sizeof( oriData ) ) )
 		printf_s( "Decrypted failed error \n" );
 	
-	printf_s( "Decrypte : %s (%d) \n", temp, sizeof(temp) );
+	printf_s( "Decrypted : " );
+	for ( int i = 0; i < sizeof( oriData ); ++i )
+		printf_s( "%3d ", oriData[i] );
+	printf_s( "  Size (%d) \n", sizeof( oriData ) );
 
 	bool flag = false;
 
@@ -52,6 +64,7 @@ int _tmain( int argc, _TCHAR* argv[] )
 	else
 		printf_s( "Same! \n" );
 	
+	delete temp;
 	getchar();
 
 	return 0;
