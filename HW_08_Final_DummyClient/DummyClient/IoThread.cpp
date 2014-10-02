@@ -25,9 +25,7 @@ DWORD IOThread::Run()
 
 		//... ...
 	}
-
-	printf_s( "찍!" );
-
+	
 	return 1;
 }
 

@@ -27,25 +27,53 @@ int _tmain( int argc, _TCHAR* argv[] )
 	BYTE *temp = new BYTE[sizeof(oriData)];
 	memcpy( temp, oriData, sizeof( oriData ) );
 
+
 	printf_s( "Original  : " );
 	for ( int i = 0; i < sizeof( oriData ); ++i )
 		printf_s( "%3d ", oriData[i] );
 	printf_s( "  Size (%d) \n", sizeof( oriData ) );
 
-	if ( !keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData, sizeof( oriData ), oriData ) )
+
+	if ( !keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData , 1, oriData ) )
 		printf_s( "Encrypted failed error \n" );
+	else
+		printf_s( "Success! \n" );
 	
+	keyChanger1.GetSessionKey( &bobPrivateKeySets, &aliceSendingKeySets );
+
+	if ( !keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData + 1, 3, oriData + 1 ) )
+		printf_s( "Encrypted failed error \n" );
+	else
+		printf_s( "Success! \n" );
+
+	keyChanger1.GetSessionKey( &bobPrivateKeySets, &aliceSendingKeySets );
+
+	if ( !keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData + 4, 4, oriData + 4 ) )
+		printf_s( "Encrypted failed error \n" );
+	else
+		printf_s( "Success! \n" );
+
 	printf_s( "Encrypted : " );
 	for ( int i = 0; i < sizeof( oriData ); ++i )
 		printf_s( "%3d ", oriData[i] );
 	printf_s( "  Size (%d) \n", sizeof( oriData ) );
 
-	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, oriData, 1 ) )
+
+	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, oriData , 1 ) )
 		printf_s( "Decrypted failed error \n" );
 	else
 		printf_s( "Success! \n" );
 	
-	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, oriData + 1, 1 ) )
+	keyChanger2.GetSessionKey( &alicePrivateKeySets, &bobSendingKeySets );
+
+	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, oriData + 1, 2 ) )
+		printf_s( "Decrypted failed error \n" );
+	else
+		printf_s( "Success! \n" );
+	
+	keyChanger2.GetSessionKey( &alicePrivateKeySets, &bobSendingKeySets );
+
+	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, oriData + 3, 5 ) )
 		printf_s( "Decrypted failed error \n" );
 	else
 		printf_s( "Success! \n" );

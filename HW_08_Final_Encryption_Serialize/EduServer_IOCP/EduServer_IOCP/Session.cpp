@@ -326,13 +326,21 @@ char* Session::GetKeyBlob()
 void Session::CryptAction( PBYTE original, int originalSize, PBYTE crypted )
 {
 	if ( IsEncrypt() )
+	{
+		mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
+
 		if ( !mCrypt.EncryptData( mPrivateKeySet.hSessionKey, original, originalSize, crypted ) )
 			printf_s( "Encrypt failed error \n" );
+	}
 }
 
 void Session::DecryptAction( PBYTE crypted, int crypedSize )
 {
 	if ( IsEncrypt() )
+	{
+		mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
+
 		if ( !mCrypt.DecryptData( mPrivateKeySet.hSessionKey, crypted, crypedSize ) )
 			printf_s( "decrypt failed error \n" );
+	}
 }

@@ -357,9 +357,12 @@ void ClientSession::RecvCompletion(DWORD transferred)
 
 	// 암호화
 	if ( IsEncrypt() )
+	{
+		mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
+
 		if ( !mCrypt.DecryptData( mPrivateKeySet.hSessionKey, (PBYTE)mRecvBuffer.GetBufferStart(), transferred ) )
 			printf_s( "RecvCompletion - decrypt failed error \n" );
-
+	}
 	OnRead( transferred );
 }
 
@@ -478,6 +481,8 @@ bool ClientSession::FlushSend()
 	DWORD flags = 0;
 	sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
 	sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
+
+	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
 
 	if ( !mCrypt.EncryptData( mPrivateKeySet.hSessionKey, (PBYTE)sendContext->mWsaBuf.buf, sendContext->mWsaBuf.len, (PBYTE)sendContext->mWsaBuf.buf ) )
 		printf_s( "FlushSend - Encrypt failed error \n" );
