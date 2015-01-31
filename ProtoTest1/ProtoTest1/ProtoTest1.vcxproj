@@ -85,13 +85,15 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="KeyChanger.h" />
+    <ClInclude Include="Crypter.h" />
+    <ClInclude Include="KeyExchanger.h" />
     <ClInclude Include="mypacket.pb.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="SystemIncludes.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="ULong.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="KeyChanger.cpp" />
     <ClCompile Include="mypacket.pb.cc" />
     <ClCompile Include="ProtoTest1.cpp" />
     <ClCompile Include="stdafx.cpp">

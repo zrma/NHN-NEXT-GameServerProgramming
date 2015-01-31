@@ -7,13 +7,9 @@
 #include "google\protobuf\io\coded_stream.h"
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 #include <google/protobuf/text_format.h>
-#include "KeyChanger.h"
+#include "Crypter.h"
 
 #define MAX_BUFFER_SIZE 4096
-
-KeyChanger GKeyChanger;
-KeyPrivateSets GBobPrivateKeySets;
-KeyPrivateSets GAlicePrivateKeySets;
 
 struct MessageHeader
 {
@@ -41,47 +37,25 @@ int _tmain(int argc, _TCHAR* argv[])
 	//////////////////////////////////////////////////////////////////////////
 	// 밥 = 세션1
 	// 엘리스 = 세션2
-	KeySendingSets bobSendingKeySets;
-	KeySendingSets aliceSendingKeySets;
-
-	GKeyChanger.GenerateKey( &GBobPrivateKeySets, &bobSendingKeySets );
-	GKeyChanger.GenerateKey( &GAlicePrivateKeySets, &aliceSendingKeySets );
+	Crypter alice;
+	Crypter bob;
 	
-	//////////////////////////////////////////////////////////////////////////
-	// 삽질 테스트
-	
-	bool flag = false;
+	alice.GenerateExchangeKey();
+	bob.GenerateExchangeKey();
 
-	// 밥 키가 유효할 때까지(255가 없을 때까지) 계속 뽑아준다.
-	// Why -> 널 문자 때문에 제대로 안 들어간다. 그래서 밑에서 꼼수로 +1 해줌
-	// 하지만 unsigned char 255인 녀석(signed char -1)은 오버플로우 되면서 0이 되므로... risk!
-	while ( !flag )
-	{
-		for ( DWORD i = 0; i < bobSendingKeySets.dwDataLen; ++i )
-		{
-			if ( bobSendingKeySets.pbKeyBlob[i] == (UCHAR)255 )
-			{
-				printf_s( "키 재생성! \n" );
-				GKeyChanger.GenerateKey( &GBobPrivateKeySets, &bobSendingKeySets );
-				break;
-			}
-
-			flag = true;
-		}
-	}
+	std::vector<char>& bobSendThisKey = bob.GetExchangeKey();
 
 	MyPacket::CryptRequest cryptRequest;
-	cryptRequest.mutable_sendkey()->set_datalen( bobSendingKeySets.dwDataLen );
+	cryptRequest.mutable_sendkey()->set_datalen( bobSendThisKey.size() );
 	
-	char* key = new char[bobSendingKeySets.dwDataLen];
-	memcpy( key, bobSendingKeySets.pbKeyBlob, bobSendingKeySets.dwDataLen );
+	char* key = new char[bobSendThisKey.size()];
+	char* keyCurPtr = key;
 
-	// 널문자 때문에 제대로 안 들어가므로 +1씩 더해준다. 뜯을 때 -1 해주자
-	printf_s( "Send \n" );
-	for ( size_t i = 0; i < bobSendingKeySets.dwDataLen; ++i )
-		printf_s( "%d ", (UCHAR)key[i]++ );
-	printf_s( " \n" );
-	
+	for each( char c in bobSendThisKey )
+	{
+		*( keyCurPtr++ ) = c;
+	}
+
 	cryptRequest.mutable_sendkey()->set_keyblob( key );
 	delete key;
 
@@ -117,28 +91,33 @@ int _tmain(int argc, _TCHAR* argv[])
 		printf_s( "Packet Parse Error! \n" );
 	}
 
-	KeySendingSets copyKeySets;
-	copyKeySets.pbKeyBlob = new BYTE[message.sendkey().datalen()];
+	std::vector<char> aliceReciveThisKey;
 
-	// 키 복사 중
-	copyKeySets.dwDataLen = message.sendkey().datalen();
-	memcpy( copyKeySets.pbKeyBlob, message.sendkey().keyblob().data(),
-			copyKeySets.dwDataLen );
+	for ( int i = 0; i < message.sendkey().datalen(); ++i )
+	{
+		aliceReciveThisKey.push_back( message.sendkey().keyblob().c_str()[i] );
+	}
 
-	// 널문자 때문에 +1 더해준 것 -1
-	printf_s( "Recv \n" );
-	for ( size_t i = 0; i < copyKeySets.dwDataLen; ++i )
-		printf_s( "%d ", --copyKeySets.pbKeyBlob[i] );
-	printf_s( " \n" );
+	alice.CreateSharedKey( aliceReciveThisKey );
+	bob.CreateSharedKey( alice.GetExchangeKey() );
+	
+	printf_s( "----------------------------\n" );
+	bob.PrintExchangeKey();
+	printf_s( "----------------------------\n" );
+	bob.PrintBuffer( aliceReciveThisKey );
 
-	if ( !strcmp( (char*)bobSendingKeySets.pbKeyBlob, (char*)copyKeySets.pbKeyBlob ) )
+	printf_s( "----------------------------\n\n" );
+	alice.PrintSharedKey();
+	printf_s( "----------------------------\n" );
+	bob.PrintSharedKey();
+
+	printf_s( "----------------------------\n" );
+
+	if ( alice.GetSharedKey() == bob.GetSharedKey() )
 		printf_s( "Save \n" );
 	else
 		printf_s( "Out! \n" );
-
-	GKeyChanger.GetSessionKey( &GBobPrivateKeySets, &aliceSendingKeySets );
-	GKeyChanger.GetSessionKey( &GAlicePrivateKeySets, &copyKeySets );
-		
+	
 	getchar();
 
 	//////////////////////////////////////////////////////////////////////////
@@ -159,22 +138,17 @@ int _tmain(int argc, _TCHAR* argv[])
 	position.set_x( 1.0f );
 	position.set_y( 2.0f );
 	position.set_z( 3.0f );
-
-
+	
 	loginResult.mutable_playerpos()->set_x( 1.0f );
 	loginResult.mutable_playerpos()->set_y( 2.0f );
 	loginResult.mutable_playerpos()->set_z( 3.0f );
 
 	WriteMessageToStream( MyPacket::MessageType::PKT_SC_LOGIN, loginResult, *cos2 );
 	
-	GKeyChanger.EncryptData( GBobPrivateKeySets.hSessionKey, buferB, sizeof( buferB ), buferB );
-	GKeyChanger.DecryptData( GAlicePrivateKeySets.hSessionKey, buferB, sizeof( buferB ) );
-
-	
 	//////////////////////////////////////////////////////////////////////////
-
-	GKeyChanger.EncryptData( GAlicePrivateKeySets.hSessionKey, buferB, sizeof( buferB ), buferB );
-	GKeyChanger.DecryptData( GBobPrivateKeySets.hSessionKey, buferB, sizeof( buferB ) );
+	alice.Encrypt( (char*)buferB, sizeof( buferB ) );
+	bob.Encrypt( (char*)buferB, sizeof( buferB ) );
+	//////////////////////////////////////////////////////////////////////////
 
 	google::protobuf::io::ArrayInputStream ais2( buferB, sizeof( buferB ) );
 	google::protobuf::io::CodedInputStream cis2( &ais2 );

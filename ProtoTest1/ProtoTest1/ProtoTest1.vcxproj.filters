@@ -27,7 +27,16 @@
     <ClInclude Include="mypacket.pb.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
-    <ClInclude Include="KeyChanger.h">
+    <ClInclude Include="KeyExchanger.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Crypter.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ULong.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemIncludes.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -39,9 +48,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="mypacket.pb.cc">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="KeyChanger.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
