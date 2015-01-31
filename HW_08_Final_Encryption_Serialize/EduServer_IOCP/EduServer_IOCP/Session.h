@@ -65,13 +65,14 @@ protected:
 	volatile long	mConnected;
 
 	//////////////////////////////////////////////////////////////////////////
-	//암호화 관련 이야기!!
-	//에니그마로 암호학의 발전을 이끈 히틀러 $@%#$%노무... 시끼
-
+	// 암호화 관련
 	bool			mIsEncrypt = false;
 
-	// 키 생성 및 암/복호화 클래스
-	KeyChanger		mCrypt;
+	// 키 생성 및 암호화 클래스
+	KeyChanger		mEncrypt;
+	// 키 생성 및 복호화 클래스
+	KeyChanger		mDecrypt;
+
 	// 내가 사용할 비밀키
 	KeyPrivateSets	mPrivateKeySet;
 	// 내가 상대방에게 보낼 공개키

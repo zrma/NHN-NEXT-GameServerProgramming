@@ -7,8 +7,11 @@
 
 #include "targetver.h"
 
+#include <iomanip>
 #include <stdio.h>
 #include <tchar.h>
+#include <iostream>
+#include <conio.h>
 
 
 

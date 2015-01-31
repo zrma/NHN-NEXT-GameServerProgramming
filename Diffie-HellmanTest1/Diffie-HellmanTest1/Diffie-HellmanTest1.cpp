@@ -2,157 +2,59 @@
 //
 
 #include "stdafx.h"
-#include "KeyChanger.h"
-
-
+#include "Crypter.h"
 
 int _tmain( int argc, _TCHAR* argv[] )
 {
-	KeyChanger keyChanger1, keyChanger2;
-
-	KeyPrivateSets bobPrivateKeySets;
-	KeyPrivateSets alicePrivateKeySets;
-	KeySendingSets bobSendingKeySets;
-	KeySendingSets aliceSendingKeySets;
-
-	printf_s( "" );
-	keyChanger1.GenerateKey( &bobPrivateKeySets, &bobSendingKeySets );
-	keyChanger2.GenerateKey( &alicePrivateKeySets, &aliceSendingKeySets );
-	printf_s( "" );
-	keyChanger1.GetSessionKey( &bobPrivateKeySets, &aliceSendingKeySets );
-	keyChanger2.GetSessionKey( &alicePrivateKeySets, &bobSendingKeySets );
-	printf_s( "" );
-
-	BYTE oriData[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
-	BYTE *temp = new BYTE[sizeof(oriData)];
-	memcpy( temp, oriData, sizeof( oriData ) );
-
-
-	printf_s( "Original  : " );
-	for ( int i = 0; i < sizeof( oriData ); ++i )
-		printf_s( "%3d ", oriData[i] );
-	printf_s( "  Size (%d) \n", sizeof( oriData ) );
-
-
-	if ( !keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData , 1, oriData ) )
-		printf_s( "Encrypted failed error \n" );
-	else
-		printf_s( "Success! \n" );
+	std::cout << "Diffie-Hellman key exchange alogrithm example:\n";
 	
-	keyChanger1.GetSessionKey( &bobPrivateKeySets, &aliceSendingKeySets );
+	Crypter alice;
+	Crypter bob;
 
-	if ( !keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData + 1, 3, oriData + 1 ) )
-		printf_s( "Encrypted failed error \n" );
-	else
-		printf_s( "Success! \n" );
+	// Generation of exchange keys for Alice and Bob
+	std::cout << "\nGeneration of exchange key for Alice...\n";
+	alice.GenerateExchangeKey();
+	std::cout << "Exchange key for Alice is equal:\n";
+	alice.PrintExchangeKey();
 
-	keyChanger1.GetSessionKey( &bobPrivateKeySets, &aliceSendingKeySets );
+	std::cout << "\nGeneration of exchange key for Bob...\n";
+	bob.GenerateExchangeKey();
+	std::cout << "Exchange key for Bob is equal:\n";
+	bob.PrintExchangeKey();
 
-	if ( !keyChanger1.EncryptData( bobPrivateKeySets.hSessionKey, oriData + 4, 4, oriData + 4 ) )
-		printf_s( "Encrypted failed error \n" );
-	else
-		printf_s( "Success! \n" );
+	// Calculation if shared keys for Alice and Bob
+	std::cout << "\nCalculation of shared key for Alice...\n";
+	alice.CreateSharedKey( bob.GetExchangeKey() );
+	std::cout << "Shared key for Alice is equal:\n";
+	alice.PrintSharedKey();
 
-	printf_s( "Encrypted : " );
-	for ( int i = 0; i < sizeof( oriData ); ++i )
-		printf_s( "%3d ", oriData[i] );
-	printf_s( "  Size (%d) \n", sizeof( oriData ) );
+	std::cout << "\nCalculation of shared key for Bob...\n";
+	bob.CreateSharedKey( alice.GetExchangeKey() );
+	std::cout << "Shared key for Bob is equal:\n";
+	bob.PrintSharedKey();
 
-
-	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, oriData , 1 ) )
-		printf_s( "Decrypted failed error \n" );
-	else
-		printf_s( "Success! \n" );
-	
-	keyChanger2.GetSessionKey( &alicePrivateKeySets, &bobSendingKeySets );
-
-	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, oriData + 1, 2 ) )
-		printf_s( "Decrypted failed error \n" );
-	else
-		printf_s( "Success! \n" );
-	
-	keyChanger2.GetSessionKey( &alicePrivateKeySets, &bobSendingKeySets );
-
-	if ( !keyChanger2.DecryptData( alicePrivateKeySets.hSessionKey, oriData + 3, 5 ) )
-		printf_s( "Decrypted failed error \n" );
-	else
-		printf_s( "Success! \n" );
-
-	printf_s( "Decrypted : " );
-	for ( int i = 0; i < sizeof( oriData ); ++i )
-		printf_s( "%3d ", oriData[i] );
-	printf_s( "  Size (%d) \n", sizeof( oriData ) );
-
-	bool flag = false;
-
-	for ( int i = 0; i < sizeof( oriData ); ++i )
+	if ( alice.GetSharedKey() == bob.GetSharedKey() )
 	{
-		if ( oriData[i] != temp[i] )
-		{
-			flag = true;
-			break;
-		}
+		std::cout << "\nOperation finished successfully: shared keys for Alice and Bob are equal.";
+	}
+	else
+	{
+		std::cout << "\nOperation failed: shared keys for Alice and Bob are different.";
 	}
 
-	if ( flag )
-		printf_s( "Diff! \n" );
-	else
-		printf_s( "Same! \n" );
-	
-	delete temp;
-	getchar();
+	char test[16] = { 
+		'a', 'b', 'c', 'd', 'e',
+		'f', 'g', 'h', 'i', 'j',
+		'k', 'l', 'm', 'n', 'o',
+		0 };
+
+	alice.Encrypt( test, 6 );
+	bob.Decrypt( test, 3 );
+	bob.Decrypt( test + 3, 3 );
+
+	std::cout << "\n\n" << test << std::endl;
+
+	_getch();
 
 	return 0;
 }
-
-
-
-
-/*
-
-
-
-// Diffie-HellmanTest1.cpp : 콘솔 응용 프로그램에 대한 진입점을 정의합니다.
-//
-
-#include "stdafx.h"
-#include <time.h>
-#include <stdlib.h>
-#include "Elise.h"
-#include "Bob.h"
-
-
-
-
-int _tmain(int argc, _TCHAR* argv[])
-{
-srand( (unsigned int)time( NULL ) );
-
-// phase 1 set
-Elise* elise = new Elise();
-Bob* bob = new Bob();
-
-elise->Generate_a();
-bob->Generate_b();
-
-// phase 2 get set AB
-
-long double A = elise->GetA();
-long double B = bob->GetB();
-
-bob->SetA( A );
-elise->SetB( B );
-
-long double bob_s = bob->Get_s();
-long double elise_s = elise->Get_s();
-
-printf_s( "bob_s:%f elise_s:%f \n", bob_s, elise_s );
-
-getchar();
-
-return 0;
-}
-
-
-
-*/

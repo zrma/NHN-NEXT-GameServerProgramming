@@ -271,13 +271,9 @@ void Session::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
 
 	mKeyBlob = new BYTE[mReceiveKeySet.dwDataLen];
 	memcpy( mKeyBlob, keySet.keyblob().data(), mReceiveKeySet.dwDataLen );
-
-	// 널문자 때문에 +1 더해준 것 -1
-	for ( size_t i = 0; i < mReceiveKeySet.dwDataLen; ++i )
-		mKeyBlob[i]--;
-
+	
 	mReceiveKeySet.pbKeyBlob = mKeyBlob;
-	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
+	mEncrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
 
 	mIsEncrypt = true;
 }
@@ -290,21 +286,18 @@ void Session::KeyInit()
 
 	memset( &mKeyBlob, 0, sizeof( BYTE ) * 8 );
 
-	mCrypt.GenerateKey( &mPrivateKeySet, &mServerSendKeySet );
+	mEncrypt.GenerateKey( &mPrivateKeySet, &mServerSendKeySet );
 
 	bool flag = false;
 
-	// 키가 유효할 때까지(255가 없을 때까지) 계속 뽑아준다.
-	// Why -> 널 문자 때문에 제대로 안 들어간다. 그래서 밑에서 꼼수로 +1 해줌
-	// 하지만 unsigned char 255인 녀석(signed char -1)은 오버플로우 되면서 0이 되므로... risk!
 	while ( !flag )
 	{
 		for ( DWORD i = 0; i < mServerSendKeySet.dwDataLen; ++i )
 		{
-			if ( mServerSendKeySet.pbKeyBlob[i] == (UCHAR)255 )
+			if ( mServerSendKeySet.pbKeyBlob[i] == (UCHAR)0 )
 			{
 				printf_s( "키 재생성! \n" );
-				mCrypt.GenerateKey( &mPrivateKeySet, &mServerSendKeySet );
+				mEncrypt.GenerateKey( &mPrivateKeySet, &mServerSendKeySet );
 				break;
 			}
 
@@ -327,10 +320,10 @@ void Session::CryptAction( PBYTE original, int originalSize, PBYTE crypted )
 {
 	if ( IsEncrypt() )
 	{
-		mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
-
-		if ( !mCrypt.EncryptData( mPrivateKeySet.hSessionKey, original, originalSize, crypted ) )
+		if ( !mEncrypt.EncryptData( mPrivateKeySet.hSessionKey, original, originalSize, crypted ) )
+		{
 			printf_s( "Encrypt failed error \n" );
+		}
 	}
 }
 
@@ -338,9 +331,9 @@ void Session::DecryptAction( PBYTE crypted, int crypedSize )
 {
 	if ( IsEncrypt() )
 	{
-		mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
-
-		if ( !mCrypt.DecryptData( mPrivateKeySet.hSessionKey, crypted, crypedSize ) )
+		if ( !mEncrypt.DecryptData( mPrivateKeySet.hSessionKey, crypted, crypedSize ) )
+		{
 			printf_s( "decrypt failed error \n" );
+		}
 	}
 }

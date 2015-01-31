@@ -42,11 +42,7 @@ void Player::ResponseCrypt()
 	
 	char* key = new char[len];
 	memcpy( key, mSession->GetKeyBlob(), len );
-
-	// 널문자 때문에 제대로 안 들어가므로 +1씩 더해준다. 뜯을 때 -1 해주자
-	for ( size_t i = 0; i < len; ++i )
-		(UCHAR)key[i]++;
-	
+		
 	cryptResult.mutable_sendkey()->set_keyblob( key );
 	delete key;
 

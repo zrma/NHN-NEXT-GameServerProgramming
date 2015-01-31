@@ -59,8 +59,6 @@ KeyChanger::~KeyChanger()
 
 bool KeyChanger::GenerateKey( KeyPrivateSets* keyPrivateSets, KeySendingSets* keySendingSets )
 {
-
-
 	HCRYPTPROV hProvParty1 = keyPrivateSets->hProvParty;
 	HCRYPTKEY hPrivateKey1 = keyPrivateSets->hPrivateKey;
 	DWORD dwDataLen1 = keySendingSets->dwDataLen;
@@ -127,14 +125,7 @@ bool KeyChanger::GenerateKey( KeyPrivateSets* keyPrivateSets, KeySendingSets* ke
 	{
 		return false;
 	}
-
-
-
-
-
-
-
-
+	
 	// Get the size for the key BLOB.
 	fReturn = CryptExportKey(
 		hPrivateKey1,
@@ -147,9 +138,7 @@ bool KeyChanger::GenerateKey( KeyPrivateSets* keyPrivateSets, KeySendingSets* ke
 	{
 		return false;
 	}
-
-
-
+	
 	// Allocate the memory for the key BLOB.
 	if ( !( pbKeyBlob1 = (PBYTE)malloc( dwDataLen1 ) ) )
 	{
@@ -240,11 +229,7 @@ bool KeyChanger::EncryptData( HCRYPTKEY sessionKey, BYTE* originalData, int orig
 	{
 		return false;
 	}
-
-
-
-
-
+	
 	/************************
 	Encrypt some data with party 1's session key.
 	************************/
