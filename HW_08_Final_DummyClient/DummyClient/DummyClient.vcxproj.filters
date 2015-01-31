@@ -90,7 +90,16 @@
     <ClInclude Include="Player.h">
       <Filter>Contents</Filter>
     </ClInclude>
-    <ClInclude Include="KeyChanger.h">
+    <ClInclude Include="Crypter.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyExchanger.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemIncludes.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
+    <ClInclude Include="ULong.h">
       <Filter>Packet</Filter>
     </ClInclude>
   </ItemGroup>
@@ -142,9 +151,6 @@
     </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Contents</Filter>
-    </ClCompile>
-    <ClCompile Include="KeyChanger.cpp">
-      <Filter>Packet</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

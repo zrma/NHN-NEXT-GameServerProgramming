@@ -48,9 +48,33 @@ int _tmain( int argc, _TCHAR* argv[] )
 		'k', 'l', 'm', 'n', 'o',
 		0 };
 
-	alice.Encrypt( test, 6 );
-	bob.Decrypt( test, 3 );
-	bob.Decrypt( test + 3, 3 );
+	int count = 0;
+	while ( count < 15 )
+	{
+		int randomNum = (int)( rand() * 5 );
+
+		if ( count + randomNum > 15 )
+		{
+			randomNum = 15 - count;
+		}
+
+		alice.Encrypt( test + count, randomNum );
+		count += randomNum;
+	}
+	count = 0;
+
+	while ( count < 15 )
+	{
+		int randomNum = (int)( rand() * 5 );
+
+		if ( count + randomNum > 15 )
+		{
+			randomNum = 15 - count;
+		}
+
+		bob.Decrypt( test + count, randomNum );
+		count += randomNum;
+	}
 
 	std::cout << "\n\n" << test << std::endl;
 

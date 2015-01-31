@@ -95,12 +95,13 @@
   <ItemGroup>
     <ClInclude Include="CircularBuffer.h" />
     <ClInclude Include="ClientSession.h" />
+    <ClInclude Include="Crypter.h" />
     <ClInclude Include="DummyClient.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FastSpinlock.h" />
     <ClInclude Include="IocpManager.h" />
     <ClInclude Include="IoThread.h" />
-    <ClInclude Include="KeyChanger.h" />
+    <ClInclude Include="KeyExchanger.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="MemoryPool.h" />
     <ClInclude Include="mypacket.pb.h" />
@@ -110,9 +111,11 @@
     <ClInclude Include="SessionManager.h" />
     <ClInclude Include="StackWalker.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="SystemIncludes.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="ThreadLocal.h" />
     <ClInclude Include="TypeTraits.h" />
+    <ClInclude Include="ULong.h" />
     <ClInclude Include="XTL.h" />
   </ItemGroup>
   <ItemGroup>
@@ -123,7 +126,6 @@
     <ClCompile Include="FastSpinlock.cpp" />
     <ClCompile Include="IocpManager.cpp" />
     <ClCompile Include="IoThread.cpp" />
-    <ClCompile Include="KeyChanger.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="MemoryPool.cpp" />
     <ClCompile Include="mypacket.pb.cc" />

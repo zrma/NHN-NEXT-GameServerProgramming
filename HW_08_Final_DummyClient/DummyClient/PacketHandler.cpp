@@ -98,7 +98,7 @@ REGISTER_HANDLER( PKT_SC_CRYPT )
 	}
 
 	MyPacket::SendingKeySet keySet = inPacket.sendkey();
-	session->SetReceiveKeySet( keySet );
+	session->SetReceiveKey( keySet );
 
 	printf_s( "서버의 키를 받음 \n" );
 

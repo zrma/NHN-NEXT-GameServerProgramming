@@ -29,10 +29,8 @@ public:
 
 
 private:
-
 	void PlayerReset();
 	
-
 private:
 
 	FastSpinlock mPlayerLock;

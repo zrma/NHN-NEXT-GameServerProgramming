@@ -23,10 +23,17 @@ void Player::PlayerReset()
 
 void Player::RequestCrypt( MyPacket::CryptRequest cryptRequest )
 {
-	mSession->KeyInit();
-
+	mSession->CrypterInit();
 	MyPacket::SendingKeySet keySet = cryptRequest.sendkey();
-	mSession->SetReceiveKeySet( keySet );
+	
+	std::vector<char> receiveKey;
+
+	for ( size_t i = 0; i < keySet.datalen(); ++i )
+	{
+		receiveKey.push_back( keySet.keyblob().at( i ) );
+	}
+
+	mSession->SetReceiveKey( receiveKey );
 
 	// printf_s( "Crypting \n" );
 
@@ -35,14 +42,20 @@ void Player::RequestCrypt( MyPacket::CryptRequest cryptRequest )
 
 void Player::ResponseCrypt()
 {
-	MyPacket::CryptResult cryptResult;
+	const std::vector<char>& keySet = mSession->GetExchangeKey();
+	int len = keySet.size();
 
-	DWORD len = mSession->GetKeyDataLen();
+	MyPacket::CryptResult cryptResult;
 	cryptResult.mutable_sendkey()->set_datalen( len );
-	
+
 	char* key = new char[len];
-	memcpy( key, mSession->GetKeyBlob(), len );
-		
+	char* keyCur = key;
+
+	for each ( char c in keySet )
+	{
+		( *keyCur++ ) = c;
+	}
+
 	cryptResult.mutable_sendkey()->set_keyblob( key );
 	delete key;
 
@@ -159,11 +172,6 @@ void Player::ResponseChat()
 
 	mSession->SendRequest( MyPacket::PKT_SC_CHAT, chatResult );
 }
-
-
-
-
-
 
 //세 번째에 map 크기 인자를 넣어서 크기를 넘지 않도록 해야되지 않을까...
 float RandomFloat( float a, float b )

@@ -163,7 +163,7 @@ bool Session::FlushSend()
 	sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
 
 	//암호화
-	CryptAction( (PBYTE)sendContext->mWsaBuf.buf, sendContext->mWsaBuf.len, (PBYTE)sendContext->mWsaBuf.buf );
+	Crypt( sendContext->mWsaBuf.buf, sendContext->mWsaBuf.len );
 		
 	/// start async send
 	if (SOCKET_ERROR == WSASend(mSocket, &sendContext->mWsaBuf, 1, &sendbytes, flags, (LPWSAOVERLAPPED)sendContext, NULL))
@@ -212,10 +212,10 @@ void Session::RecvCompletion(DWORD transferred)
 
 	mRecvBuffer.Commit(transferred);
 
-	//암호 해제 구간
-	DecryptAction( (PBYTE)mRecvBuffer.GetBufferStart(), transferred );
+	// 암호 해제 구간
+	Decrypt( mRecvBuffer.GetBufferStart(), transferred );
 	
-	//받고서 바로 패킷 처리 작업 진행
+	// 받고서 바로 패킷 처리 작업 진행
 	OnReceive( transferred );
 }
 
@@ -250,90 +250,34 @@ void Session::EchoBack()
 		return;
 
 	mRecvBuffer.Remove(len);
-
 }
 
-void Session::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
+void Session::CrypterInit()
 {
-	mReceiveKeySet.dwDataLen = keySet.datalen();
-	
-	if ( mReceiveKeySet.dwDataLen == 0 )
-	{
-		printf_s( "Key Length error - 0" );
-		return;
-	}
+	mCrypter.GenerateExchangeKey();
+}
 
-	if ( mKeyBlob )
-	{
-		delete mKeyBlob;
-		mKeyBlob = nullptr;
-	}
+Session::KeySet& Session::GetExchangeKey()
+{
+	return mCrypter.GetExchangeKey();
+}
 
-	mKeyBlob = new BYTE[mReceiveKeySet.dwDataLen];
-	memcpy( mKeyBlob, keySet.keyblob().data(), mReceiveKeySet.dwDataLen );
-	
-	mReceiveKeySet.pbKeyBlob = mKeyBlob;
-	mEncrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
-
+void Session::SetReceiveKey( KeySet& receiveKey )
+{
+	mCrypter.CreateSharedKey( receiveKey );
 	mIsEncrypt = true;
 }
 
-void Session::KeyInit()
-{
-	memset( &mPrivateKeySet, 0, sizeof( KeyPrivateSets ) );
-	memset( &mReceiveKeySet, 0, sizeof( KeySendingSets ) );
-	memset( &mServerSendKeySet, 0, sizeof( KeySendingSets ) );
-
-	memset( &mKeyBlob, 0, sizeof( BYTE ) * 8 );
-
-	mEncrypt.GenerateKey( &mPrivateKeySet, &mServerSendKeySet );
-
-	bool flag = false;
-
-	while ( !flag )
-	{
-		for ( DWORD i = 0; i < mServerSendKeySet.dwDataLen; ++i )
-		{
-			if ( mServerSendKeySet.pbKeyBlob[i] == (UCHAR)0 )
-			{
-				printf_s( "키 재생성! \n" );
-				mEncrypt.GenerateKey( &mPrivateKeySet, &mServerSendKeySet );
-				break;
-			}
-
-			flag = true;
-		}
-	}
-}
-
-DWORD Session::GetKeyDataLen()
-{
-	return mServerSendKeySet.dwDataLen;
-}
-
-char* Session::GetKeyBlob()
-{
-	return (char*)mServerSendKeySet.pbKeyBlob;
-}
-
-void Session::CryptAction( PBYTE original, int originalSize, PBYTE crypted )
+void Session::Crypt( char* originalData, int dataSize )
 {
 	if ( IsEncrypt() )
-	{
-		if ( !mEncrypt.EncryptData( mPrivateKeySet.hSessionKey, original, originalSize, crypted ) )
-		{
+		if ( !mCrypter.Encrypt( originalData, dataSize ) )
 			printf_s( "Encrypt failed error \n" );
-		}
-	}
 }
 
-void Session::DecryptAction( PBYTE crypted, int crypedSize )
+void Session::Decrypt( char* encryptedData, int dataSize )
 {
 	if ( IsEncrypt() )
-	{
-		if ( !mEncrypt.DecryptData( mPrivateKeySet.hSessionKey, crypted, crypedSize ) )
-		{
+		if ( !mCrypter.Encrypt( encryptedData, dataSize ) )
 			printf_s( "decrypt failed error \n" );
-		}
-	}
 }

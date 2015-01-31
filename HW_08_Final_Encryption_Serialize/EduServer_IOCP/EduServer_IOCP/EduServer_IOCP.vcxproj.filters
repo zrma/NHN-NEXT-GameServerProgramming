@@ -92,7 +92,16 @@
     <ClInclude Include="World.h">
       <Filter>Contents</Filter>
     </ClInclude>
-    <ClInclude Include="KeyChanger.h">
+    <ClInclude Include="Crypter.h">
+      <Filter>Cryption</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyExchanger.h">
+      <Filter>Cryption</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemIncludes.h">
+      <Filter>Cryption</Filter>
+    </ClInclude>
+    <ClInclude Include="ULong.h">
       <Filter>Cryption</Filter>
     </ClInclude>
   </ItemGroup>
@@ -153,9 +162,6 @@
     </ClCompile>
     <ClCompile Include="PacketHandler.cpp">
       <Filter>PacketHandler</Filter>
-    </ClCompile>
-    <ClCompile Include="KeyChanger.cpp">
-      <Filter>Cryption</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

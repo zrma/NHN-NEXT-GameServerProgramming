@@ -48,6 +48,7 @@ void ClientSession::SessionReset()
 	mSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
 
 	mPlayer.PlayerReset();
+	mIsEncrypt = false;
 }
 
 bool ClientSession::PostAccept()

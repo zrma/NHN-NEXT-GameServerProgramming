@@ -38,8 +38,6 @@ ClientSession::ClientSession() : mRecvBuffer(BUFFER_SIZE), mSendBuffer(BUFFER_SI
 	{
 		printf( "Bind failed: %d\n", WSAGetLastError() );
 	}
-
-	memset( &mKeyBlob, 0, sizeof( BYTE ) * 8 );
 }
 
 void ClientSession::SessionReset()
@@ -53,12 +51,6 @@ void ClientSession::SessionReset()
 
 	mIsEncrypt = false;
 	
-	memset( &mPrivateKeySet, 0, sizeof( KeyPrivateSets ) );
-	memset( &mCliSendKeySet, 0, sizeof( KeySendingSets ) );
-	memset( &mReceiveKeySet, 0, sizeof( KeySendingSets ) );
-
-	memset( &mKeyBlob, 0, sizeof( BYTE ) * 8 );
-
 	LINGER lingerOption;
 	lingerOption.l_onoff = 1;
 	lingerOption.l_linger = 0;
@@ -188,37 +180,21 @@ void ClientSession::ConnectCompletion()
 
 	//////////////////////////////////////////////////////////////////////////
 	// 여기부터 로그인 리퀘스트 패킷 조합
-	mCrypt.GenerateKey( &mPrivateKeySet, &mCliSendKeySet );
-	
-	bool flag = false;
+	mCrypter.GenerateExchangeKey();
 
-	// 키가 유효할 때까지(255가 없을 때까지) 계속 뽑아준다.
-	// Why -> 널 문자 때문에 제대로 안 들어간다. 그래서 밑에서 꼼수로 +1 해줌
-	// 하지만 unsigned char 255인 녀석(signed char -1)은 오버플로우 되면서 0이 되므로... risk!
-	while ( !flag )
-	{
-		for ( DWORD i = 0; i < mCliSendKeySet.dwDataLen; ++i )
-		{
-			if ( mCliSendKeySet.pbKeyBlob[i] == (UCHAR)255 )
-			{
-				printf_s( "키 재생성! \n" );
-				mCrypt.GenerateKey( &mPrivateKeySet, &mCliSendKeySet );
-				break;
-			}
-
-			flag = true;
-		}
-	}
+	std::vector<char>& keySet = mCrypter.GetExchangeKey();
+	int len = keySet.size();
 
 	MyPacket::CryptRequest cryptRequest;
-	cryptRequest.mutable_sendkey()->set_datalen( mCliSendKeySet.dwDataLen );
-	
-	char* key = new char[mCliSendKeySet.dwDataLen];
-	memcpy( key, mCliSendKeySet.pbKeyBlob, mCliSendKeySet.dwDataLen );
+	cryptRequest.mutable_sendkey()->set_datalen( len );
 
-	// 널문자 때문에 제대로 안 들어가므로 +1씩 더해준다. 뜯을 때 -1 해주자
-	for ( size_t i = 0; i < mCliSendKeySet.dwDataLen; ++i )
-		key[i]++;
+	char* key = new char[len];
+	char* keyCur = key;
+
+	for each( char c in keySet )
+	{
+		( *keyCur++ ) = c;
+	}
 
 	cryptRequest.mutable_sendkey()->set_keyblob( key );
 	delete key;
@@ -228,33 +204,16 @@ void ClientSession::ConnectCompletion()
 	++mUseCount;
 }
 
-void ClientSession::SetReceiveKeySet( MyPacket::SendingKeySet keySet )
+void ClientSession::SetReceiveKey( MyPacket::SendingKeySet keySet )
 {
-	mReceiveKeySet.dwDataLen = keySet.datalen();
-		
-	if ( mReceiveKeySet.dwDataLen == 0 )
+	std::vector<char> receiveKey;
+
+	for ( size_t i = 0; i < keySet.datalen(); ++i )
 	{
-		printf_s( "Key Length error - 0" );
-		return;
+		receiveKey.push_back( keySet.keyblob().at( i ) );
 	}
 
-	if ( mKeyBlob )
-	{
-		delete mKeyBlob;
-		mKeyBlob = nullptr;
-	}
-
-	mKeyBlob = new BYTE[mReceiveKeySet.dwDataLen];
-	memcpy( mKeyBlob, keySet.keyblob().data(), mReceiveKeySet.dwDataLen );
-
-	// 널문자 때문에 +1 더해준 것 -1
-	for ( size_t i = 0; i < mReceiveKeySet.dwDataLen; ++i )
-		( UCHAR )--mKeyBlob[i];
-	
-	mReceiveKeySet.pbKeyBlob = mKeyBlob;
-
-	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
-
+	mCrypter.CreateSharedKey( receiveKey );
 	mIsEncrypt = true;
 }
 
@@ -357,12 +316,9 @@ void ClientSession::RecvCompletion(DWORD transferred)
 
 	// 암호화
 	if ( IsEncrypt() )
-	{
-		mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
-
-		if ( !mCrypt.DecryptData( mPrivateKeySet.hSessionKey, (PBYTE)mRecvBuffer.GetBufferStart(), transferred ) )
+		if ( !mCrypter.Encrypt( mRecvBuffer.GetBufferStart(), transferred ) )
 			printf_s( "RecvCompletion - decrypt failed error \n" );
-	}
+
 	OnRead( transferred );
 }
 
@@ -482,9 +438,7 @@ bool ClientSession::FlushSend()
 	sendContext->mWsaBuf.len = (ULONG)mSendBuffer.GetContiguiousBytes();
 	sendContext->mWsaBuf.buf = mSendBuffer.GetBufferStart();
 
-	mCrypt.GetSessionKey( &mPrivateKeySet, &mReceiveKeySet );
-
-	if ( !mCrypt.EncryptData( mPrivateKeySet.hSessionKey, (PBYTE)sendContext->mWsaBuf.buf, sendContext->mWsaBuf.len, (PBYTE)sendContext->mWsaBuf.buf ) )
+	if ( !mCrypter.Encrypt( sendContext->mWsaBuf.buf, sendContext->mWsaBuf.len ) )
 		printf_s( "FlushSend - Encrypt failed error \n" );
 	
 	/// start async send

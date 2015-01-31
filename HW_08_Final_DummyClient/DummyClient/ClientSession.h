@@ -3,7 +3,7 @@
 #include "MemoryPool.h"
 #include "CircularBuffer.h"
 #include "ProtoHeader.h"
-#include "KeyChanger.h"
+#include "Crypter.h"
 
 #define BUFSIZE	65536
 
@@ -114,7 +114,7 @@ public:
 	bool	IsEncrypt() const { return mIsEncrypt; }
 	bool	SetEncrypt( bool flag = true ) { mIsEncrypt = flag; }
 
-	void	SetReceiveKeySet( MyPacket::SendingKeySet keySet );
+	void	SetReceiveKey( MyPacket::SendingKeySet keySet );
 
 	void	DisconnectRequest( DisconnectReason dr );
 	void	DisconnectCompletion( DisconnectReason dr );
@@ -150,18 +150,11 @@ private:
 	long long		mRecvBytes = 0;
 	long			mUseCount = 0;
 
+	//////////////////////////////////////////////////////////////////////////
+	// 암호화 관련
 	bool			mIsEncrypt = false;
-
-	// 키 생성 및 암/복호화 클래스
-	KeyChanger		mCrypt;
-	// 내가 사용할 비밀키
-	KeyPrivateSets	mPrivateKeySet;
-	// 내가 상대방에게 보낼 공개키
-	KeySendingSets	mCliSendKeySet;
-	// 상대가 나한테 보내준 공개키
-	KeySendingSets	mReceiveKeySet;
-
-	PBYTE			mKeyBlob = nullptr;
+	Crypter			mCrypter;
+	//////////////////////////////////////////////////////////////////////////
 
 	friend class SessionManager;
 };

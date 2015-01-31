@@ -2,8 +2,7 @@
 #include "CircularBuffer.h"
 #include "OverlappedIOContext.h"
 #include "PacketHeader.h"
-#include "KeyChanger.h"
-
+#include "Crypter.h"
 
 class Session
 {
@@ -40,17 +39,18 @@ public:
 	CircularBuffer GetSendBuffer() const { return mSendBuffer; }
 
 	void EchoBack();
+	
 
+	void	CrypterInit();
 
-	void KeyInit();
-	DWORD GetKeyDataLen();
-	char* GetKeyBlob();
-	void CryptAction( PBYTE original, int originalSize, PBYTE crypted );
-	void DecryptAction( PBYTE crypted, int crypedSize );
+	typedef std::vector < char > KeySet;
+	KeySet&	GetExchangeKey();
+	void	SetReceiveKey( KeySet& receiveKey );
 
-	void SetReceiveKeySet( MyPacket::SendingKeySet keySet );
+	void	Crypt( char* originalData, int dataSize );
+	void	Decrypt( char* encryptedData, int dataSize );
 
-	bool IsEncrypt() const { return mIsEncrypt; }
+	bool	IsEncrypt() const { return mIsEncrypt; }
 
 protected:
 
@@ -67,24 +67,8 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	// 암호화 관련
 	bool			mIsEncrypt = false;
-
-	// 키 생성 및 암호화 클래스
-	KeyChanger		mEncrypt;
-	// 키 생성 및 복호화 클래스
-	KeyChanger		mDecrypt;
-
-	// 내가 사용할 비밀키
-	KeyPrivateSets	mPrivateKeySet;
-	// 내가 상대방에게 보낼 공개키
-	KeySendingSets	mServerSendKeySet;
-	// 상대가 나한테 보내준 공개키
-	KeySendingSets	mReceiveKeySet;
-
-	PBYTE			mKeyBlob = nullptr;
-
+	Crypter			mCrypter;
 	//////////////////////////////////////////////////////////////////////////
-
-
 };
 
 
