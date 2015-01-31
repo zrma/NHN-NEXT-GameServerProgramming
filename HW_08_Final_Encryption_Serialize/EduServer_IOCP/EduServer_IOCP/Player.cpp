@@ -23,14 +23,14 @@ void Player::PlayerReset()
 
 void Player::RequestCrypt( MyPacket::CryptRequest cryptRequest )
 {
-	mSession->CrypterInit();
+	// mSession->CrypterInit();
 	MyPacket::SendingKeySet keySet = cryptRequest.sendkey();
 	
 	std::vector<char> receiveKey;
 
 	for ( size_t i = 0; i < keySet.datalen(); ++i )
 	{
-		receiveKey.push_back( keySet.keyblob().at( i ) );
+		receiveKey.push_back( keySet.keyblob().c_str()[i] );
 	}
 
 	mSession->SetReceiveKey( receiveKey );

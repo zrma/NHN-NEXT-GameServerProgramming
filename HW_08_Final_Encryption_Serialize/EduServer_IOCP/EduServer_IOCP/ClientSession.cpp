@@ -226,10 +226,10 @@ bool ClientSession::SendRequest( short packetType, const google::protobuf::Messa
 				DisconnectRequest( DR_SENDFLUSH_ERROR );
 				return true;
 			}
-
 		}
 
-		// printf_s( "Crypting_3 \n" );
+		printf_s( "Crypting \n" );
+		
 		mSendPendingCount++;
 	}
 	else

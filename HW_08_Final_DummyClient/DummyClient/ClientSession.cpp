@@ -210,7 +210,7 @@ void ClientSession::SetReceiveKey( MyPacket::SendingKeySet keySet )
 
 	for ( size_t i = 0; i < keySet.datalen(); ++i )
 	{
-		receiveKey.push_back( keySet.keyblob().at( i ) );
+		receiveKey.push_back( keySet.keyblob().c_str()[i] );
 	}
 
 	mCrypter.CreateSharedKey( receiveKey );
