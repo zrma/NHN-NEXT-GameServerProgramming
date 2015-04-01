@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{EC99B5C8-7279-437B-B508-B3E574320EA7}</ProjectGuid>
+    <ProjectGuid>{72C74A27-0016-4065-A58C-46264FE425EF}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>DiffieHellmanTest1</RootNamespace>
+    <RootNamespace>DiffieHellmanKeyExchange</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -79,15 +79,13 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Crypter.h" />
-    <ClInclude Include="KeyExchanger.h" />
+    <ClInclude Include="DHKeyExchanger.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="SystemIncludes.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="ULong.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Diffie-HellmanTest1.cpp" />
+    <ClCompile Include="DHKeyExchanger.cpp" />
+    <ClCompile Include="DiffieHellmanKeyExchange.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
