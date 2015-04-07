@@ -108,3 +108,46 @@ BOOL DHKeyExchanger::CreatePrivateKey()
 
 	return fReturn;
 }
+
+BOOL DHKeyExchanger::BuildPublicKey()
+{
+	BOOL fReturn = FALSE;
+
+	do
+	{
+		/************************
+		Export Party 1's public key.
+		************************/
+		// Public key value, (G^X) mod P is calculated.
+		DWORD dwDataLen1;
+
+		// Get the size for the key BLOB.
+		fReturn = CryptExportKey( hPrivateKey1, NULL, PUBLICKEYBLOB, 0, NULL, &dwDataLen1 );
+		if ( !fReturn )
+		{
+			break;
+		}
+
+		if ( pbKeyBlob1 )
+		{
+			free( pbKeyBlob1 );
+			pbKeyBlob1 = NULL;
+		}
+
+		// Allocate the memory for the key BLOB.
+		if ( !(pbKeyBlob1 = (PBYTE)malloc( dwDataLen1 )) )
+		{
+			break;
+		}
+
+		// Get the key BLOB.
+		fReturn = CryptExportKey( hPrivateKey1, 0, PUBLICKEYBLOB, 0, pbKeyBlob1, &dwDataLen1 );
+		if ( !fReturn )
+		{
+			break;
+		}
+
+	} while ( false );
+
+	return fReturn;
+}

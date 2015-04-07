@@ -49,6 +49,8 @@ public:
 	void	Release();
 
 	BOOL	CreatePrivateKey();
+	BOOL	BuildPublicKey();
+
 
 private:
 	HCRYPTPROV	hProvParty1 = NULL;
